@@ -66,6 +66,10 @@ TOKEN : /* TIPOS DE DATOS */
   {
     System.out.println("DECIMAL");
   }
+| < tBOOLEANO : "booleano" >
+  {
+    System.out.println("BOOLEANO");
+  }
 }
 
 TOKEN : /* AGRUPACIONES */
