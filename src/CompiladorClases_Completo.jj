@@ -97,10 +97,6 @@ TOKEN : /* TIPOS DE DATOS */
   {
     System.out.println("ENTERO");
   }
-| < tDECIMAL : "decimal" >
-  {
-    System.out.println("DECIMAL");
-  }
 | < tBOOLEANO : "booleano" >
   {
     System.out.println("BOOLEANO");
@@ -136,23 +132,24 @@ TOKEN : /* VALORES */
   < #DIGITO : ["0"-"9"] >
 | < #LETRA : ["a"-"z","_","0"-"9"] >
 | < #BOOLEAN : "true" | "false" >
-| < #ID : "/^([a-z,_])([a-z,_,0-9]+)([a-z,0-9])$/" >
+| < #LETRAID_INICIAL : ["a"-"z","_"] >
+| < #LETRAID_FINAL : ["a"-"z","0"-"9"] >
 
 | < tVALOR_ENTERO : ("-")?(< DIGITO >)+ >
   {
     System.out.println("VALOR_ENTERO (Valor: " + matchedToken + ")");
   }
-| <  tVALOR_DECIMAL : ("-")?(< DIGITO >)+"."(< DIGITO >)+ >
+| < tVALOR_CARACTER : ("-")?(< LETRA >) >
   {
-    System.out.println("VALOR_DECIMAL (Valor: " + matchedToken + ")");
-  }
-| <  tIDENTIFICADOR : (< LETRA >)+ >
-  {
-    System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
+    System.out.println("VALOR_CARACTER (Valor: " + matchedToken + ")");
   }
 | < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
+  }  
+| <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) >
+  {
+    System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
   }  
 }
 
