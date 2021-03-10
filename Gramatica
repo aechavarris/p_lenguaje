@@ -1,0 +1,50 @@
+programa ::= <tPROGRAMA> <tIDENTIFICADOR> ";" 
+declaracion_variables declaracion_acciones 
+bloque_sentencias
+declaracion_variables ::= ( declaracion ";" )*
+declaracion ::= tipo_variables identificadores
+tipo_variables ::= <tENTERO> | <tCARACTER> | <tBOOLEANO>
+identificadores ::= <tIDENTIFICADOR> ( "," <tIDENTIFICADOR> )*
+declaracion_acciones ::= ( declaracion_accion )*
+declaracion_accion ::= cabecera_accion ";" 
+declaracion_variables declaracion_acciones bloque_sentencias
+cabecera_accion ::= <tACCION> <tIDENTIFICADOR> parametros_formales
+parametros_formales ::= ...
+lista_parametros	 ::= ...
+parametros ::= clase_parametros tipo_variables lista_parametros
+clase_parametros ::= <tVAL> | <tREF>
+bloque_sentencias ::= <tPRINCIPIO> lista_sentencias <tFIN>
+lista_sentencias	 ::= ...
+sentencia ::= leer ";"
+	| escribir ";"
+	| asignacion
+	| invocacion_accion
+	| seleccion
+	| mientras_que
+leer ::= <tLEER> "(" lista_asignables ")"
+lista_asignables ::= ...
+escribir ::= <tESCRIBIR> "(" lista_escribibles ")"
+lista_escribibles ::= ...
+asignación ::= <tIDENTIFICADOR> <tOPAS> expresion ";"
+invocacion_accion ::= <tIDENTIFICADOR> argumentos ";"
+mientras_que ::= <tMQ> expresion lista_sentencias <tFMQ>
+seleccion ::= ...
+argumentos ::= "(" ( lista_expresiones )? ")"
+lista_expresiones ::= ...
+expresion ::= ...
+operador_relacional ::= ...
+expresion_simple ::= ...
+operador_aditivo ::= ...
+termino ::= ...
+operador_multiplicativo ::= ...
+factor ::= "-" factor
+| <tNOT> factor
+| "(" expresion ")"
+| <tENTACAR> "(" expresion ")"
+| <tCARAENT> "(" expresion ")"
+| <tIDENTIFICADOR>
+| <tCONSTENTERA>
+| <tCONSTCHAR>
+| <tCONSTCAD>
+| <tTRUE>
+| <tFALSE>

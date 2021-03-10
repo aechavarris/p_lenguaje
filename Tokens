@@ -1,0 +1,37 @@
+Palabras reservadas y token asociados que debéis generar:
+
+tPROGRAMA -> programa
+tVAR -> var
+tAND -> and
+tOR -> or
+tNOT -> not
+tPRINCIPIO -> principio
+tFIN -> fin
+tSI -> si
+tENT -> ent
+tSI_NO -> si_no
+tFSI -> fsi
+tMQ -> mq
+tFMQ -> fmq
+tESCRIBIR -> escribir
+tLEER -> leer
+tMOD -> mod
+tENTERO -> entero
+tBOOLEANO -> booleano
+tCARACTER -> caracter
+tTRUE -> true
+tFALSE -> false
+tENTACAR -> entacar
+tCARAENT -> caraent
+tACCION -> accion
+tVAL -> val
+tREF -> ref
+tMAYOR -> >
+tMENOR -> <
+tIGUAL -> =
+tMAI -> >=
+tMEI -> <=
+tNI -> <>
+tOPAS -> :=
+
+Además, debéis considerar los identificadores, las constantes numéricas, los caracteres y las cadenas (ambos delimitados entre comillas dobles), según las especificaciones que se describen en el enunciado de la práctica. 
