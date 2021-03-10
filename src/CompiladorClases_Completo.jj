@@ -46,9 +46,9 @@ SKIP :
 
 TOKEN : /* PALABRAS RESERVADAS */
 {
-  < tCLASE : "clase" >
+  < tPROGRAMA : "programa" >
   {
-    System.out.println("CLASE");
+    System.out.println("PROGRAMA");
   }
 | < tMETODO : "metodo" >
   {
@@ -121,15 +121,20 @@ void programa():
 {
 }
 {
-  < tCLASE > < tIDENTIFICADOR > < tLLAVE_IZQ > (metodo())+ < tLLAVE_DCHA >
+  < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables)+ (declaracion_acciones)+
+  (bloque_sentencias)+
 }
 
 void sentencia():
 {
 }
 {
-  	< tENTERO > < tIDENTIFICADOR > <tASIGNACION > < tVALOR_ENTERO > < tFIN_SENTENCIA >
- | < tDECIMAL > < tIDENTIFICADOR > <tASIGNACION > < tVALOR_DECIMAL > < tFIN_SENTENCIA >
+  	(leer)+ < tFIN_SENTENCIA >
+ |  (escribir)+ < tFIN_SENTENCIA >
+ |  (asignacion)+ 
+ |	(invocacion_accion)+ 
+ |	(seleccion)+ 
+ |	(mientras_que)+ 
 }
 
 void metodo():
@@ -139,3 +144,23 @@ void metodo():
   	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
 }
 
+void declaracion_variables():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void declaracion_acciones():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void bloque_sentencias():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
