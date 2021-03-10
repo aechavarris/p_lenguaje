@@ -71,6 +71,10 @@ TOKEN : /* TIPOS DE DATOS */
   {
     System.out.println("BOOLEANO");
   }
+| < tCARACTER : "caracter" >
+  {
+    System.out.println("CARACTER");
+  }  
 }
 
 TOKEN : /* AGRUPACIONES */
@@ -89,6 +93,8 @@ TOKEN : /* VALORES */
 {
   < #DIGITO : ["0"-"9"] >
 | < #LETRA : ["a"-"z","_","0"-"9"] >
+| < #BOOLEAN : "true" | "false" >
+
 | < tVALOR_ENTERO : ("-")?(< DIGITO >)+ >
   {
     System.out.println("VALOR_ENTERO (Valor: " + matchedToken + ")");
@@ -101,6 +107,10 @@ TOKEN : /* VALORES */
   {
     System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
   }
+| < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
+  {
+    System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
+  }  
 }
 
 
