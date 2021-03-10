@@ -21,15 +21,14 @@ public class CompiladorClases
     	CompiladorClases.programa();
     	System.out.println("Analizado correctamente");
     	
-    } catch (TokenMgrError e) {
-		System.out.println("Error lexico: ");
-
-	} catch (ParseException e) {
-		System.out.println("Error sintactico: ");
-
-	} catch (Error e) {
-		//Error general
-
+    } catch (Exception e) {
+		System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        CompiladorClases.ReInit(System.in);
+	}
+    catch (Error e) { 
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
 	} 
   }
 }
