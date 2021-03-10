@@ -159,6 +159,10 @@ TOKEN : /* OPERADORES */
   {
     System.out.println("FIN_SENTENCIA");
   }
+| <  tCOMA : "," >
+  {
+    System.out.println("COMA");
+  }
 }
 
 
@@ -193,9 +197,15 @@ void declaracion_variables():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	( declaracion ";" )*
 }
 
+void declaracion():
+{
+}
+{
+  	tipo_variables identificadores
+}
 void declaracion_acciones():
 {
 }
