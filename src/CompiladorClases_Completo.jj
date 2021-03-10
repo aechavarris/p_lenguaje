@@ -50,11 +50,46 @@ TOKEN : /* PALABRAS RESERVADAS */
   {
     System.out.println("PROGRAMA");
   }
-| < tMETODO : "metodo" >
+| < tACCION : "accion" >
   {
-    System.out.println("METODO");
+    System.out.println("ACCION");
   }
-  
+| < tPRINCIPIO : "principio" >
+  {
+    System.out.println("PRINCIPIO");
+  }  
+| < tFIN : "fin" >
+  {
+    System.out.println("FIN");
+  }
+| < tMQ : "mq" >
+  {
+    System.out.println("MQ");
+  }
+| < tFMQ : "fmq" >
+  {
+    System.out.println("FMQ");
+  }
+| < tSI : "si" >
+  {
+    System.out.println("SI");
+  }
+| < tFSI : "fsi" >
+  {
+    System.out.println("FSI");
+  }
+| < tESCRIBIR : "escribir" >
+  {
+    System.out.println("ESCRIBIR");
+  }
+| < tENTACAR : "entacar" >
+  {
+    System.out.println("ENTACAR");
+  }
+| < tCARAENT : "caraent" >
+  {
+    System.out.println("CARAENT");
+  }              
 }
 
 TOKEN : /* TIPOS DE DATOS */
