@@ -121,20 +121,20 @@ void programa():
 {
 }
 {
-  < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables)+ (declaracion_acciones)+
-  (bloque_sentencias)+
+  < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables())+ (declaracion_acciones())+
+  (bloque_sentencias())+
 }
 
 void sentencia():
 {
 }
 {
-  	(leer)+ < tFIN_SENTENCIA >
- |  (escribir)+ < tFIN_SENTENCIA >
- |  (asignacion)+ 
- |	(invocacion_accion)+ 
- |	(seleccion)+ 
- |	(mientras_que)+ 
+  	(leer())+ < tFIN_SENTENCIA >
+ |  (escribir())+ < tFIN_SENTENCIA >
+ |  (asignacion())+ 
+ |	(invocacion_accion())+ 
+ |	(seleccion())+ 
+ |	(mientras_que())+ 
 }
 
 void metodo():
@@ -159,6 +159,47 @@ void declaracion_acciones():
 }
 
 void bloque_sentencias():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void leer():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void escribir():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void asignacion():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void invocacion_accion():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+
+void seleccion():
+{
+}
+{
+  	< tMETODO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+}
+void mientras_que():
 {
 }
 {
