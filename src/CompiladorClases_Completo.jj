@@ -20,16 +20,17 @@ public class CompiladorClases
     try { 
     	CompiladorClases.programa();
     	System.out.println("Analizado correctamente");
-    }
-    catch (Exception e) {
-		System.out.println("NOK.");
-        System.out.println(e.getMessage());
-        CompiladorClases.ReInit(System.in);
-	}
-    catch (Error e) { 
-        System.out.println("Oops.");
-        System.out.println(e.getMessage());
-	}
+    	
+    } catch (TokenMgrError e) {
+		//Error léxico
+
+	} catch (ParseException e) {
+		//Error sintáctico
+
+	} catch (Error e) {
+		//Error general
+
+	} 
   }
 }
 
