@@ -197,27 +197,77 @@ void declaracion_variables():
 {
 }
 {
-  	( declaracion ";" )*
+  	( declaracion() ";" )*
 }
 
 void declaracion():
 {
 }
 {
-  	tipo_variables identificadores
+  	tipo_variables() identificadores()
 }
+
+void tipo_variables():
+{
+}
+{
+  	<tENTERO> | <tCARACTER> | <tBOOLEANO>
+}
+
+void identificadores():
+{
+}
+{
+  	<tIDENTIFICADOR> ( "," <tIDENTIFICADOR> )*
+}
+
 void declaracion_acciones():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	( declaracion_accion() )*
+}
+
+void declaracion_accion():
+{
+}
+{
+  	cabecera_accion() ";" declaracion_variables() declaracion_acciones() bloque_sentencias()
+}
+
+void cabecera_accion():
+{
+}
+{
+  	<tACCION> <tIDENTIFICADOR> parametros_formales()
+}
+
+void parametros_formales():
+{
+}
+{
+  	< tFIN_SENTENCIA>
+}
+
+void parametros():
+{
+}
+{
+  	clase_parametros() tipo_variables() lista_parametros()
+}
+
+void clase_parametros():
+{
+}
+{
+  	<tVAL> | <tREF>
 }
 
 void bloque_sentencias():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	<tPRINCIPIO> lista_sentencias() <tFIN>
 }
 
 void leer():
