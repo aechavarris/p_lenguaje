@@ -297,28 +297,64 @@ void leer():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	<tLEER> "(" lista_asignables() ")"
+}
+
+void lista_asignables():
+{
+}
+{
+  	< tFIN_SENTENCIA >
 }
 
 void escribir():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	<tESCRIBIR> "(" lista_escribibles() ")"
+}
+
+void lista_escribibles():
+{
+}
+{
+  	< tFIN_SENTENCIA >
 }
 
 void asignacion():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	<tIDENTIFICADOR> <tOPAS> expresion() ";"
 }
 
 void invocacion_accion():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	<tIDENTIFICADOR> argumentos() ";"
+}
+
+
+void mientras_que():
+{
+}
+{
+  	<tMQ> expresion() lista_sentencias() <tFMQ>
+}
+
+void argumentos():
+{
+}
+{
+  	"(" ( lista_expresiones() )? ")"
+}
+
+void lista_expresiones():
+{
+}
+{
+  	< tFIN_SENTENCIA >
 }
 
 void seleccion():
@@ -327,9 +363,27 @@ void seleccion():
 {
   	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
 }
-void mientras_que():
+
+void expresion():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	< tFIN_SENTENCIA >
+}
+
+void factor():
+{
+}
+{
+  	"-" factor()
+| <tNOT> factor()
+| "(" expresion() ")"
+| <tENTACAR> "(" expresion() ")"
+| <tCARAENT> "(" expresion() ")"
+| <tIDENTIFICADOR>
+| <tCONSTENTERA>
+| <tCONSTCHAR>
+| <tCONSTCAD>
+| <tTRUE>
+| <tFALSE>
 }
