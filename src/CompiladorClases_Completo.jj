@@ -166,20 +166,20 @@ void programa():
 {
 }
 {
-  < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables())+ (declaracion_acciones())+
-  (bloque_sentencias())+
+  < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
+  (bloque_sentencias())
 }
 
 void sentencia():
 {
 }
 {
-  	(leer())+ < tFIN_SENTENCIA >
- |  (escribir())+ < tFIN_SENTENCIA >
- |  (asignacion())+ 
- |	(invocacion_accion())+ 
- |	(seleccion())+ 
- |	(mientras_que())+ 
+  	(leer()) < tFIN_SENTENCIA >
+ |  (escribir()) < tFIN_SENTENCIA >
+ |  (asignacion()) 
+ |	(invocacion_accion())
+ |	(seleccion()) 
+ |	(mientras_que())
 }
 
 void PRINCIPIO():
