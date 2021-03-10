@@ -22,10 +22,10 @@ public class CompiladorClases
     	System.out.println("Analizado correctamente");
     	
     } catch (TokenMgrError e) {
-		//Error léxico
+		System.out.println("Error lexico: ");
 
 	} catch (ParseException e) {
-		//Error sintáctico
+		System.out.println("Error sintactico: ");
 
 	} catch (Error e) {
 		//Error general
@@ -204,6 +204,7 @@ void PRINCIPIO():
 
 void declaracion_variables():
 {
+  
 }
 {
   	( declaracion() ";" )*
