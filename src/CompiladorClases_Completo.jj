@@ -109,7 +109,15 @@ TOKEN : /* TIPOS DE DATOS */
 | < tCARACTER : "caracter" >
   {
     System.out.println("CARACTER");
-  }  
+  }
+| < tVAL : "val" >
+  {
+    System.out.println("VALOR");
+  }
+| < tREF : "ref" >
+  {
+    System.out.println("REFERENCIA");
+  }    
 }
 
 TOKEN : /* AGRUPACIONES */
@@ -129,6 +137,7 @@ TOKEN : /* VALORES */
   < #DIGITO : ["0"-"9"] >
 | < #LETRA : ["a"-"z","_","0"-"9"] >
 | < #BOOLEAN : "true" | "false" >
+| < #ID : "/^([a-z,_])([a-z,_,0-9]+)([a-z,0-9])$/" >
 
 | < tVALOR_ENTERO : ("-")?(< DIGITO >)+ >
   {
