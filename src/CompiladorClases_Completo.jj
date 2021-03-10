@@ -256,6 +256,13 @@ void parametros():
   	clase_parametros() tipo_variables() lista_parametros()
 }
 
+void lista_parametros():
+{
+}
+{
+  	< tFIN_SENTENCIA >
+}
+
 void clase_parametros():
 {
 }
@@ -268,6 +275,13 @@ void bloque_sentencias():
 }
 {
   	<tPRINCIPIO> lista_sentencias() <tFIN>
+}
+
+void lista_sentencias():
+{
+}
+{
+  	< tFIN_SENTENCIA >
 }
 
 void leer():
