@@ -238,28 +238,22 @@ void cabecera_accion():
 {
 }
 {
-  	<tACCION> <tIDENTIFICADOR> parametros_formales()
+  	<tACCION> <tIDENTIFICADOR> "("parametros_formales()")" < tFIN_SENTENCIA >
 }
 
 void parametros_formales():
 {
 }
 {
-  	< tFIN_SENTENCIA>
+   parametros()
+ | parametros()< tFIN_SENTENCIA >(parametros_formales())*
 }
 
 void parametros():
 {
 }
 {
-  	clase_parametros() tipo_variables() lista_parametros()
-}
-
-void lista_parametros():
-{
-}
-{
-  	< tFIN_SENTENCIA >
+  	clase_parametros() tipo_variables() identificadores()
 }
 
 void clase_parametros():
@@ -287,28 +281,14 @@ void leer():
 {
 }
 {
-  	<tLEER> "(" lista_asignables() ")"
-}
-
-void lista_asignables():
-{
-}
-{
-  	< tFIN_SENTENCIA >
+  	<tLEER> "(" identificadores() ")"
 }
 
 void escribir():
 {
 }
 {
-  	<tESCRIBIR> "(" lista_escribibles() ")"
-}
-
-void lista_escribibles():
-{
-}
-{
-  	< tFIN_SENTENCIA >
+  	<tESCRIBIR> "(" identificadores() ")"
 }
 
 void asignacion():
@@ -344,7 +324,7 @@ void lista_expresiones():
 {
 }
 {
-  	< tFIN_SENTENCIA >
+  	expresion()(","expresion())*
 }
 
 void seleccion():
@@ -358,7 +338,19 @@ void expresion():
 {
 }
 {
-  	< tFIN_SENTENCIA >
+   tipo_variables() (operacion() <tIDENTIFICADOR >)*
+ |  < tIDENTIFICADOR >(operacion() tipo_variables())*
+}
+void operacion():
+{
+}
+{
+  	"-"
+	| "+"
+	| "*"
+	| "/"
+	| ":"
+	| "%"
 }
 
 void factor():
