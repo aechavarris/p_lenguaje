@@ -26,13 +26,15 @@ public class minilengcompiler
     catch(TokenMgrError e) {
      
      // ERRORES LEXICOS
-     programa_correcto = 0;
-     String simbolo = String.valueOf(minilengcompilerTokenManager.input_stream.readChar());
-     String fil = String.valueOf(minilengcompilerTokenManager.input_stream.getEndLine());
-     String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
+     try {
+		String simbolo = String.valueOf(minilengcompilerTokenManager.input_stream.readChar());
+        String fil = String.valueOf(minilengcompilerTokenManager.input_stream.getEndLine());
+        String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
      
-     System.err.println("ERROR LÉXICO (<" + fil + ", " + col + ">): símbolo no reconocido: <" + simbolo + ">");
-     return;
+        System.err.println("ERROR LÉXICO (<" + fil + ", " + col + ">): símbolo no reconocido: <" + simbolo + ">");
+        return;
+     }  
+     catch (Exception ex) { }
     }
     catch (Exception e) {
 		System.out.println("NOK.");
@@ -68,9 +70,21 @@ PARSER_END(minilengcompiler)
   "%%" : DEFAULT
 }
 
-< COMBLOCK,COMLINE >MORE :
+
+< COMLINE >MORE :
 {
-  <~[]>
+  <(~["\n"])*"\n">
+  {
+   System.out.println("COMENTARIO");
+   }
+}
+
+< COMBLOCK >MORE :
+{
+  <("%")?~["%"])*"%%">
+  {
+   System.out.println("COMENTARIO DOBLE");
+   }
 }
 
 
