@@ -10,16 +10,16 @@ options
   ignore_case = true;
 }
 
-PARSER_BEGIN(CompiladorClases)
+PARSER_BEGIN(minilengcompiler)
 
-public class CompiladorClases
+public class minilengcompiler
 {
   public static void main(String args []) throws ParseException
   {
-    CompiladorClases parser = new CompiladorClases(System.in);
+    minilengcompiler parser = new minilengcompiler(System.in);
     System.out.println("Leyendo de la entrada estandar...");
     try { 
-    	CompiladorClases.programa();
+    	minilengcompiler.programa();
     	System.out.println("Analizado correctamente");
     	
     }
@@ -37,7 +37,7 @@ public class CompiladorClases
     catch (Exception e) {
 		System.out.println("NOK.");
         System.out.println(e.getMessage());
-        CompiladorClases.ReInit(System.in);
+        minilengcompiler.ReInit(System.in);
 	}
     catch (Error e) { 
         System.out.println("Oops.");
