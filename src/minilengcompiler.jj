@@ -542,7 +542,7 @@ void factor():
 | <tIDENTIFICADOR>
 | <tENTERO>
 | <tCARACTER>
-| <tCONSTCAD>
+| <tVALOR_CADENA>
 | <tTRUE>
 | <tFALSE>
 }
