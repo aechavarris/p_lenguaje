@@ -402,35 +402,45 @@ void expresion():
 {
 }
 {
-   operador_relacional()
- | expresion_simple()
- | operador_aditivo()
- | termino()
- | operador_multiplicativo()
+   operador_relacional()(expresion())*
+ | expresion_simple()(expresion())*
+ | operador_aditivo()(expresion())*
+ | termino()(expresion())*
+ | operador_multiplicativo()(expresion())*
  
 }
 void operador_relacional():
 {
 }
 {
-	 "<"
-	| ">"
-	| "<="
-	| ">="
+	 factor()"<"factor()
+	| factor()">"factor()
+	| factor()"<="factor()
+	| factor()">="factor()
+	| factor()"=="factor()
+	| factor()"<"factor()operador()
+	| factor()">"factor()operador()
+	| factor()"<="factor()operador()
+	| factor()">="factor()operador()
+	| factor()"=="factor()operador()
 }
 
 void expresion_simple():
 {
 }
 {
+  factor()
 }
 
 void operador_aditivo():
 {
 }
 {
-  "-"
-	| "+"
+  factor()"-"factor()
+	| factor()"+"factor()
+	| factor()"-"factor()operador()
+	| factor()"+"factor()operador()
+	 
 }
 void termino()
 {
@@ -443,10 +453,27 @@ void operador_multiplicativo():
 {
 }
 {
-  "*"
-	| ":"
+  factor()"*"factor()
+	| factor()":"factor()
+	| factor()"*"factor()operador()
+	| factor()":"factor()operador()
 }
 
+void operador():
+{
+}
+{
+	"+"
+| "-"
+| "<"
+| ">"
+| "<"
+| ">="
+| "<="
+| "*"
+| "/"
+| ":"
+}
 void factor():
 {
 }
