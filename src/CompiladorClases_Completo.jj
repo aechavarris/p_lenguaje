@@ -338,23 +338,49 @@ void expresion():
 {
 }
 {
-   tipo_variables() (operacion() <tIDENTIFICADOR >)*
- |  < tIDENTIFICADOR >(operacion() tipo_variables())*
+   operador_relacional()
+ | expresion_simple()
+ | operador_aditivo()
+ | termino()
+ | operador_multiplicativo()
+ 
 }
-void operacion():
+void operador_relacional():
 {
 }
 {
-  	"-"
-	| "+"
-	| "*"
-	| "/"
-	| ":"
-	| "%"
-	| "<"
+	 "<"
 	| ">"
 	| "<="
 	| ">="
+}
+
+void expresion_simple():
+{
+}
+{
+}
+
+void operador_aditivo():
+{
+}
+{
+  "-"
+	| "+"
+}
+void termino()
+{
+}
+{
+  
+}
+
+void operador_multiplicativo():
+{
+}
+{
+  "*"
+	| ":"
 }
 
 void factor():
