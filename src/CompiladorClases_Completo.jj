@@ -133,7 +133,7 @@ TOKEN : /* PALABRAS RESERVADAS */
   {
     System.out.println("MENOR");
   }
-| < tIGUAL : "=" >
+| < tIGUAL : "==" >
   {
     System.out.println("IGUAL");
   }
@@ -403,9 +403,9 @@ void expresion():
 }
 {
    operador_relacional()(expresion())*
- | expresion_simple()(expresion())*
  | operador_aditivo()(expresion())*
  | termino()(expresion())*
+ | "-"termino()(expresion())*
  | operador_multiplicativo()(expresion())*
  
 }
@@ -425,13 +425,6 @@ void operador_relacional():
 	| factor()"=="factor()operador()
 }
 
-void expresion_simple():
-{
-}
-{
-  factor()
-}
-
 void operador_aditivo():
 {
 }
@@ -442,11 +435,14 @@ void operador_aditivo():
 	| factor()"+"factor()operador()
 	 
 }
-void termino()
+void termino():
 {
 }
 {
-  
+  	factor()
+	| "("factor()")"
+	| factor()operador()
+	| "("factor()")"operador()
 }
 
 void operador_multiplicativo():
