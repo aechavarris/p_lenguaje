@@ -510,14 +510,13 @@ void operador():
 {
 }
 {
-	"+"
-| "-"
-| "<"
-| ">"
-| "<"
-| ">="
-| "<="
-| "*"
+	< tSUMA >
+| < tRESTA >
+| < tMAYOR >
+| < tMENOR >
+| < tMAI >
+| < tMEI >
+| < tMULL >
 | < tDIV >
 | < tMOD >
 }
