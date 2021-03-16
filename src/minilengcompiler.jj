@@ -81,7 +81,7 @@ PARSER_END(minilengcompiler)
 
 < COMBLOCK >MORE :
 {
-  <("%")?~["%"])*"%%">
+  <(("%")?~["%"])*"%%">
   {
    System.out.println("COMENTARIO DOBLE");
    }
