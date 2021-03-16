@@ -81,6 +81,10 @@ TOKEN : /* PALABRAS RESERVADAS */
   {
     System.out.println("ESCRIBIR");
   }
+| < tLEER : "leer" >
+  {
+    System.out.println("LEER");
+  }  
 | < tENTACAR : "entacar" >
   {
     System.out.println("ENTACAR");
@@ -88,7 +92,67 @@ TOKEN : /* PALABRAS RESERVADAS */
 | < tCARAENT : "caraent" >
   {
     System.out.println("CARAENT");
+  }
+| < tAND : "and" >
+  {
+    System.out.println("AND");
   }              
+| < tOR : "or" >
+  {
+    System.out.println("OR");
+  }
+| < tNOT : "not" >
+  {
+    System.out.println("NOT");
+  }
+| < tENT : "ent" >
+  {
+    System.out.println("ENT");
+  }
+| < tSI_NO : "si_no" >
+  {
+    System.out.println("SI_NO");
+  }
+| < tMOD : "mod" >
+  {
+    System.out.println("MOD");
+  }
+| < tTRUE : "true" >
+  {
+    System.out.println("TRUE");
+  }
+| < tFALSE : "false" >
+  {
+    System.out.println("FALSE");
+  }
+| < tMAYOR : ">" >
+  {
+    System.out.println("MAYOR");
+  }
+| < tMENOR : "<" >
+  {
+    System.out.println("MENOR");
+  }
+| < tIGUAL : "=" >
+  {
+    System.out.println("IGUAL");
+  }
+| < tMAI : ">=" >
+  {
+    System.out.println("MAI");
+  }
+| < tMEI : "<=" >
+  {
+    System.out.println("MEI");
+  }
+| < tNI : "<>" >
+  {
+    System.out.println("NI");
+  }
+| < tOPAS : ":=" >
+  {
+    System.out.println("OPAS");
+  }                                 
 }
 
 TOKEN : /* TIPOS DE DATOS */
