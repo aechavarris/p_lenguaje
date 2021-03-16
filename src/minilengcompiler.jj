@@ -108,22 +108,6 @@ TOKEN : /* PALABRAS RESERVADAS */
   {
     System.out.println("FSI");
   }
-| < tESCRIBIR : "escribir" >
-  {
-    System.out.println("ESCRIBIR");
-  }
-| < tLEER : "leer" >
-  {
-    System.out.println("LEER");
-  }  
-| < tENTACAR : "entacar" >
-  {
-    System.out.println("ENTACAR");
-  }
-| < tCARAENT : "caraent" >
-  {
-    System.out.println("CARAENT");
-  }
 | < tAND : "and" >
   {
     System.out.println("AND");
@@ -144,16 +128,32 @@ TOKEN : /* PALABRAS RESERVADAS */
   {
     System.out.println("SI_NO");
   }
-| < tTRUE : "true" >
-  {
-    System.out.println("TRUE");
-  }
-| < tFALSE : "false" >
-  {
-    System.out.println("FALSE");
-  }
 }
 
+TOKEN : /* FUNCIONES */
+{
+  < tMOD : "mod" >
+  {
+    System.out.println("MOD");
+  }
+| < tESCRIBIR : "escribir" >
+  {
+    System.out.println("ESCRIBIR");
+  }
+| < tLEER : "leer" >
+  {
+    System.out.println("LEER");
+  }  
+| < tENTACAR : "entacar" >
+  {
+    System.out.println("ENTACAR");
+  }
+| < tCARAENT : "caraent" >
+  {
+    System.out.println("CARAENT");
+  }  
+}
+  
 TOKEN : /* OPERADORES */
 {
   < tSUMA : "+" >
@@ -176,10 +176,6 @@ TOKEN : /* OPERADORES */
   {
     System.out.println("DIV1");
   }      
-| < tMOD : "mod" >
-  {
-    System.out.println("MOD");
-  }
 | < tMAYOR : ">" >
   {
     System.out.println("MAYOR");
@@ -231,7 +227,15 @@ TOKEN : /* TIPOS DE DATOS */
 | < tREF : "ref" >
   {
     System.out.println("REFERENCIA");
-  }    
+  }
+| < tTRUE : "true" >
+  {
+    System.out.println("TRUE");
+  }
+| < tFALSE : "false" >
+  {
+    System.out.println("FALSE");
+  }      
 }
 
 TOKEN : /* AGRUPACIONES */
@@ -253,15 +257,21 @@ TOKEN : /* VALORES */
 | < #BOOLEAN : "true" | "false" >
 | < #LETRAID_INICIAL : ["a"-"z","_"] >
 | < #LETRAID_FINAL : ["a"-"z","0"-"9"] >
+| < #CARACTER : "\""~["\""] "\"" >
+| < #CADENA : "\""(~["\""])+ "\"" >
 
 | < tVALOR_ENTERO : ("-")?(< DIGITO >)+ >
   {
     System.out.println("VALOR_ENTERO (Valor: " + matchedToken + ")");
   }
-| < tVALOR_CARACTER : ("-")?(< LETRA >) >
+| < tVALOR_CARACTER : ("-")?(< CARACTER >) >
   {
     System.out.println("VALOR_CARACTER (Valor: " + matchedToken + ")");
   }
+| < tVALOR_CADENA : ("-")?(< CADENA >) >
+  {
+    System.out.println("VALOR_CADENA (Valor: " + matchedToken + ")");
+  }  
 | < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
