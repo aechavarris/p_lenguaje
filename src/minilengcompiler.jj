@@ -440,7 +440,6 @@ void operador_relacional():
 {
 }
 {
-<<<<<<< Updated upstream
 	 factor()"<"factor()
 	| factor()">"factor()
 	| factor()"<="factor()
@@ -451,17 +450,6 @@ void operador_relacional():
 	| factor()"<="factor()operador()
 	| factor()">="factor()operador()
 	| factor()"=="factor()operador()
-=======
-  	"-"
-	| "+"
-	| "*"
-	| "/"
-	| ":"
-	| "<"
-	| ">"
-	| "<="
-	| ">="
->>>>>>> Stashed changes
 }
 
 void operador_aditivo():
