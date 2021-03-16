@@ -17,13 +17,14 @@ public class CompiladorClases
   public static void main(String args []) throws ParseException
   {
     CompiladorClases parser = new CompiladorClases(System.in);
-    System.out.println("Leyendo de la entrada estándar...");
+    System.out.println("Leyendo de la entrada estandar...");
     try { 
     	CompiladorClases.programa();
     	System.out.println("Analizado correctamente");
     	
     }
     catch(TokenMgrError e) {
+     
      // ERRORES LEXICOS
      programa_correcto = 0;
      String simbolo = String.valueOf(minilengcompilerTokenManager.input_stream.readChar());
@@ -45,7 +46,7 @@ public class CompiladorClases
   }
 }
 
-PARSER_END(CompiladorClases)
+PARSER_END(minilengcompiler)
 
 < DEFAULT >SKIP :
 {
