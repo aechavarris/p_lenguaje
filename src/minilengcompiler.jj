@@ -73,8 +73,8 @@ PARSER_END(minilengcompiler)
   <~[]>
 }
 
- 
-TOKEN : /* PALABRAS RESERVADAS */
+
+TOKEN : /* CONTROLES DE FLUJO */
 {
   < tPROGRAMA : "programa" >
   {
@@ -83,6 +83,14 @@ TOKEN : /* PALABRAS RESERVADAS */
 | < tACCION : "accion" >
   {
     System.out.println("ACCION");
+  }
+| < tENT : "ent" >
+  {
+    System.out.println("ENT");
+  }
+| < tSI_NO : "si_no" >
+  {
+    System.out.println("SI_NO");
   }
 | < tPRINCIPIO : "principio" >
   {
@@ -107,26 +115,6 @@ TOKEN : /* PALABRAS RESERVADAS */
 | < tFSI : "fsi" >
   {
     System.out.println("FSI");
-  }
-| < tAND : "and" >
-  {
-    System.out.println("AND");
-  }              
-| < tOR : "or" >
-  {
-    System.out.println("OR");
-  }
-| < tNOT : "not" >
-  {
-    System.out.println("NOT");
-  }
-| < tENT : "ent" >
-  {
-    System.out.println("ENT");
-  }
-| < tSI_NO : "si_no" >
-  {
-    System.out.println("SI_NO");
   }
 }
 
@@ -203,7 +191,19 @@ TOKEN : /* OPERADORES */
 | < tOPAS : ":=" >
   {
     System.out.println("OPAS");
-  }                                 
+  }
+| < tAND : "and" >
+  {
+    System.out.println("AND");
+  }              
+| < tOR : "or" >
+  {
+    System.out.println("OR");
+  }
+| < tNOT : "not" >
+  {
+    System.out.println("NOT");
+  }                                   
 }
 
 TOKEN : /* TIPOS DE DATOS */
@@ -283,7 +283,7 @@ TOKEN : /* VALORES */
 }
 
 
-TOKEN : /* OPERADORES */
+TOKEN : /* FINES DE SENTENCIA */
 {
   <  tFIN_SENTENCIA : ";" >
   {
