@@ -144,10 +144,6 @@ TOKEN : /* PALABRAS RESERVADAS */
   {
     System.out.println("SI_NO");
   }
-| < tMOD : "mod" >
-  {
-    System.out.println("MOD");
-  }
 | < tTRUE : "true" >
   {
     System.out.println("TRUE");
@@ -155,6 +151,34 @@ TOKEN : /* PALABRAS RESERVADAS */
 | < tFALSE : "false" >
   {
     System.out.println("FALSE");
+  }
+}
+
+TOKEN : /* OPERADORES */
+{
+  < tSUMA : "+" >
+  {
+    System.out.println("SUMA");
+  }
+| < tRESTA : "-" >
+  {
+    System.out.println("RESTA");
+  }
+| < tMULL : "*" >
+  {
+    System.out.println("MULL");
+  }
+| < tDIV : "/" >
+  {
+    System.out.println("DIV");
+  }
+| < tDIV1 : "div" >
+  {
+    System.out.println("DIV1");
+  }      
+| < tMOD : "mod" >
+  {
+    System.out.println("MOD");
   }
 | < tMAYOR : ">" >
   {
