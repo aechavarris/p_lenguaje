@@ -1,7 +1,8 @@
 /**
- * Especificaci√≥n JavaCC para la Pr√°ctica 2 (Procesadores de Lenguajes)
- * Javier Fabra - jfabra@unizar.es
- * v1.2 - 2021/03/08
+ * Especificacion JavaCC para la Practica 2 (Procesadores de Lenguajes)
+ * Marcos Nuez - 761319@unizar.es
+ * Alvaro Echavarri - 737400@unizar.es
+ * v1.2 - 2021/03/16
  */
 options
 {
@@ -21,7 +22,18 @@ public class CompiladorClases
     	CompiladorClases.programa();
     	System.out.println("Analizado correctamente");
     	
-    } catch (Exception e) {
+    }
+    catch(TokenMgrError e) {
+     // ERRORES LEXICOS
+     programa_correcto = 0;
+     String simbolo = String.valueOf(minilengcompilerTokenManager.input_stream.readChar());
+     String fil = String.valueOf(minilengcompilerTokenManager.input_stream.getEndLine());
+     String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
+     
+     System.err.println("ERROR L…XICO (<" + fil + ", " + col + ">): sÌmbolo no reconocido: <" + simbolo + ">");
+     return;
+    }
+    catch (Exception e) {
 		System.out.println("NOK.");
         System.out.println(e.getMessage());
         CompiladorClases.ReInit(System.in);
@@ -35,14 +47,32 @@ public class CompiladorClases
 
 PARSER_END(CompiladorClases)
 
-SKIP :
+< DEFAULT >SKIP :
 {
   " "
 | "\r"
 | "\t"
 | "\n"
+| "%" : COMLINE
+| "%%" : COMBLOCK
 }
 
+< COMLINE >SKIP :
+{
+  "%" : DEFAULT
+}
+
+< COMBLOCK >SKIP :
+{
+  "%%" : DEFAULT
+}
+
+< COMBLOCK,COMLINE >MORE :
+{
+  <~[]>
+}
+
+ 
 TOKEN : /* PALABRAS RESERVADAS */
 {
   < tPROGRAMA : "programa" >
@@ -220,11 +250,7 @@ TOKEN : /* VALORES */
 
 TOKEN : /* OPERADORES */
 {
-  <  tASIGNACION : "=" >
-  {
-    System.out.println("ASIGNACION");
-  }
-| <  tFIN_SENTENCIA : ";" >
+  <  tFIN_SENTENCIA : ";" >
   {
     System.out.println("FIN_SENTENCIA");
   }
@@ -413,6 +439,7 @@ void operador_relacional():
 {
 }
 {
+<<<<<<< Updated upstream
 	 factor()"<"factor()
 	| factor()">"factor()
 	| factor()"<="factor()
@@ -423,6 +450,17 @@ void operador_relacional():
 	| factor()"<="factor()operador()
 	| factor()">="factor()operador()
 	| factor()"=="factor()operador()
+=======
+  	"-"
+	| "+"
+	| "*"
+	| "/"
+	| ":"
+	| "<"
+	| ">"
+	| "<="
+	| ">="
+>>>>>>> Stashed changes
 }
 
 void operador_aditivo():
