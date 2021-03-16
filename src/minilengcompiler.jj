@@ -507,8 +507,8 @@ void factor():
 | <tENTACAR> "(" expresion() ")"
 | <tCARAENT> "(" expresion() ")"
 | <tIDENTIFICADOR>
-| <tCONSTENTERA>
-| <tCONSTCHAR>
+| <tENTERO>
+| <tCARACTER>
 | <tCONSTCAD>
 | <tTRUE>
 | <tFALSE>
