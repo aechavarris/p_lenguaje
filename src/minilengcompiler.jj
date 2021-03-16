@@ -518,8 +518,8 @@ void operador():
 | ">="
 | "<="
 | "*"
-| "/"
-| ":"
+| < tDIV >
+| < tMOD >
 }
 void factor():
 {
