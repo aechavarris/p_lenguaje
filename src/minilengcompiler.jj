@@ -290,7 +290,7 @@ TOKEN : /* VALORES */
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
   }  
-| <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) >
+| <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >) >
   {
     System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
   }  
