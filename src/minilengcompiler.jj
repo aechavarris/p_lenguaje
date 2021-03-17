@@ -177,7 +177,11 @@ TOKEN : /* OPERADORES */
 | < tDIV1 : "div" >
   {
     System.out.println("DIV1");
-  }      
+  }
+| < tDIV2 : ":" >
+  {
+    System.out.println("DIV2");
+  }        
 | < tMAYOR : ">" >
   {
     System.out.println("MAYOR");
@@ -262,6 +266,14 @@ TOKEN : /* AGRUPACIONES */
   {
     System.out.println("LLAVE_DCHA");
   }
+| <  tPA : "(" >
+  {
+    System.out.println("PA");
+  }
+| <  tPC : ")" >
+  {
+    System.out.println("PC");
+  }   
 }
 
 TOKEN : /* VALORES */
@@ -349,14 +361,14 @@ void tipo_variables():
 {
 }
 {
-  	<tENTERO> | <tCARACTER> | <tBOOLEANO>
+  	< tENTERO > | < tCARACTER > | < tBOOLEANO >
 }
 
 void identificadores():
 {
 }
 {
-  	<tIDENTIFICADOR> ( "," <tIDENTIFICADOR> )*
+  	< tIDENTIFICADOR > ( "," < tIDENTIFICADOR > )*
 }
 
 void declaracion_acciones():
@@ -377,7 +389,7 @@ void cabecera_accion():
 {
 }
 {
-  	<tACCION> <tIDENTIFICADOR> "("parametros_formales()")" < tFIN_SENTENCIA >
+  	< tACCION > < tIDENTIFICADOR > < tPA >parametros_formales()< tPC > < tFIN_SENTENCIA >
 }
 
 void parametros_formales():
@@ -399,14 +411,14 @@ void clase_parametros():
 {
 }
 {
-  	<tVAL> | <tREF>
+  	< tVAL > | < tREF >
 }
 
 void bloque_sentencias():
 {
 }
 {
-  	<tPRINCIPIO> lista_sentencias() <tFIN>
+  	< tPRINCIPIO > lista_sentencias() < tFIN >
 }
 
 void lista_sentencias():
@@ -420,28 +432,28 @@ void leer():
 {
 }
 {
-  	<tLEER> "(" identificadores() ")"
+  	< tLEER > < tPA > identificadores() < tPC >
 }
 
 void escribir():
 {
 }
 {
-  	<tESCRIBIR> "(" identificadores() ")"
+  	< tESCRIBIR > < tPA > identificadores() < tPC >
 }
 
 void asignacion():
 {
 }
 {
-  	<tIDENTIFICADOR> <tOPAS> expresion() ";"
+  	< tIDENTIFICADOR > < tOPAS > expresion() < tFIN_SENTENCIA >
 }
 
 void invocacion_accion():
 {
 }
 {
-  	<tIDENTIFICADOR> argumentos() ";"
+  	<tIDENTIFICADOR> argumentos() < tFIN_SENTENCIA >
 }
 
 
@@ -449,14 +461,14 @@ void mientras_que():
 {
 }
 {
-  	<tMQ> expresion() lista_sentencias() <tFMQ>
+  	< tMQ > expresion() lista_sentencias() < tFMQ >
 }
 
 void argumentos():
 {
 }
 {
-  	"(" ( lista_expresiones() )? ")"
+  	< tPA > ( lista_expresiones() )? < tPC >
 }
 
 void lista_expresiones():
@@ -470,7 +482,7 @@ void seleccion():
 {
 }
 {
-  	< tPRINCIPIO > < tIDENTIFICADOR > "{" (sentencia())* "}"
+  	< tPRINCIPIO > < tIDENTIFICADOR > < tLLAVE_IZQ > (sentencia())* < tLLAVE_DCHA >
 }
 
 void expresion():
@@ -488,26 +500,26 @@ void operador_relacional():
 {
 }
 {
-	 factor()"<"factor()
-	| factor()">"factor()
-	| factor()"<="factor()
-	| factor()">="factor()
-	| factor()"=="factor()
-	| factor()"<"factor()operador()
-	| factor()">"factor()operador()
-	| factor()"<="factor()operador()
-	| factor()">="factor()operador()
-	| factor()"=="factor()operador()
+	 factor()< tMENOR >factor()
+	| factor()< tMAYOR >factor()
+	| factor()< tMEI >factor()
+	| factor()< tMAI >factor()
+	| factor()< tIGUAL >factor()
+	| factor()< tMENOR >factor()operador()
+	| factor()< tMAYOR >factor()operador()
+	| factor()< tMEI >factor()operador()
+	| factor()< tMAI >factor()operador()
+	| factor()< tIGUAL >factor()operador()
 }
 
 void operador_aditivo():
 {
 }
 {
-  factor()"-"factor()
-	| factor()"+"factor()
-	| factor()"-"factor()operador()
-	| factor()"+"factor()operador()
+  factor()< tRESTA >factor()
+	| factor()< tSUMA >factor()
+	| factor()< tRESTA >factor()operador()
+	| factor()< tSUMA >factor()operador()
 	 
 }
 void termino():
@@ -515,26 +527,26 @@ void termino():
 }
 {
   	factor()
-	| "("factor()")"
+	| < tPA >factor()< tPC >
 	| factor()operador()
-	| "("factor()")"operador()
+	| < tPA >factor()< tPC >operador()
 }
 
 void operador_multiplicativo():
 {
 }
 {
-  factor()"*"factor()
-	| factor()":"factor()
-	| factor()"*"factor()operador()
-	| factor()":"factor()operador()
+  factor()< tMULL >factor()
+	| factor()< tDIV2 >factor()
+	| factor()< tMULL >factor()operador()
+	| factor()< tDIV2 >factor()operador()
 }
 
 void operador():
 {
 }
 {
-	< tSUMA >
+  < tSUMA >
 | < tRESTA >
 | < tMAYOR >
 | < tMENOR >
@@ -542,21 +554,23 @@ void operador():
 | < tMEI >
 | < tMULL >
 | < tDIV >
+| < tDIV1 >
+| < tDIV2 >
 | < tMOD >
 }
 void factor():
 {
 }
 {
-  	"-" factor()
-| <tNOT> factor()
-| "(" expresion() ")"
-| <tENTACAR> "(" expresion() ")"
-| <tCARAENT> "(" expresion() ")"
-| <tIDENTIFICADOR>
-| <tENTERO>
-| <tCARACTER>
-| <tVALOR_CADENA>
-| <tTRUE>
-| <tFALSE>
+  < tRESTA > factor()
+| < tNOT > factor()
+| < tPA > expresion() < tPC >
+| < tENTACAR > < tPA > expresion() < tPC >
+| < tCARAENT > < tPA > expresion() < tPC >
+| < tIDENTIFICADOR >
+| < tENTERO >
+| < tCARACTER >
+| < tVALOR_CADENA >
+| < tTRUE >
+| < tFALSE >
 }

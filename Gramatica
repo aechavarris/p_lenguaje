@@ -21,15 +21,15 @@ sentencia ::= leer ";"
 	| invocacion_accion
 	| seleccion
 	| mientras_que
-leer ::= <tLEER> "(" lista_asignables ")"
+leer ::= <tLEER> <tPA> lista_asignables <tPC>
 lista_asignables ::= ...
-escribir ::= <tESCRIBIR> "(" lista_escribibles ")"
+escribir ::= <tESCRIBIR> <tPA> lista_escribibles <tPC>
 lista_escribibles ::= ...
 asignación ::= <tIDENTIFICADOR> <tOPAS> expresion ";"
 invocacion_accion ::= <tIDENTIFICADOR> argumentos ";"
 mientras_que ::= <tMQ> expresion lista_sentencias <tFMQ>
 seleccion ::= ...
-argumentos ::= "(" ( lista_expresiones )? ")"
+argumentos ::= <tPA> ( lista_expresiones )? <tPC>
 lista_expresiones ::= ...
 expresion ::= ...
 operador_relacional ::= ...
@@ -39,9 +39,9 @@ termino ::= ...
 operador_multiplicativo ::= ...
 factor ::= "-" factor
 | <tNOT> factor
-| "(" expresion ")"
-| <tENTACAR> "(" expresion ")"
-| <tCARAENT> "(" expresion ")"
+| <tPA> expresion <tPC>
+| <tENTACAR> <tPA> expresion <tPC>
+| <tCARAENT> <tPA> expresion <tPC>
 | <tIDENTIFICADOR>
 | <tCONSTENTERA>
 | <tCONSTCHAR>
