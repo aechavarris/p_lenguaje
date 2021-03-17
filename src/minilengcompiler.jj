@@ -6,8 +6,10 @@
  */
 options
 {
+  lookahead=2;
   static = true;
   ignore_case = true;
+  
 }
 
 PARSER_BEGIN(minilengcompiler)
@@ -389,15 +391,15 @@ void cabecera_accion():
 {
 }
 {
-  	< tACCION > < tIDENTIFICADOR > < tPA >parametros_formales()< tPC > < tFIN_SENTENCIA >
+  	< tACCION > < tIDENTIFICADOR > < tFIN_SENTENCIA >
+ |  < tACCION > < tIDENTIFICADOR > parametros_formales() < tFIN_SENTENCIA >
 }
 
 void parametros_formales():
 {
 }
 {
-   parametros()
- | parametros()< tFIN_SENTENCIA >(parametros_formales())*
+  < tPA >parametros() (< tFIN_SENTENCIA > parametros())*< tPC >
 }
 
 void parametros():
