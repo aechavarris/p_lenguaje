@@ -17,8 +17,7 @@ import java.io.*;
 
 public class minilengcompiler
 {
-	  public static void main(String args []) throws ParseException
-	  {
+	  public static void main(String args []) throws ParseException {
 	    if (args.length != 0 ) {
 			File tmp = new File(args[0]);
 			String file = tmp.getAbsolutePath();
@@ -31,7 +30,7 @@ public class minilengcompiler
 			}
       	}
       	else {
-      	    System.out.printf("Leyendo de la entrada estándar..." + "\n");
+      	    System.out.printf("Leyendo de la entrada estandar..." + "\n");
 			minilengcompiler parser = new minilengcompiler(System.in);
         }    	
    		try {  
