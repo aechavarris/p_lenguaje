@@ -13,26 +13,27 @@ options
 
 PARSER_BEGIN(minilengcompiler)
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 
 public class minilengcompiler
 {
 	  public static void main(String args []) throws ParseException
 	  {
-	    minilengcompiler parser = new minilengcompiler(System.in);
 	    if (args.length != 0 ) {
-			String file = "";
-			file = args[0];
-
+			File tmp = new File(args[0]);
+			String file = tmp.getAbsolutePath();
 			try {
-				parser = new minilengcompiler(new FileInputStream(file));
+				minilengcompiler parser = new minilengcompiler(new FileInputStream(file));
 			}  
-			catch (Exception ex) {
+			catch (FileNotFoundException e) {
 				System.out.printf("No existe el fichero: "+ file + "\n");
 				System.exit(1);
 			}
-      	}  	
+      	}
+      	else {
+      	    System.out.printf("Leyendo de la entrada estándar..." + "\n");
+			minilengcompiler parser = new minilengcompiler(System.in);
+        }    	
    		try {  
 		    minilengcompiler.programa();
 		    System.out.println("Analizado correctamente");	
