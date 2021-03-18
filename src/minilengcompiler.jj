@@ -6,7 +6,6 @@
  */
 options
 {
-  lookahead=2;
   static = true;
   ignore_case = true;
   
@@ -20,7 +19,7 @@ public class minilengcompiler
   {
     minilengcompiler parser = new minilengcompiler(System.in);
     System.out.println("Leyendo de la entrada estandar...");
-    try { 
+    try {  
     	minilengcompiler.programa();
     	System.out.println("Analizado correctamente");
     	
@@ -179,10 +178,6 @@ TOKEN : /* OPERADORES */
 | < tDIV1 : "div" >
   {
     System.out.println("DIV1");
-  }
-| < tDIV2 : ":" >
-  {
-    System.out.println("DIV2");
   }        
 | < tMAYOR : ">" >
   {
@@ -196,6 +191,10 @@ TOKEN : /* OPERADORES */
   {
     System.out.println("IGUAL");
   }
+| < tOAS : ":=" >
+  {
+    System.out.println("OAS");
+  }
 | < tMAI : ">=" >
   {
     System.out.println("MAI");
@@ -207,10 +206,6 @@ TOKEN : /* OPERADORES */
 | < tNI : "<>" >
   {
     System.out.println("NI");
-  }
-| < tOPAS : ":=" >
-  {
-    System.out.println("OPAS");
   }
 | < tAND : "and" >
   {
@@ -303,11 +298,16 @@ TOKEN : /* VALORES */
 | < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
-  }  
+  }
+| <  tIDENTIFICADOR_ASIG : ((< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >))(" ")*< tOAS > >
+  {
+    System.out.println("IDENTIFICADOR_ASIG (Valor: " + matchedToken + ")");
+  } 
 | <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >) >
   {
     System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
-  }  
+  }
+
 }
 
 
@@ -338,15 +338,28 @@ void sentencia():
 {
   	(leer()) < tFIN_SENTENCIA >
  |  (escribir()) < tFIN_SENTENCIA >
- |  (asignacion()) 
- |	(invocacion_accion())
+ |  (asignacion()) < tFIN_SENTENCIA >
+ |	(invocacion_accion()) < tFIN_SENTENCIA >
  |	(seleccion()) 
  |	(mientras_que())
 }
 
+void asignacion():
+{
+}
+{
+  < tIDENTIFICADOR_ASIG > expresion() 
+}
+
+void invocacion_accion():
+{
+}
+{
+  <tIDENTIFICADOR> argumentos() 
+}
+
 void declaracion_variables():
 {
-  
 }
 {
   	( declaracion() ";" )*
@@ -384,15 +397,14 @@ void declaracion_accion():
 {
 }
 {
-  	cabecera_accion() ";" declaracion_variables() declaracion_acciones() bloque_sentencias()
+  	cabecera_accion() declaracion_variables() declaracion_acciones() bloque_sentencias()
 }
 
 void cabecera_accion():
 {
 }
 {
-  	< tACCION > < tIDENTIFICADOR > < tFIN_SENTENCIA >
- |  < tACCION > < tIDENTIFICADOR > parametros_formales() < tFIN_SENTENCIA >
+  	< tACCION > < tIDENTIFICADOR > (< tFIN_SENTENCIA >|parametros_formales() < tFIN_SENTENCIA >)
 }
 
 void parametros_formales():
@@ -443,21 +455,6 @@ void escribir():
 {
   	< tESCRIBIR > < tPA > identificadores() < tPC >
 }
-
-void asignacion():
-{
-}
-{
-  	< tIDENTIFICADOR > < tOPAS > expresion() < tFIN_SENTENCIA >
-}
-
-void invocacion_accion():
-{
-}
-{
-  	<tIDENTIFICADOR> argumentos() < tFIN_SENTENCIA >
-}
-
 
 void mientras_que():
 {
@@ -539,9 +536,9 @@ void operador_multiplicativo():
 }
 {
   factor()< tMULL >factor()
-	| factor()< tDIV2 >factor()
+	| factor()< tDIV >factor()
 	| factor()< tMULL >factor()operador()
-	| factor()< tDIV2 >factor()operador()
+	| factor()< tDIV >factor()operador()
 }
 
 void operador():
@@ -557,7 +554,6 @@ void operador():
 | < tMULL >
 | < tDIV >
 | < tDIV1 >
-| < tDIV2 >
 | < tMOD >
 }
 void factor():
