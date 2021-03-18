@@ -13,40 +13,52 @@ options
 
 PARSER_BEGIN(minilengcompiler)
 
+import java.io.File;
+import java.io.FileInputStream;
+
 public class minilengcompiler
 {
-  public static void main(String args []) throws ParseException
-  {
-    minilengcompiler parser = new minilengcompiler(System.in);
-    System.out.println("Leyendo de la entrada estandar...");
-    try {  
-    	minilengcompiler.programa();
-    	System.out.println("Analizado correctamente");
-    	
-    }
-    catch(TokenMgrError e) {
-     
-     // ERRORES LEXICOS
-     try {
-		String simbolo = String.valueOf(minilengcompilerTokenManager.input_stream.readChar());
-        String fil = String.valueOf(minilengcompilerTokenManager.input_stream.getEndLine());
-        String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
-     
-        System.err.println("ERROR LÉXICO (<" + fil + ", " + col + ">): símbolo no reconocido: <" + simbolo + ">");
-        return;
-     }  
-     catch (Exception ex) { }
-    }
-    catch (Exception e) {
-		System.out.println("NOK.");
-        System.out.println(e.getMessage());
-        minilengcompiler.ReInit(System.in);
-	}
-    catch (Error e) { 
-        System.out.println("Oops.");
-        System.out.println(e.getMessage());
-	} 
-  }
+	  public static void main(String args []) throws ParseException
+	  {
+	    minilengcompiler parser = new minilengcompiler(System.in);
+	    if (args.length != 0 ) {
+			String file = "";
+			file = args[0];
+
+			try {
+				parser = new minilengcompiler(new FileInputStream(file));
+			}  
+			catch (Exception ex) {
+				System.out.printf("No existe el fichero: "+ file + "\n");
+				System.exit(1);
+			}
+      	}  	
+   		try {  
+		    minilengcompiler.programa();
+		    System.out.println("Analizado correctamente");	
+		}
+		catch(TokenMgrError e) {  
+		     // ERRORES LEXICOS
+		     try {
+				String simbolo = String.valueOf(minilengcompilerTokenManager.input_stream.readChar());
+		        String fil = String.valueOf(minilengcompilerTokenManager.input_stream.getEndLine());
+		        String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
+		     
+		        System.err.println("ERROR LÉXICO (<" + fil + ", " + col + ">): símbolo no reconocido: <" + simbolo + ">");
+		        return;
+		     }  
+		     catch (Exception ex) { }
+		}
+		catch (Exception e) {
+			System.out.println("NOK.");
+		    System.out.println(e.getMessage());
+		    minilengcompiler.ReInit(System.in);
+		}
+		catch (Error e) { 
+		    System.out.println("Oops.");
+		    System.out.println(e.getMessage());
+		}    
+ 	 }
 }
 
 PARSER_END(minilengcompiler)
