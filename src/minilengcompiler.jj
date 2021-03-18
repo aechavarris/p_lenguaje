@@ -311,7 +311,7 @@ TOKEN : /* VALORES */
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
   }
-| <  tIDENTIFICADOR_ASIG : ((< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >))(" ")*< tOAS > >
+| <  tIDENTIFICADOR_ASIG : ((< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >))(" ")*(< tOAS >) >
   {
     System.out.println("IDENTIFICADOR_ASIG (Valor: " + matchedToken + ")");
   } 
@@ -319,7 +319,6 @@ TOKEN : /* VALORES */
   {
     System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
   }
-
 }
 
 
@@ -500,74 +499,40 @@ void expresion():
 {
 }
 {
-   operador_relacional()(expresion())*
- | operador_aditivo()(expresion())*
- | termino()(expresion())*
- | "-"termino()(expresion())*
- | operador_multiplicativo()(expresion())*
+   factor()operador_relacional() factor()
+ | (factor()operador_aditivo() factor())+
+ | factor()
+ | (factor()operador_multiplicativo() factor())+
  
 }
 void operador_relacional():
 {
 }
 {
-	 factor()< tMENOR >factor()
-	| factor()< tMAYOR >factor()
-	| factor()< tMEI >factor()
-	| factor()< tMAI >factor()
-	| factor()< tIGUAL >factor()
-	| factor()< tMENOR >factor()operador()
-	| factor()< tMAYOR >factor()operador()
-	| factor()< tMEI >factor()operador()
-	| factor()< tMAI >factor()operador()
-	| factor()< tIGUAL >factor()operador()
+	 < tMENOR >
+	| < tMAYOR >
+	| < tMEI >
+	| < tMAI >
+	| < tIGUAL >
 }
 
 void operador_aditivo():
 {
 }
 {
-  factor()< tRESTA >factor()
-	| factor()< tSUMA >factor()
-	| factor()< tRESTA >factor()operador()
-	| factor()< tSUMA >factor()operador()
-	 
-}
-void termino():
-{
-}
-{
-  	factor()
-	| < tPA >factor()< tPC >
-	| factor()operador()
-	| < tPA >factor()< tPC >operador()
+  < tRESTA >
+	| < tSUMA > 
 }
 
 void operador_multiplicativo():
 {
 }
 {
-  factor()< tMULL >factor()
-	| factor()< tDIV >factor()
-	| factor()< tMULL >factor()operador()
-	| factor()< tDIV >factor()operador()
+  < tMULL >
+	| < tDIV >
+	| < tDIV1 >
 }
 
-void operador():
-{
-}
-{
-  < tSUMA >
-| < tRESTA >
-| < tMAYOR >
-| < tMENOR >
-| < tMAI >
-| < tMEI >
-| < tMULL >
-| < tDIV >
-| < tDIV1 >
-| < tMOD >
-}
 void factor():
 {
 }
@@ -579,7 +544,7 @@ void factor():
 | < tCARAENT > < tPA > expresion() < tPC >
 | < tIDENTIFICADOR >
 | < tENTERO >
-| < tCARACTER >
+| < tVALOR_CARACTER >
 | < tVALOR_CADENA >
 | < tTRUE >
 | < tFALSE >
