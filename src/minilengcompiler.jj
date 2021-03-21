@@ -293,7 +293,7 @@ TOKEN : /* VALORES */
 | < #CARACTER : "\""~["\""] "\"" >
 | < #CADENA : "\""(~["\""])+ "\"" >
 
-| < tVALOR_ENTERO : ("-")?(< DIGITO >)+ >
+| < tVALOR_ENTERO : (< DIGITO >)+ >
   {
     System.out.println("VALOR_ENTERO (Valor: " + matchedToken + ")");
   }
@@ -538,6 +538,8 @@ void operador_relacional():
 	| < tMAI >
 	| < tIGUAL >
 	| < tNI >
+	| < tAND >
+	| < tOR >
 }
 
 void operador_aditivo():
@@ -550,11 +552,12 @@ void operador_aditivo():
 
 void operador_multiplicativo():
 {
-}
+} 
 {
   < tMULL >
 	| < tDIV >
 	| < tDIV1 >
+	| < tMOD >
 }
 
 void factor():

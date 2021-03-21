@@ -23,8 +23,8 @@ ACCION primer_dia_anho;
 
        principio
            anho:=anho-1900;
-           cuatro:=(anho MOD 4=0) AND (anho MOD 100<>0);
-           cien:=anho MOD 400=0;
+           cuatro:=(anho MOD 4==0) AND (anho MOD 100<>0);
+           cien:=anho MOD 400==0;
            bisiestos_validos:=cuatro OR cien;
            bisiestos:=anho DIV 4;
            si bisiestos_validos
@@ -37,7 +37,7 @@ ACCION primer_dia_anho;
 ACCION primer_dia_mes;
 
 % Calcula el dia de la semana en el cual cayo 
-el dia uno d ese mes
+%el dia uno d ese mes
 % en ese anio
 %-----------------------------------------------------------
 
@@ -45,8 +45,8 @@ el dia uno d ese mes
 
        principio
            anho:=anho-1900;
-           cien:=(anho MOD 4=0) AND (anho MOD 100<>0);
-           cuatro:=anho MOD 400=0;
+           cien:=(anho MOD 4==0) AND (anho MOD 100<>0);
+           cuatro:=anho MOD 400==0;
            bisiestos_validos:=cien OR cuatro;
            si bisiestos_validos
               ent   anhade:=1;
