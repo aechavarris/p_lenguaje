@@ -98,7 +98,6 @@ PARSER_END(minilengcompiler)
    System.out.println("COMENTARIO DOBLE");
    }
 }
-Y
 
 TOKEN : /* CONTROLES DE FLUJO */
 {
@@ -349,9 +348,10 @@ void sentencia():
   	(leer()) < tFIN_SENTENCIA >
  |  (escribir()) < tFIN_SENTENCIA >
  |  (asignacion()) < tFIN_SENTENCIA >
- |	(invocacion_accion()) < tFIN_SENTENCIA >
+ |	(invocacion_accion()) 
  |	(seleccion()) 
  |	(mientras_que())
+ | 	(si())
 }
 
 void asignacion():
@@ -365,7 +365,7 @@ void invocacion_accion():
 {
 }
 {
-  <tIDENTIFICADOR> argumentos() 
+  <tIDENTIFICADOR>(< tFIN_SENTENCIA >|argumentos()< tFIN_SENTENCIA >)
 }
 
 void declaracion_variables():
@@ -463,14 +463,42 @@ void escribir():
 {
 }
 {
-  	< tESCRIBIR > < tPA > identificadores() < tPC >
+  	< tESCRIBIR > < tPA > lista_escribibles() < tPC > 
+}
+
+void caraent():
+{
+}
+{
+  < tCARAENT ><tPA >(<tVALOR_CADENA >|< tIDENTIFICADOR >|entacar())<tPC > 
+}
+
+void entacar():
+{
+}
+{
+  < tENTACAR ><tPA >(<tVALOR_ENTERO >|< tIDENTIFICADOR >|caraent())<tPC > 
+}
+
+void lista_escribibles():
+{
+}
+{
+  	( < tVALOR_CADENA >|< tIDENTIFICADOR >| entacar()|< tVALOR_CARACTER > ) ( < tCOMA > (< tVALOR_CADENA >|< tIDENTIFICADOR >| entacar()|< tVALOR_CARACTER > ) )*
 }
 
 void mientras_que():
 {
 }
 {
-  	< tMQ > expresion()(< tAND > expresion())* lista_sentencias() < tFMQ >
+  	< tMQ > expresion()( ( < tAND > | < tOR > ) expresion())* lista_sentencias() < tFMQ >
+}
+
+void si():
+{
+}
+{
+  	< tSI > expresion()( ( < tAND > | < tOR > ) expresion())* < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
 }
 
 void argumentos():
@@ -547,6 +575,7 @@ void factor2():
 | < tENTERO >
 | < tVALOR_CARACTER >
 | < tVALOR_CADENA >
+| < tVALOR_ENTERO > 
 | < tTRUE >
 | < tFALSE >
 }
