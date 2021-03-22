@@ -48,6 +48,9 @@ public class minilengcompiler {
 		     }  
 		     catch (Exception ex) { }
 		}
+		catch(ParseException e) {
+			error_sintactico(e,"No se ha encontrado declaracion de programa");
+		}
 		catch (Exception e) {
 			System.out.println("NOK.");
 		    System.out.println(e.getMessage());
@@ -58,6 +61,18 @@ public class minilengcompiler {
 		    System.out.println(e.getMessage());
 		}    
  	 }
+ 	 private static void error_sintactico(ParseException e, String mensaje) {
+    	// ERRORES SINTACTICOS
+    	Token ultimoLeido = minilengcompiler.getNextToken();
+    	int fil = ultimoLeido.beginLine;
+    	int col = ultimoLeido.beginColumn;
+    	String current = ultimoLeido.image;
+    
+    	//String currImg = e.currentToken.image;
+    	//String col = String.valueOf(e.currentToken.endColumn);
+    	//String fil = String.valueOf(e.currentToken.beginLine);
+    	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Simbolo obtenido -> " + current + " -> " + mensaje );
+  }
 }
 
 PARSER_END(minilengcompiler)
