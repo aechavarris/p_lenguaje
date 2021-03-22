@@ -58,6 +58,7 @@ public class minilengcompiler {
 		    System.out.println(e.getMessage());
 		}    
  	 }
+ 	 
  	 private static void error_sintactico(ParseException e, String mensaje) {
     	// ERRORES SINTACTICOS
     	Token ultimoLeido = minilengcompiler.getNextToken();
@@ -65,9 +66,6 @@ public class minilengcompiler {
     	int col = ultimoLeido.beginColumn;
     	String current = ultimoLeido.image;
     
-    	//String currImg = e.currentToken.image;
-    	//String col = String.valueOf(e.currentToken.endColumn);
-    	//String fil = String.valueOf(e.currentToken.beginLine);
     	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Simbolo obtenido -> " + current + " -> " + mensaje );
   }
 }
