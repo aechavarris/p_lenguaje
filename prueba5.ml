@@ -1,14 +1,13 @@
 % --------------------------------------------------------
-Programa prueba2;
+Programa prueba5;
 % -------------------------------------------------------- 
 
 %%
- Checkeamos dos cosas: Por un lado, que detecta los dobles
- comentarios y, por otro lado, que salta error con los
- acentos en letras minúsculas
+ Checkeamos que salta error con acentos en letras 
+ mayúsculas
 %%
 
-entero ejecución;
+entero perDÓN;
 
 accion dato (ref entero d);
 Principio
