@@ -342,7 +342,7 @@ void programa():
   	< tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
  	 (bloque_sentencias())*
   }catch(ParseException e) {
-		error_sintactico(e,"No se ha encontrado declaracion de programa");
+		error_sintactico(e,"Error en programa");
 	}
 }
 
@@ -350,6 +350,7 @@ void sentencia():
 {
 }
 {
+try { 
   	(leer()) < tFIN_SENTENCIA >
  |  (escribir()) < tFIN_SENTENCIA >
  |  (asignacion()) < tFIN_SENTENCIA >
@@ -357,186 +358,292 @@ void sentencia():
  |	(seleccion()) 
  |	(mientras_que())
  | 	(si())
+ 
+}catch(ParseException e) {
+	error_sintactico(e,"Error en sentencia");
+}
 }
 
 void asignacion():
 {
 }
 {
-  < tIDENTIFICADOR_ASIG > expresion() 
+  try { 
+  < tIDENTIFICADOR_ASIG > expresion()
+}catch(ParseException e) {
+	error_sintactico(e,"Error en asignacion");
+}
 }
 
 void invocacion_accion():
 {
 }
 {
+  try {
+    
   <tIDENTIFICADOR>(< tFIN_SENTENCIA >|argumentos()< tFIN_SENTENCIA >)
+}catch(ParseException e) {
+	error_sintactico(e,"Error en invocacion_accion");
+}
 }
 
 void declaracion_variables():
 {
 }
 {
+  try { 
   	( declaracion() ";" )*
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en declaracion_variables");
+}
 }
 
 void declaracion():
 {
 }
 {
+  try { 
   	tipo_variables() identificadores()
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en declaracion");
+}
 }
 
 void tipo_variables():
 {
 }
 {
+  try { 
   	< tENTERO > | < tCARACTER > | < tBOOLEANO >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en tipo_variables");
+}
 }
 
 void identificadores():
 {
 }
 {
+  try { 
   	< tIDENTIFICADOR > ( "," < tIDENTIFICADOR > )*
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en identificadores");
+}
 }
 
 void declaracion_acciones():
 {
 }
 {
+  try { 
   	( declaracion_accion() )*
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en declaracion_acciones");
+}
 }
 
 void declaracion_accion():
 {
 }
 {
+  try { 
   	cabecera_accion() declaracion_variables() declaracion_acciones() bloque_sentencias()
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en declaracion_accion");
+}
 }
 
 void cabecera_accion():
 {
 }
 {
+  try { 
   	< tACCION > < tIDENTIFICADOR > (< tFIN_SENTENCIA >|parametros_formales() < tFIN_SENTENCIA >)
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en cabecera_accion");
+}
 }
 
 void parametros_formales():
 {
 }
 {
+  try { 
   < tPA >parametros() (< tFIN_SENTENCIA > parametros())*< tPC >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en parametros_formales");
+}
 }
 
 void parametros():
 {
 }
 {
+  try { 
   	clase_parametros() tipo_variables() identificadores()
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en parametros");
+}
 }
 
 void clase_parametros():
 {
 }
 {
+  try { 
   	< tVAL > | < tREF >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en clase_parametros");
+}
 }
 
 void bloque_sentencias():
 {
 }
 {
+  try { 
   	< tPRINCIPIO > lista_sentencias() < tFIN >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en bloque_sentencias");
+}
 }
 
 void lista_sentencias():
 {
 }
 {
+  try { 
   	(sentencia())*
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en lista_sentencias");
+}
 }
 
 void leer():
 {
 }
 {
+  try { 
   	< tLEER > < tPA > identificadores() < tPC >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en leer");
+}
 }
 
 void escribir():
 {
 }
 {
-  	< tESCRIBIR > < tPA > lista_escribibles() < tPC > 
+  try { 
+  	< tESCRIBIR > < tPA > lista_escribibles() < tPC >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en escribir");
+}
 }
 
 void caraent():
 {
 }
 {
-  < tCARAENT ><tPA >(<tVALOR_CADENA >|< tIDENTIFICADOR >|entacar())<tPC > 
+  try { 
+  < tCARAENT ><tPA >(<tVALOR_CADENA >|< tIDENTIFICADOR >|entacar())<tPC >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en caraent");
+}
 }
 
 void entacar():
 {
 }
 {
-  < tENTACAR ><tPA >(<tVALOR_ENTERO >|< tIDENTIFICADOR >|caraent())<tPC > 
+  try { 
+  < tENTACAR ><tPA >(<tVALOR_ENTERO >|< tIDENTIFICADOR >|caraent())<tPC >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en entacar");
+}
 }
 
 void lista_escribibles():
 {
 }
 {
+  try { 
   	( < tVALOR_CADENA >|< tIDENTIFICADOR >| entacar()|< tVALOR_CARACTER > ) ( < tCOMA > (< tVALOR_CADENA >|< tIDENTIFICADOR >| entacar()|< tVALOR_CARACTER > ) )*
+}catch(ParseException e) {
+	error_sintactico(e,"Error en lista_escribibles");
+}
 }
 
 void mientras_que():
 {
 }
 {
+  try { 
   	< tMQ > expresion()( ( < tAND > | < tOR > ) expresion())* lista_sentencias() < tFMQ >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en mientras_que");
+}
 }
 
 void si():
 {
 }
 {
+  try { 
   	< tSI > expresion()( ( < tAND > | < tOR > ) expresion())* < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en si");
+}
 }
 
 void argumentos():
 {
 }
 {
+  try { 
   	< tPA > ( lista_expresiones() )? < tPC >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en argumentos");
+}
 }
 
 void lista_expresiones():
 {
 }
 {
+  try { 
   	expresion()(","expresion())*
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en lista_expresiones");
+}
 }
 
 void seleccion():
 {
 }
 {
+  try { 
   	< tPRINCIPIO > < tIDENTIFICADOR > < tLLAVE_IZQ > (sentencia())* < tLLAVE_DCHA >
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en seleccion");
+}
 }
 
 void expresion():
 {
 }
 {
+  try { 
    factor()( (operador_relacional()|operador_aditivo()|operador_multiplicativo()) factor() )*
+ }catch(ParseException e) {
+	error_sintactico(e,"Error en expresion");
+}
 }
 void operador_relacional():
 {
 }
 {
+  try { 
 	 < tMENOR >
 	| < tMAYOR >
 	| < tMEI >
@@ -545,37 +652,53 @@ void operador_relacional():
 	| < tNI >
 	| < tAND >
 	| < tOR >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en operador_relacional");
+}
 }
 
 void operador_aditivo():
 {
 }
 {
+  try { 
   < tRESTA >
-	| < tSUMA > 
+	| < tSUMA >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en operador_adictivo");
+}
 }
 
 void operador_multiplicativo():
 {
 } 
 {
+  try { 
   < tMULL >
 	| < tDIV >
 	| < tDIV1 >
 	| < tMOD >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en operador_multiplicativo");
+}
 }
 
 void factor():
 {
 }
 {
+  try { 
   ((< tRESTA >|< tNOT >) factor2())|factor2()
+}catch(ParseException e) {
+	error_sintactico(e,"Error en factor");
+}
 }
 
 void factor2():
 {
 }
 {
+  try { 
    < tPA > expresion() < tPC >
 | < tENTACAR > < tPA > expresion() < tPC >
 | < tCARAENT > < tPA > expresion() < tPC >
@@ -586,4 +709,7 @@ void factor2():
 | < tVALOR_ENTERO > 
 | < tTRUE >
 | < tFALSE >
+}catch(ParseException e) {
+	error_sintactico(e,"Error en factor2");
+}
 }
