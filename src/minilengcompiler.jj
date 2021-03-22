@@ -47,16 +47,7 @@ public class minilengcompiler {
 		        return;
 		     }  
 		     catch (Exception ex) { }
-		}
-		catch (Exception e) {
-			System.out.println("NOK.");
-		    System.out.println(e.getMessage());
-		    minilengcompiler.ReInit(System.in);
-		}
-		catch (Error e) { 
-		    System.out.println("Oops.");
-		    System.out.println(e.getMessage());
-		}    
+		}   
  	 }
  	 
  	 private static void error_sintactico(ParseException e, String mensaje) {
@@ -66,7 +57,7 @@ public class minilengcompiler {
     	int col = ultimoLeido.beginColumn;
     	String current = ultimoLeido.image;
     
-    	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Simbolo obtenido -> " + current + " -> " + mensaje );
+    	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Símbolo obtenido -> " + current + " -> " + mensaje );
   }
 }
 
