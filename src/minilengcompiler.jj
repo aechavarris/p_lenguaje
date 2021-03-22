@@ -48,9 +48,6 @@ public class minilengcompiler {
 		     }  
 		     catch (Exception ex) { }
 		}
-		catch(ParseException e) {
-			error_sintactico(e,"No se ha encontrado declaracion de programa");
-		}
 		catch (Exception e) {
 			System.out.println("NOK.");
 		    System.out.println(e.getMessage());
@@ -352,8 +349,12 @@ void programa():
 {
 }
 {
-  < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
-  (bloque_sentencias())*
+  try { 
+  	< tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
+ 	 (bloque_sentencias())*
+  }catch(ParseException e) {
+		error_sintactico(e,"No se ha encontrado declaracion de programa");
+	}
 }
 
 void sentencia():
