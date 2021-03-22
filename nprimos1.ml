@@ -14,7 +14,7 @@ programa nprimos;
       j := 2;
       divisible := false;
       mq (j < (i div 2)) and not divisible
-	     divisible := i mod j = 0;
+	     divisible := i mod j == 0;
 	     j := j + 1;
       fmq
       si not divisible ent
