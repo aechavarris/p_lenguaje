@@ -13,7 +13,7 @@ accion test1;
  principio
   c := ""==" ";
   mq (c <= not "S") and (not c <> "N") or (c==1)
-    escribir("(S/N)?",entacar(caraent(20)),c);
+    escribir("(S/N)?",entacar(caraent("75")),c);
     leer(c, ln,x);
   fmq
   respuesta := entacar(20)>true;
@@ -26,8 +26,8 @@ accion test2(Val entero  a,b ; ref  entero  m );
  caracter c,ln;
 
  principio
-  c := -1+5*20+("hola"=="hol")*((4 mod 3)*-(5 div 3))
-  bool:=4<>(5 mod 6)<=500
+  c := -1+5*20+("hola"=="hol")*((4 mod 3)*-(5 div 3));
+  bool:=4<>(5 mod 6)<=500;
   si c==1 ent print:="1";
   si_no
   si c==2 ent print:="2";

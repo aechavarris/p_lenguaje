@@ -304,6 +304,7 @@ TOKEN : /* VALORES */
 | < #LETRAID_FINAL : ["a"-"z","0"-"9"] >
 | < #CARACTER : "\""~["\""] "\"" >
 | < #CADENA : "\""(~["\""])+ "\"" >
+| < #CADENA_VACIA : "\"""\"" >
 
 | < tVALOR_ENTERO : (< DIGITO >)+ >
   {
@@ -316,7 +317,11 @@ TOKEN : /* VALORES */
 | < tVALOR_CADENA : ("-")?(< CADENA >) >
   {
     System.out.println("VALOR_CADENA (Valor: " + matchedToken + ")");
-  }  
+  }
+| < tVALOR_CADENA_VACIA : ("-")?(< CADENA_VACIA >) >
+  {
+    System.out.println("VALOR_CADENA (Valor: " + matchedToken + ")");
+  }
 | < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
@@ -717,7 +722,8 @@ void factor2():
 | < tENTERO >
 | < tVALOR_CARACTER >
 | < tVALOR_CADENA >
-| < tVALOR_ENTERO > 
+| < tVALOR_CADENA_VACIA >
+| < tVALOR_ENTERO >
 | < tTRUE >
 | < tFALSE >
 }catch(ParseException e) {
