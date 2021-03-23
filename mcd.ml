@@ -17,7 +17,7 @@ accion a2 (val entero b);
 		a1:=a1+1;
 		caca(j);
 		caca(j);
-		fallo:="hola"="hola";
+		fallo:="hola"=="hola";
 		fallo:="a">="c";
 		fallo:="hola">2;
 		fallo:=1>3;
