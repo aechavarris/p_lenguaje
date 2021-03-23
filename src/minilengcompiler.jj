@@ -58,6 +58,7 @@ public class minilengcompiler {
     	String current = ultimoLeido.image;
     
     	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Símbolo obtenido -> " + current + " -> " + mensaje );
+    	System.exit(1);
   }
 }
 
