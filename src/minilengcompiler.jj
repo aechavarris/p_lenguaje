@@ -16,6 +16,7 @@ PARSER_BEGIN(minilengcompiler)
 import java.io.*;
 
 public class minilengcompiler {
+  static boolean errorSintactico = false;
 	  public static void main(String args []) throws ParseException {
 	    if (args.length != 0 ) {
 			File tmp = new File(args[0]);
@@ -34,6 +35,11 @@ public class minilengcompiler {
         }    	
    		try {  
 		    minilengcompiler.programa();
+
+		    if ( errorSintactico ) {
+				System.out.println("Hay uno o más errores sintácticos");
+				System.exit(1);
+		    }  
 		    System.out.println("Analizado correctamente");	
 		}
 		catch(TokenMgrError e) {  
@@ -58,7 +64,14 @@ public class minilengcompiler {
     	String current = ultimoLeido.image;
     
     	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Símbolo obtenido -> " + current + " -> " + mensaje );
+<<<<<<< Updated upstream
     	System.exit(1);
+=======
+
+    	if ( !errorSintactico ) {
+			errorSintactico = true;
+   		}  
+>>>>>>> Stashed changes
   }
 }
 
