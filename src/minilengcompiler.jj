@@ -39,7 +39,8 @@ public class minilengcompiler {
 		    if ( errorSintactico ) {
 				System.out.println("Hay uno o más errores sintácticos");
 				System.exit(1);
-		    }  
+		    }
+		     
 		    System.out.println("Analizado correctamente");	
 		}
 		catch(TokenMgrError e) {  
