@@ -1,6 +1,4 @@
-%-------------------------------------------------------------------
 programa adivinar;
-%-------------------------------------------------------------------
 
  caracter prueba1, prueba2, prueba3, max;
  booleano prueba;
@@ -14,55 +12,59 @@ accion test1;
 
  principio
   c := ""==" ";
-  mq (c <> "S") and (c <> "N") or (c==1)
+  mq (c <= not "S") and (not c <> "N") or (c==1)
     escribir("(S/N)?",entacar(caraent(20)),c);
     leer(c, ln,x);
   fmq
-  respuesta := c;
+  respuesta := entacar(20)>true;
  fin
 
 %-------------------------------------------------------------------
-accion test2;
+accion test2(Val entero  a,b ; ref  entero  m );
 %-------------------------------------------------------------------
 
  caracter c,ln;
 
  principio
-  c := " ";
-  mq (c < "A") or (c > "Z")
-    escribir("letra:");
-    leer(c, ln);
-  fmq
-  respuesta := c;
+  c := -1+5*20+("hola"=="hol")*((4 mod 3)*-(5 div 3))
+  bool:=4<>(5 mod 6)<=500
+  si c==1 ent print:="1";
+  si_no
+  si c==2 ent print:="2";
+  si_no
+  si c==3 ent print:="3";
+  si_no
+  si c==4 ent print:="4";
+  si_no
+  si c==5 ent print:="5"; 
+  si_no
+  si c==6 ent print:="6"; 
+  si_no
+  si c==7 ent print:="7";
+  si_no
+  si c==8 ent print:="8";
+  si_no
+  si c==9 ent print:="9";
+  si_no
+  si c==10 ent print:="10";
+  si_no
+  si c==11 ent print:="11";
+  si_no
+  si c==12 ent print:="12";
+  si_no
+     escribir(print); 
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  fsi
+  test1;
  fin
 
-%-------------------------------------------------------------------
-principio
-%-------------------------------------------------------------------
- escribir("Piensa en una letra e intentare adivinarla.", 
-          entacar(13),entacar(10));
- escribir("Listo?");
- siono;
- min := "A";
- max := "Z";
- headivinado := false;
- mq (min <> max) and not headivinado
-   letra := entacar((caraent(min) + caraent(max)) div 2);
-   escribir("(", min, ",", max, ")",": has pensado en la letra ", letra, "?");
-   siono;
-   si (respuesta == "N") ent
-     escribir("La letra que has pensado es mayor?");
-     siono;
-     si respuesta == "S" ent
-      min := entacar(caraent(letra) + 1);
-     si_no
-      max := entacar(caraent(letra) - 1);
-    fsi
-   si_no
-    headivinado := true;
-   fsi
- fmq
- si not headivinado ent
-  escribir("La letra es la ", min, entacar(13), entacar (10));
- fsi
-fin
