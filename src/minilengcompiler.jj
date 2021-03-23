@@ -458,7 +458,7 @@ void cabecera_accion():
 }
 {
   try { 
-  	< tACCION > < tIDENTIFICADOR > (< tFIN_SENTENCIA >|parametros_formales() < tFIN_SENTENCIA >)
+  	< tACCION > < tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
  }catch(ParseException e) {
 	error_sintactico(e,"Error en cabecera_accion");
 }
@@ -469,7 +469,7 @@ void parametros_formales():
 }
 {
   try { 
-  < tPA >parametros() (< tFIN_SENTENCIA > parametros())*< tPC >
+  < tPA >(parametros() (< tFIN_SENTENCIA > parametros())*)?< tPC >
 }catch(ParseException e) {
 	error_sintactico(e,"Error en parametros_formales");
 }
