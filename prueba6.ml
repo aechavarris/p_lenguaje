@@ -4,9 +4,12 @@ programa adivinar;
  booleano prueba;
  caracter x, y;
 
-%-------------------------------------------------------------------
+%%
+Este programa intenta probar toda la gramatica del analizador sintactico
+y algunas situaciones algo rebuscadas que pueden resultar el fallos.
+%%
 accion test1;
-%-------------------------------------------------------------------
+
 
  caracter c,ln;
 
