@@ -64,14 +64,10 @@ public class minilengcompiler {
     	String current = ultimoLeido.image;
     
     	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Símbolo obtenido -> " + current + " -> " + mensaje );
-<<<<<<< Updated upstream
     	System.exit(1);
-=======
-
     	if ( !errorSintactico ) {
 			errorSintactico = true;
    		}  
->>>>>>> Stashed changes
   }
 }
 
