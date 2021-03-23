@@ -1,4 +1,6 @@
-programa test2;
+% --------------------------------------------------------
+Programa test2;
+% --------------------------------------------------------
 
 %%
 Este programa provocara un error cuando se intente crear una variable

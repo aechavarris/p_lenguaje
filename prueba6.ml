@@ -1,4 +1,6 @@
-programa adivinar;
+% --------------------------------------------------------
+Programa test1;
+% --------------------------------------------------------
 
  caracter prueba1, prueba2, prueba3, max;
  booleano prueba;
