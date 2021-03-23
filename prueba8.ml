@@ -1,24 +1,19 @@
 % --------------------------------------------------------
-Programa prueba2;
+Programa test3;
 % -------------------------------------------------------- 
 
 %%
- Checkeamos dos cosas: Por un lado, que detecta los dobles
- comentarios y, por otro lado, que salta error con los
- acentos en letras minúsculas
+ En este programa se comprobara el correcto sintaxis de 
+ operaciones relacionales, aditivas, etc ...
 %%
 
-entero ejecución;
-
-accion dato (ref entero d);
 Principio
-	d:=0;
-	Mq d <= 0
-		escribir("Escribe un numero: ");
-		leer(d);
-		Si d <= 0 ent
-			escribir("El numero debe ser positivo.");
-			escribir (entacar(13), entacar(10));
+	d:=((25 div 3)+3==4 mod 5;
+	Mq d == 0
+		escribir((-2*-5(4 mod --2+5)));
+		Si d => 0 ent
+		si d or and 2==3
+			escribir(entacar());
 		FSi
 	FMq
 Fin

@@ -561,7 +561,7 @@ void caraent():
 }
 {
   try { 
-  < tCARAENT ><tPA >(<tVALOR_CADENA >|< tIDENTIFICADOR >|entacar())<tPC >
+  < tCARAENT ><tPA >(expresion())<tPC >
 }catch(ParseException e) {
 	error_sintactico(e,"Error en caraent");
 }
@@ -572,7 +572,7 @@ void entacar():
 }
 {
   try { 
-  < tENTACAR ><tPA >(<tVALOR_ENTERO >|< tIDENTIFICADOR >|caraent())<tPC >
+  < tENTACAR ><tPA >(expresion())<tPC >
 }catch(ParseException e) {
 	error_sintactico(e,"Error en entacar");
 }
@@ -583,7 +583,7 @@ void lista_escribibles():
 }
 {
   try { 
-  	( < tVALOR_CADENA >|< tIDENTIFICADOR >| entacar()|< tVALOR_CARACTER > ) ( < tCOMA > (< tVALOR_CADENA >|< tIDENTIFICADOR >| entacar()|< tVALOR_CARACTER > ) )*
+  	( expresion() ) ( < tCOMA > (expresion() ) )*
 }catch(ParseException e) {
 	error_sintactico(e,"Error en lista_escribibles");
 }
