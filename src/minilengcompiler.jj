@@ -688,7 +688,7 @@ void factor():
 }
 {
   try { 
-  ((< tRESTA >|< tNOT >) factor2())|factor2()
+  (< tRESTA >|< tNOT >)? factor2()
 }catch(ParseException e) {
 	error_sintactico(e,"Error en factor");
 }
