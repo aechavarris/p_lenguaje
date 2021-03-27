@@ -1,32 +1,25 @@
 % --------------------------------------------------------
 Programa prueba3;
 % -------------------------------------------------------- 
+%%
+Este programa provocara errores referidos a la estructura del propio programa
+declaraciones de acciones, declaracion de variables, etc ...
+%%
+accion test(val entero a,b; refentero m);
 
-
-
-accion mcd(val entero a,b; ref entero m);
-
-	entero i, j, k;
-	
-	% Comprobamos que no reconoce otro caracter especial $
-	
-	entero equiumi$;
+entero i, j, k;
 	
 Principio
-	j := a;
-	k := b;
-	i := a mod b;
-	Mq i <> 0
-		j := k;
-		k := i;
-		i := j mod k;
-	FMq
-	m := i;
 Fin
 
-Principio
-	dato(i);
-	dato(j);
-	mcd(i,j,m);
-	escribir("El MCD es: ", m, entacar(13), entacar(10));
-Fin
+entero c,z;
+accion test2(a);
+
+principio
+;
+fin
+
+
+
+
+

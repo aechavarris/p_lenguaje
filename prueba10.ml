@@ -2,13 +2,15 @@
 Programa prueba1;
 % --------------------------------------------------------
 
-% Aqui verificamos como en este comentario la ñ da igual
-entero hasta, m, n, ñ;
-
+%%
+Este programa simple comprobara que las palabras clave
+estan protegidas, que ningun identificador puede llamarse
+booleano, entero.....
+%%
+accion booleano;
 Principio
-	hasta := 6;
-  Mq (hasta <> 0) 
-		escribir("hasta");
-		hasta := hasta - 1;
+	entero := 6;
+  Mq (entero <> 0) 
+		caracter=0;
 	FMq
 Fin
