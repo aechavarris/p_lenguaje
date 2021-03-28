@@ -9,7 +9,6 @@ declaracion_accion ::= cabecera_accion ";"
 declaracion_variables declaracion_acciones bloque_sentencias
 cabecera_accion ::= < tACCION > < tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
 parametros_formales ::= < tPA >(parametros() (< tFIN_SENTENCIA > parametros())*)?< tPC >
-lista_parametros	 ::= ...
 parametros ::= clase_parametros tipo_variables lista_parametros
 clase_parametros ::= <tVAL> | <tREF>
 bloque_sentencias ::= <tPRINCIPIO> lista_sentencias <tFIN>
