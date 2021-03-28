@@ -1,50 +1,63 @@
-programa ::= <tPROGRAMA> <tIDENTIFICADOR> ";" 
-declaracion_variables declaracion_acciones 
-bloque_sentencias
+programa ::= < tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
+ 	 (bloque_sentencias())* 
 declaracion_variables ::= ( declaracion ";" )*
-declaracion ::= tipo_variables identificadores
+declaracion ::= tipo_variables() identificadores()
 tipo_variables ::= <tENTERO> | <tCARACTER> | <tBOOLEANO>
 identificadores ::= <tIDENTIFICADOR> ( "," <tIDENTIFICADOR> )*
 declaracion_acciones ::= ( declaracion_accion )*
 declaracion_accion ::= cabecera_accion ";" 
 declaracion_variables declaracion_acciones bloque_sentencias
-cabecera_accion ::= <tACCION> <tIDENTIFICADOR> parametros_formales
-parametros_formales ::= ...
+cabecera_accion ::= < tACCION > < tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
+parametros_formales ::= < tPA >(parametros() (< tFIN_SENTENCIA > parametros())*)?< tPC >
 lista_parametros	 ::= ...
 parametros ::= clase_parametros tipo_variables lista_parametros
 clase_parametros ::= <tVAL> | <tREF>
 bloque_sentencias ::= <tPRINCIPIO> lista_sentencias <tFIN>
-lista_sentencias	 ::= ...
-sentencia ::= leer ";"
-	| escribir ";"
-	| asignacion
-	| invocacion_accion
-	| seleccion
-	| mientras_que
-leer ::= <tLEER> <tPA> lista_asignables <tPC>
+lista_sentencias	 ::= (sentencia())*
+sentencia ::= (leer()) < tFIN_SENTENCIA >
+ |  (escribir()) < tFIN_SENTENCIA >
+ |  (asignacion()) < tFIN_SENTENCIA >
+ |	(invocacion_accion()) 
+ |	(seleccion()) 
+ |	(mientras_que())
+ | 	(si())
+leer ::= < tLEER > < tPA > identificadores() < tPC >
+caraent ::= < tCARAENT ><tPA >(expresion())<tPC >
+entacar ::= < tENTACAR ><tPA >(expresion())<tPC >
 lista_asignables ::= ...
-escribir ::= <tESCRIBIR> <tPA> lista_escribibles <tPC>
-lista_escribibles ::= ...
-asignación ::= <tIDENTIFICADOR> <tOPAS> expresion ";"
-invocacion_accion ::= <tIDENTIFICADOR> argumentos ";"
-mientras_que ::= <tMQ> expresion lista_sentencias <tFMQ>
-seleccion ::= ...
-argumentos ::= <tPA> ( lista_expresiones )? <tPC>
-lista_expresiones ::= ...
-expresion ::= ...
-operador_relacional ::= ...
-expresion_simple ::= ...
-operador_aditivo ::= ...
-termino ::= ...
-operador_multiplicativo ::= ...
-factor ::= "-" factor
-| <tNOT> factor
-| <tPA> expresion <tPC>
-| <tENTACAR> <tPA> expresion <tPC>
-| <tCARAENT> <tPA> expresion <tPC>
-| <tIDENTIFICADOR>
-| <tCONSTENTERA>
-| <tCONSTCHAR>
-| <tCONSTCAD>
-| <tTRUE>
-| <tFALSE>
+escribir ::= < tESCRIBIR > < tPA > lista_escribibles() < tPC >
+lista_escribibles ::= ( expresion() ) ( < tCOMA > (expresion() ) )*
+asignación ::=  < tIDENTIFICADOR_ASIG > expresion()
+invocacion_accion ::= <tIDENTIFICADOR>(< tFIN_SENTENCIA >|argumentos()< tFIN_SENTENCIA >)
+mientras_que ::= < tMQ > expresion()( ( < tAND > | < tOR > ) expresion())* lista_sentencias() < tFMQ >
+si ::= < tSI > expresion()( ( < tAND > | < tOR > ) expresion())* < tENT > lista_sentencias()
+seleccion ::= < tPRINCIPIO > < tIDENTIFICADOR > < tLLAVE_IZQ > (sentencia())* < tLLAVE_DCHA >
+argumentos ::= < tPA > ( lista_expresiones() )? < tPC >
+lista_expresiones ::= expresion()(","expresion())*
+expresion ::= factor()( (operador_relacional()|operador_aditivo()|operador_multiplicativo()) factor() 
+operador_relacional ::= < tMENOR >
+	| < tMAYOR >
+	| < tMEI >
+	| < tMAI >
+	| < tIGUAL >
+	| < tNI >
+	| < tAND >
+	| < tOR >
+operador_aditivo ::= < tRESTA >
+	| < tSUMA >
+operador_multiplicativo ::= < tMULL >
+	| < tDIV >
+	| < tDIV1 >
+	| < tMOD >
+factor ::= (< tRESTA >|< tNOT >)? factor2()
+factor2 ::= < tPA > expresion() < tPC >
+| < tENTACAR > < tPA > expresion() < tPC >
+| < tCARAENT > < tPA > expresion() < tPC >
+| < tIDENTIFICADOR >
+| < tENTERO >
+| < tVALOR_CARACTER >
+| < tVALOR_CADENA >
+| < tVALOR_CADENA_VACIA >
+| < tVALOR_ENTERO >
+| < tTRUE >
+| < tFALSE >
