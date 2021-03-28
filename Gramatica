@@ -24,7 +24,6 @@ sentencia ::= (leer()) < tFIN_SENTENCIA >
 leer ::= < tLEER > < tPA > identificadores() < tPC >
 caraent ::= < tCARAENT ><tPA >(expresion())<tPC >
 entacar ::= < tENTACAR ><tPA >(expresion())<tPC >
-lista_asignables ::= ...
 escribir ::= < tESCRIBIR > < tPA > lista_escribibles() < tPC >
 lista_escribibles ::= ( expresion() ) ( < tCOMA > (expresion() ) )*
 asignación ::=  < tIDENTIFICADOR_ASIG > expresion()
