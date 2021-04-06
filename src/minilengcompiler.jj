@@ -652,11 +652,26 @@ void expresion():
 }
 {
   try { 
-   factor()( (operador_relacional()|operador_aditivo()|operador_multiplicativo()) factor() )*
+   factor()( (operador()) factor() )*
  }catch(ParseException e) {
 	error_sintactico(e,"Error en expresion");
 }
 }
+
+void operador():
+{
+}
+{
+  try {
+    operador_multiplicativo()
+    |operador_relacional()
+	|operador_aditivo()
+	 
+}catch(ParseException e) {
+	error_sintactico(e,"Error en operador_relacional");
+}
+}
+
 void operador_relacional():
 {
 }
