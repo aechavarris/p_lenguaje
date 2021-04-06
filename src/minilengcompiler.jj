@@ -64,7 +64,7 @@ public class minilengcompiler {
     	int col = ultimoLeido.beginColumn;
     	String current = ultimoLeido.image;
     
-    	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Símbolo obtenido -> " + current + " -> " + mensaje );
+    	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Token obtenido -> " + current + " -> " + mensaje );
     	if ( !errorSintactico ) {
 			errorSintactico = true;
    		}  
@@ -97,8 +97,6 @@ PARSER_END(minilengcompiler)
 < COMLINE >MORE :
 {
   < ~[ ] >
-  {
-   }
 }
 
 < COMBLOCK >MORE :
@@ -207,7 +205,7 @@ TOKEN : /* OPERADORES */
   {
     System.out.println("MENOR");
   }
-| < tIGUAL : "==" >
+| < tIGUAL : "=" >
   {
     System.out.println("IGUAL");
   }
@@ -324,11 +322,7 @@ TOKEN : /* VALORES */
   {
     System.out.println("VALOR_BOOLEANO (Valor: " + matchedToken + ")");
   }
-| <  tIDENTIFICADOR_ASIG : ((< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >))(" ")*(< tOAS >) >
-  {
-    System.out.println("IDENTIFICADOR_ASIG (Valor: " + matchedToken + ")");
-  } 
-| <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)+(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) | (< LETRAID_INICIAL >)(< LETRAID_FINAL >) >
+| <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)*(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) >
   {
     System.out.println("IDENTIFICADOR (Valor: " + matchedToken + ")");
   }
@@ -367,8 +361,7 @@ void sentencia():
 try { 
   	(leer()) < tFIN_SENTENCIA >
  |  (escribir()) < tFIN_SENTENCIA >
- |  (asignacion()) < tFIN_SENTENCIA >
- |	(invocacion_accion()) 
+ |  < tIDENTIFICADOR > (asignacion_invocacion_accion()) < tFIN_SENTENCIA >
  |	(seleccion()) 
  |	(mientras_que())
  | 	(si())
@@ -378,12 +371,23 @@ try {
 }
 }
 
+void asignacion_invocacion_accion():
+{
+}
+{
+  try { 
+  asignacion()|invocacion_accion()
+}catch(ParseException e) {
+	error_sintactico(e,"Error en asignacion");
+}
+}
+
 void asignacion():
 {
 }
 {
   try { 
-  < tIDENTIFICADOR_ASIG > expresion()
+  < tOAS > expresion()
 }catch(ParseException e) {
 	error_sintactico(e,"Error en asignacion");
 }
