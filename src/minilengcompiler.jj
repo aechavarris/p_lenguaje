@@ -512,9 +512,32 @@ void operador():
 }
 {
   try {
-    operador_multiplicativo()
-    |operador_relacional()
-	|operador_aditivo()
+    operador_aditivo()|operador2()
+
+	 
+}catch(ParseException e) {
+	error_sintactico(e,"Error en operador_relacional");
+}
+}
+
+void operador2():
+{
+}
+{
+  try {
+    operador_multiplicativo()|operador3()
+	 
+}catch(ParseException e) {
+	error_sintactico(e,"Error en operador_relacional");
+}
+}
+
+void operador3():
+{
+}
+{
+  try {
+    operador_relacional()
 	 
 }catch(ParseException e) {
 	error_sintactico(e,"Error en operador_relacional");
