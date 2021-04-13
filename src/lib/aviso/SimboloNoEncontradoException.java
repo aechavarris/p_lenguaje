@@ -1,4 +1,4 @@
-package lib.semantico;
+package lib.aviso;
 
 public class SimboloNoEncontradoException extends Exception {
 
