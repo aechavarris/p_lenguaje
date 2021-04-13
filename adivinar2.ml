@@ -42,10 +42,10 @@ principio
    letra := entacar((caraent(min) + caraent(max)) div 2);
    escribir("(", min, ",", max, ")",": has pensado en la letra ", letra, "?");
    siono;
-   si (respuesta == "N") ent
+   si (respuesta = "N") ent
      escribir("La letra que has pensado es mayor?");
      siono;
-     si respuesta == "S" ent
+     si respuesta = "S" ent
       min := entacar(caraent(letra) + 1);
      si_no
       max := entacar(caraent(letra) - 1);

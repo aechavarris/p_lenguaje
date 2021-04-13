@@ -15,6 +15,6 @@ accion test1;
   test_0:=1;
   escribir(entacar(caraent(1));
   escribir(caraent("20"));
-  si entacar("2")==2 ent
+  si entacar("2")=2 ent
 	escribir("2");
  fin

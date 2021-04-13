@@ -8,7 +8,7 @@ entero x,y,n,m;
 Principio
 %--------------------------------------------------------
         n := 0;
-        Mq (n <= 0) or (n >=100) or (n div 10 == n mod 10)
+        Mq (n <= 0) or (n >=100) or (n div 10 = n mod 10)
            escribir("n: ");
            leer(n);
         FMq

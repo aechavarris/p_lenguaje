@@ -23,8 +23,8 @@ ACCION primer_dia_anho;
 
        principio
            anho:=anho-1900;
-           cuatro:=(anho MOD 4==0) AND (anho MOD 100<>0);
-           cien:=anho MOD 400==0;
+           cuatro:=(anho MOD 4=0) AND (anho MOD 100<>0);
+           cien:=anho MOD 400=0;
            bisiestos_validos:=cuatro OR cien;
            bisiestos:=anho DIV 4;
            si bisiestos_validos
@@ -45,36 +45,36 @@ ACCION primer_dia_mes;
 
        principio
            anho:=anho-1900;
-           cien:=(anho MOD 4==0) AND (anho MOD 100<>0);
-           cuatro:=anho MOD 400==0;
+           cien:=(anho MOD 4=0) AND (anho MOD 100<>0);
+           cuatro:=anho MOD 400=0;
            bisiestos_validos:=cien OR cuatro;
            si bisiestos_validos
               ent   anhade:=1;
               si_no anhade:=0;
            fsi
-           si mes==1 ent dia1mes:=dia1anho;
+           si mes=1 ent dia1mes:=dia1anho;
            si_no
-              si mes==2 ent dia1mes:=(dia1anho+31) MOD 7;
+              si mes=2 ent dia1mes:=(dia1anho+31) MOD 7;
            si_no
-              si mes==3 ent dia1mes:=(dia1anho+59+anhade) MOD 7;
+              si mes=3 ent dia1mes:=(dia1anho+59+anhade) MOD 7;
            si_no
-              si mes==4 ent dia1mes:=(dia1anho+90+anhade) MOD 7;
+              si mes=4 ent dia1mes:=(dia1anho+90+anhade) MOD 7;
            si_no
-              si mes==5 ent dia1mes:=(dia1anho+120+anhade) MOD 7; 
+              si mes=5 ent dia1mes:=(dia1anho+120+anhade) MOD 7; 
            si_no
-              si mes==6 ent dia1mes:=(dia1anho+151+anhade) MOD 7; 
+              si mes=6 ent dia1mes:=(dia1anho+151+anhade) MOD 7; 
            si_no
-              si mes==7 ent dia1mes:=(dia1anho+181+anhade) MOD 7; 
+              si mes=7 ent dia1mes:=(dia1anho+181+anhade) MOD 7; 
            si_no
-              si mes==8 ent dia1mes:=(dia1anho+212+anhade) MOD 7;
+              si mes=8 ent dia1mes:=(dia1anho+212+anhade) MOD 7;
            si_no
-              si mes==9 ent dia1mes:=(dia1anho+243+anhade) MOD 7;
+              si mes=9 ent dia1mes:=(dia1anho+243+anhade) MOD 7;
            si_no
-              si mes==10 ent dia1mes:=(dia1anho+273+anhade) MOD 7;
+              si mes=10 ent dia1mes:=(dia1anho+273+anhade) MOD 7;
            si_no
-              si mes==11 ent dia1mes:=(dia1anho+304+anhade) MOD 7 ;
+              si mes=11 ent dia1mes:=(dia1anho+304+anhade) MOD 7 ;
            si_no
-              si mes==12 ent dia1mes:=(dia1anho+334+anhade) MOD 7;
+              si mes=12 ent dia1mes:=(dia1anho+334+anhade) MOD 7;
            si_no
               escribir("Has introducido el mes mal"); 
            fsi

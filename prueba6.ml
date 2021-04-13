@@ -16,8 +16,8 @@ accion test1;
  caracter c,ln;
 
  principio
-  c := ""==" ";
-  mq (c <= not "S") and (not c <> "N") or (c==1)
+  c := ""=" ";
+  mq (c <= not "S") and (not c <> "N") or (c=1)
     escribir("(S/N)?",entacar(caraent("75")),c);
     leer(c, ln,x);
   fmq
@@ -31,31 +31,31 @@ accion test2(Val entero  a,b ; ref  entero  m );
  caracter c,ln;
 
  principio
-  c := -1+5*20+("hola"=="hol")*((4 mod 3)*-(5 div 3));
+  c := -1+5*20+("hola"="hol")*((4 mod 3)*-(5 div 3));
   bool:=4<>(5 mod 6)<=500;
-  si c==1 ent print:="1";
+  si c=1 ent print:="1";
   si_no
-  si c==2 ent print:="2";
+  si c=2 ent print:="2";
   si_no
-  si c==3 ent print:="3";
+  si c=3 ent print:="3";
   si_no
-  si c==4 ent print:="4";
+  si c=4 ent print:="4";
   si_no
-  si c==5 ent print:="5"; 
+  si c=5 ent print:="5"; 
   si_no
-  si c==6 ent print:="6"; 
+  si c=6 ent print:="6"; 
   si_no
-  si c==7 ent print:="7";
+  si c=7 ent print:="7";
   si_no
-  si c==8 ent print:="8";
+  si c=8 ent print:="8";
   si_no
-  si c==9 ent print:="9";
+  si c=9 ent print:="9";
   si_no
-  si c==10 ent print:="10";
+  si c=10 ent print:="10";
   si_no
-  si c==11 ent print:="11";
+  si c=11 ent print:="11";
   si_no
-  si c==12 ent print:="12";
+  si c=12 ent print:="12";
   si_no
      escribir(print); 
   fsi
