@@ -1,3 +1,7 @@
 /minilengcompiler.java
 /minilengcompilerConstants.java
 /minilengcompilerTokenManager.java
+/ParseException.java
+/SimpleCharStream.java
+/Token.java
+/TokenMgrError.java

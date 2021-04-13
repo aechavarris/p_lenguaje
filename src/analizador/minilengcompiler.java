@@ -10,6 +10,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static boolean errorSintactico = false;
   static TablaSimbolos tabla_simbolos = new TablaSimbolos();
   static int nivel = 0;
+  static int ejecucion_correcta=1;
 
          public static void main(String args []) throws ParseException {
             if (args.length != 0 ) {
@@ -45,6 +46,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
 
                         System.err.println("ERROR L\u00c9XICO (<" + fil + ", " + col + ">): s\u00edmbolo no reconocido: <" + simbolo + ">");
+                        ejecucion_correcta=0;
                         return;
                      }
                      catch (Exception ex) { }
@@ -62,6 +64,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         if ( !errorSintactico ) {
                         errorSintactico = true;
                 }
+                ejecucion_correcta=0;
         }
 
         private static void error_semantico(String name, int f, int col, Exception except) {
@@ -75,9 +78,13 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
 
   static final public void programa() throws ParseException {
+  Token p=null;
     try {
       jj_consume_token(tPROGRAMA);
-      jj_consume_token(tIDENTIFICADOR);
+      p = jj_consume_token(tIDENTIFICADOR);
+                  if(p!=null){
+                        tabla_simbolos.introducir_programa(p.image,0);
+                        }
       jj_consume_token(tFIN_SENTENCIA);
       declaracion_variables();
       declaracion_acciones();

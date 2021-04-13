@@ -25,6 +25,7 @@ public class minilengcompiler {
   static boolean errorSintactico = false;
   static TablaSimbolos tabla_simbolos = new TablaSimbolos();
   static int nivel = 0;
+  static int ejecucion_correcta=1;
   
 	 public static void main(String args []) throws ParseException {
 	    if (args.length != 0 ) {
@@ -60,6 +61,7 @@ public class minilengcompiler {
 		        String col = String.valueOf(minilengcompilerTokenManager.input_stream.getEndColumn());
 		     
 		        System.err.println("ERROR LÉXICO (<" + fil + ", " + col + ">): símbolo no reconocido: <" + simbolo + ">");
+		        ejecucion_correcta=0;
 		        return;
 		     }  
 		     catch (Exception ex) { }
@@ -76,7 +78,8 @@ public class minilengcompiler {
     	System.out.println("ERROR SINTÁCTICO (<" + fil  + ", " + col + ">): Token obtenido -> " + current + " -> " + mensaje );
     	if ( !errorSintactico ) {
 			errorSintactico = true;
-   		}  
+   		}
+   		ejecucion_correcta=0;
   	}
 
   	private static void error_semantico(String name, int f, int col, Exception except) {
@@ -212,10 +215,17 @@ TOKEN : /* FINES DE SENTENCIA */
 
 void programa():
 {
+  Token p=null;
 }
 {
   try { 
-  	< tPROGRAMA > < tIDENTIFICADOR > < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
+  	< tPROGRAMA > p=< tIDENTIFICADOR >
+  		{
+  		  if(p!=null){
+			tabla_simbolos.introducir_programa(p.image,0);
+  	 		}
+  	  	}
+  	   < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
  	 (bloque_sentencias())*
   }catch(ParseException e) {
 		error_sintactico(e,"Error en programa");
