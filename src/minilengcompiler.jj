@@ -16,7 +16,11 @@ PARSER_BEGIN(minilengcompiler)
 import java.io.*;
 
 public class minilengcompiler {
+  
   static boolean errorSintactico = false;
+  static Tabla_simbolos tabla_simbolos = new Tabla_simbolos();
+  static int nivel = 0;
+  
 	  public static void main(String args []) throws ParseException {
 	    if (args.length != 0 ) {
 			File tmp = new File(args[0]);
