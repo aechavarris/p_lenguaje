@@ -16,6 +16,9 @@ import lib.aviso.Aviso;
 
 import java.util.Random;
 
+import lib.semantico.SimboloYaDeclaradoException;
+import lib.semantico.SimboloNoEncontradoException;
+
 import analizador.Token;
 import analizador.minilengcompiler;
 
