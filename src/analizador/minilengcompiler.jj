@@ -4,6 +4,7 @@
  * Alvaro Echavarri - 737400@unizar.es
  * v1.2 - 2021/03/16
  */
+
 options
 {
   static = true;
@@ -15,14 +16,17 @@ PARSER_BEGIN(minilengcompiler)
 
 package analizador;
 import java.io.*;
+import lib.aviso.*;
+import lib.semantico.*;
+
 
 public class minilengcompiler {
   
   static boolean errorSintactico = false;
-  static Tabla_simbolos tabla_simbolos = new Tabla_simbolos();
+  static TablaSimbolos tabla_simbolos = new TablaSimbolos();
   static int nivel = 0;
   
-	  public static void main(String args []) throws ParseException {
+	 public static void main(String args []) throws ParseException {
 	    if (args.length != 0 ) {
 			File tmp = new File(args[0]);
 			String file = tmp.getAbsolutePath();
@@ -73,7 +77,12 @@ public class minilengcompiler {
     	if ( !errorSintactico ) {
 			errorSintactico = true;
    		}  
-  }
+  	}
+
+  	private static void error_semantico(String name, int f, int col, Exception e) {
+
+	  
+ 	}  
 }
 
 PARSER_END(minilengcompiler)
