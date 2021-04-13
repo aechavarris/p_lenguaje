@@ -65,7 +65,7 @@ public class minilengcompiler {
 		        return;
 		     }  
 		     catch (Exception ex) { }
-		}   
+		}    
  	 }
  	 
  	 private static void error_sintactico(ParseException e, String mensaje) {
@@ -90,6 +90,7 @@ public class minilengcompiler {
 		else if (except instanceof SimboloYaDeclaradoException) {
 			System.out.println("ERROR SEMÁNTICO: <Ya ha sido declarado el símbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
 		}
+		ejecucion_correcta=0;
  	}  
 }
 
@@ -227,6 +228,13 @@ void programa():
   	  	}
   	   < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
  	 (bloque_sentencias())*
+ 	 {
+ 	   if(ejecucion_correcta==1) {
+			tabla_simbolos.eliminar_variables(nivel);
+			tabla_simbolos.eliminar_acciones(nivel);
+			tabla_simbolos.eliminar_programa();
+ 	   }
+ 	 }
   }catch(ParseException e) {
 		error_sintactico(e,"Error en programa");
 	}

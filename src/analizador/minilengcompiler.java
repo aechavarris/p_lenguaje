@@ -75,6 +75,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 else if (except instanceof SimboloYaDeclaradoException) {
                         System.out.println("ERROR SEM\u00c1NTICO: <Ya ha sido declarado el s\u00edmbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
                 }
+                ejecucion_correcta=0;
         }
 
   static final public void programa() throws ParseException {
@@ -100,6 +101,11 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         bloque_sentencias();
       }
+           if(ejecucion_correcta==1) {
+                        tabla_simbolos.eliminar_variables(nivel);
+                        tabla_simbolos.eliminar_acciones(nivel);
+                        tabla_simbolos.eliminar_programa();
+           }
     } catch (ParseException e) {
                 error_sintactico(e,"Error en programa");
     }
