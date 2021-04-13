@@ -12,7 +12,7 @@ options
   
 }
 
-PARSER_BEGIN(minilengcompiler)   
+PARSER_BEGIN(minilengcompiler) 
 
 package analizador;
 import java.io.*;
@@ -80,8 +80,13 @@ public class minilengcompiler {
   	}
 
   	private static void error_semantico(String name, int f, int col, Exception e) {
-
-	  
+  		// ERRORES SEMÁNTICOS
+  		if (e instanceof SimboloNoEncontradoException) {
+			System.out.println("ERROR SEMÁNTICO: <No se ha encontrado el símbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
+	    }
+		else if (except instanceof SimboloYaDeclaradoException) {
+			System.out.println("ERROR SEMÁNTICO: <Ya ha sido declarado el símbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
+		}
  	}  
 }
 
