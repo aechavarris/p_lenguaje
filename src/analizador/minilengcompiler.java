@@ -64,9 +64,9 @@ public class minilengcompiler implements minilengcompilerConstants {
                 }
         }
 
-        private static void error_semantico(String name, int f, int col, Exception e) {
+        private static void error_semantico(String name, int f, int col, Exception except) {
                 // ERRORES SEMÁNTICOS
-                if (e instanceof SimboloNoEncontradoException) {
+                if (except instanceof SimboloNoEncontradoException) {
                         System.out.println("ERROR SEM\u00c1NTICO: <No se ha encontrado el s\u00edmbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
             }
                 else if (except instanceof SimboloYaDeclaradoException) {
