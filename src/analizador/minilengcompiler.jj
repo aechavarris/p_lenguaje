@@ -13,6 +13,7 @@ options
 
 PARSER_BEGIN(minilengcompiler)
 
+package analizador;
 import java.io.*;
 
 public class minilengcompiler {
@@ -25,7 +26,7 @@ public class minilengcompiler {
 				minilengcompiler parser = new minilengcompiler(new FileInputStream(file));
 			}  
 			catch (FileNotFoundException e) {
-				System.out.printf("No existe el fichero: "+ file + "\n");
+				System.out.printf("No existe el fichero: "+ file + "\n"); 
 				System.exit(1);
 			}
       	}
@@ -181,7 +182,7 @@ TOKEN : /* VALORES */
 | < tVALOR_CADENA : ("-")?(< CADENA >) >
 | < tVALOR_CADENA_VACIA : ("-")?(< CADENA_VACIA >) >
 | < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
-| < tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)*(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) >
+| <  tIDENTIFICADOR : (< LETRAID_INICIAL >)(< LETRA >)*(< LETRAID_FINAL >) | (< LETRAID_INICIAL >) >
 }
 
 TOKEN : /* FINES DE SENTENCIA */
