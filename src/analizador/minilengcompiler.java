@@ -3,7 +3,10 @@ package analizador;
 import java.io.*;
 
 public class minilengcompiler implements minilengcompilerConstants {
+
   static boolean errorSintactico = false;
+  static int nivel = 0;
+
           public static void main(String args []) throws ParseException {
             if (args.length != 0 ) {
                         File tmp = new File(args[0]);
