@@ -236,7 +236,7 @@ void programa():
  	   }
  	 }
   }catch(ParseException e) {
-		error_sintactico(e,"Error en programa");
+		error_sintactico(e,"Error en definicion de programa");
 	}
 }
 
