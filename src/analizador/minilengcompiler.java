@@ -480,31 +480,6 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       jj_consume_token(tMQ);
       expresion();
-      label_8:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case tAND:
-        case tOR:
-          ;
-          break;
-        default:
-          jj_la1[14] = jj_gen;
-          break label_8;
-        }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case tAND:
-          jj_consume_token(tAND);
-          break;
-        case tOR:
-          jj_consume_token(tOR);
-          break;
-        default:
-          jj_la1[15] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-        expresion();
-      }
       lista_sentencias();
       jj_consume_token(tFMQ);
     } catch (ParseException e) {
@@ -516,42 +491,17 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       jj_consume_token(tSI);
       expresion();
-      label_9:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case tAND:
-        case tOR:
-          ;
-          break;
-        default:
-          jj_la1[16] = jj_gen;
-          break label_9;
-        }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case tAND:
-          jj_consume_token(tAND);
-          break;
-        case tOR:
-          jj_consume_token(tOR);
-          break;
-        default:
-          jj_la1[17] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-        expresion();
-      }
       jj_consume_token(tENT);
       lista_sentencias();
-      label_10:
+      label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tSI_NO:
           ;
           break;
         default:
-          jj_la1[18] = jj_gen;
-          break label_10;
+          jj_la1[14] = jj_gen;
+          break label_8;
         }
         jj_consume_token(tSI_NO);
         lista_sentencias();
@@ -582,7 +532,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         lista_expresiones();
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[15] = jj_gen;
         ;
       }
       jj_consume_token(tPC);
@@ -594,15 +544,15 @@ public class minilengcompiler implements minilengcompilerConstants {
   static final public void lista_expresiones() throws ParseException {
     try {
       expresion();
-      label_11:
+      label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tCOMA:
           ;
           break;
         default:
-          jj_la1[20] = jj_gen;
-          break label_11;
+          jj_la1[16] = jj_gen;
+          break label_9;
         }
         jj_consume_token(tCOMA);
         expresion();
@@ -617,7 +567,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tPRINCIPIO);
       jj_consume_token(tIDENTIFICADOR);
       jj_consume_token(tLLAVE_IZQ);
-      label_12:
+      label_10:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tPRINCIPIO:
@@ -629,8 +579,8 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[21] = jj_gen;
-          break label_12;
+          jj_la1[17] = jj_gen;
+          break label_10;
         }
         sentencia();
       }
@@ -643,7 +593,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static final public void expresion() throws ParseException {
     try {
       factor();
-      label_13:
+      label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tMOD:
@@ -663,8 +613,8 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[22] = jj_gen;
-          break label_13;
+          jj_la1[18] = jj_gen;
+          break label_11;
         }
         operador();
         factor();
@@ -696,7 +646,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         operador2();
         break;
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[19] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -725,7 +675,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         operador3();
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[20] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -770,7 +720,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tOR);
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[21] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -789,7 +739,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tSUMA);
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[22] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -814,7 +764,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tMOD);
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[23] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -836,13 +786,13 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_consume_token(tNOT);
           break;
         default:
-          jj_la1[28] = jj_gen;
+          jj_la1[24] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
       default:
-        jj_la1[29] = jj_gen;
+        jj_la1[25] = jj_gen;
         ;
       }
       factor2();
@@ -896,7 +846,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tFALSE);
         break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -915,7 +865,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[31];
+  static final private int[] jj_la1 = new int[27];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -925,13 +875,13 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x0,0x0,0x0,0x0,0x4000,0xb000000,0x0,0xca8000,0xfc200000,0xfc200000,0xf0200000,0x80000000,0xc000000,0x70200000,0x8000000,0x8000000,0x3000000,};
+      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xb000000,0x0,0xca8000,0xfc200000,0xfc200000,0xf0200000,0x80000000,0xc000000,0x70200000,0x8000000,0x8000000,0x3000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x0,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0xc0,0xc0,0xc0,0xc0,0x0,0xf004c300,0x0,0x0,0xfb,0xfb,0xfb,0xfb,0x0,0x0,0x100,0x100,0xf004c200,};
+      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x0,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xf004c300,0x0,0x0,0xfb,0xfb,0xfb,0xfb,0x0,0x0,0x100,0x100,0xf004c200,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x2,0x2,0x4,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x0,0x0,0x0,0x0,0x2,0x8,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
+      jj_la1_2 = new int[] {0x0,0x2,0x2,0x4,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x2,0x8,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
    }
 
   /** Constructor with InputStream. */
@@ -952,7 +902,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -966,7 +916,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -983,7 +933,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -993,7 +943,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1009,7 +959,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1018,7 +968,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1074,7 +1024,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 31; i++) {
+    for (int i = 0; i < 27; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

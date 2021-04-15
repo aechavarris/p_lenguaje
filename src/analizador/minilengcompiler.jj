@@ -483,7 +483,7 @@ void mientras_que():
 }
 {
   try { 
-  	< tMQ > expresion()( ( < tAND > | < tOR > ) expresion())* lista_sentencias() < tFMQ >
+  	< tMQ > expresion() lista_sentencias() < tFMQ >
  }catch(ParseException e) {
 	error_sintactico(e,"Error en mientras_que");
 }
@@ -494,7 +494,7 @@ void si():
 }
 {
   try { 
-  	< tSI > expresion()( ( < tAND > | < tOR > ) expresion())* < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+  	< tSI > expresion() < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
  }catch(ParseException e) {
 	error_sintactico(e,"Error en si");
 }
