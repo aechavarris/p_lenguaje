@@ -329,7 +329,9 @@ Tipo_variable tipo_variables():
 }
 {
   try { 
-  	tipo=< tENTERO > | tipo=< tCARACTER > | tipo=< tBOOLEANO >
+  	< tENTERO > {tipo=Tipo_variable.ENTERO; }
+  	| < tCARACTER > {tipo=Tipo_variable.CHAR; }
+  	| < tBOOLEANO > {tipo=Tipo_variable.BOOLEANO; }
  }catch(ParseException e) {
 	error_sintactico(e,"No se ha encontrado tipo de variable");
 }
@@ -355,7 +357,7 @@ ArrayList<Token> identificadores():
   	 		}
   	  	} )*
  }catch(ParseException e) {
-	error_sintactico(e,"Error en identificadores");
+	error_sintactico(e,"Sintaxis en definicion de identificadores incorrecta");
 }
 {return tokens;}
 }
@@ -367,7 +369,7 @@ void declaracion_acciones():
   try { 
   	( declaracion_accion() )*
  }catch(ParseException e) {
-	error_sintactico(e,"Error en declaracion_acciones");
+	error_sintactico(e,"Declaracion de acciones incorrecta");
 }
 }
 
@@ -384,7 +386,7 @@ void declaracion_accion():
   	  direccion=direccion_anterior;
   	  nivel=nivel-1; }
  }catch(ParseException e) {
-	error_sintactico(e,"Error en declaracion_accion");
+	error_sintactico(e,"Estructura de accion incorrecta");
 }
 }
 
@@ -402,7 +404,7 @@ void cabecera_accion():
   	 	}
   	}
  }catch(ParseException e) {
-	error_sintactico(e,"Error en cabecera_accion");
+	error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
 }
 }
 
@@ -413,7 +415,7 @@ void parametros_formales():
   try { 
   < tPA >(parametros() (< tFIN_SENTENCIA > parametros())*)?< tPC >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en parametros_formales");
+	error_sintactico(e,"Estructura de parametros de accion incorrecta");
 }
 }
 
@@ -433,19 +435,20 @@ void parametros():
   	  }
   	}
  }catch(ParseException e) {
-	error_sintactico(e,"Error en parametros");
+	error_sintactico(e,"Sintaxis de parametros incorrecta");
 }
 }
 
-void clase_parametros():
+Clase_parametro clase_parametros():
 {
   Clase_parametro clase=null;
 }
 {
   try { 
-  	clase=< tVAL > | clase=< tREF >
+  	< tVAL >{clase=Clase_parametro.VAL; }
+  	| < tREF >{clase=Clase_parametro.REF; }
  }catch(ParseException e) {
-	error_sintactico(e,"Error en clase_parametros");
+	error_sintactico(e,"Tipo de parametro no encontrado");
 }
 {return clase;}
 }
@@ -457,7 +460,7 @@ void bloque_sentencias():
   try { 
   	< tPRINCIPIO > lista_sentencias() < tFIN >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en bloque_sentencias");
+	error_sintactico(e,"Sintaxis de bloque de sentencias incorrecta");
 }
 }
 
@@ -468,7 +471,7 @@ void lista_sentencias():
   try {
   	(sentencia())*
  }catch(ParseException e) {
-	error_sintactico(e,"Error en lista_sentencias");
+	error_sintactico(e,"Estructura de sentencias incorrecta");
 }
 }
 

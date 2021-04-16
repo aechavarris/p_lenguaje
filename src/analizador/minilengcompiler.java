@@ -240,13 +240,16 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tENTERO:
-        tipo = jj_consume_token(tENTERO);
+        jj_consume_token(tENTERO);
+                     tipo=Tipo_variable.ENTERO;
         break;
       case tCARACTER:
-        tipo = jj_consume_token(tCARACTER);
+        jj_consume_token(tCARACTER);
+                         tipo=Tipo_variable.CHAR;
         break;
       case tBOOLEANO:
-        tipo = jj_consume_token(tBOOLEANO);
+        jj_consume_token(tBOOLEANO);
+                         tipo=Tipo_variable.BOOLEANO;
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -285,7 +288,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en identificadores");
+        error_sintactico(e,"Sintaxis en definicion de identificadores incorrecta");
     }
  {if (true) return tokens;}
     throw new Error("Missing return statement in function");
@@ -306,7 +309,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         declaracion_accion();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en declaracion_acciones");
+        error_sintactico(e,"Declaracion de acciones incorrecta");
     }
   }
 
@@ -323,7 +326,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           direccion=direccion_anterior;
           nivel=nivel-1;
     } catch (ParseException e) {
-        error_sintactico(e,"Error en declaracion_accion");
+        error_sintactico(e,"Estructura de accion incorrecta");
     }
   }
 
@@ -346,7 +349,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         direccion = direccion+1;
                 }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en cabecera_accion");
+        error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
     }
   }
 
@@ -377,7 +380,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
       jj_consume_token(tPC);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en parametros_formales");
+        error_sintactico(e,"Estructura de parametros de accion incorrecta");
     }
   }
 
@@ -394,19 +397,21 @@ public class minilengcompiler implements minilengcompilerConstants {
                         direccion = direccion+1;
           }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en parametros");
+        error_sintactico(e,"Sintaxis de parametros incorrecta");
     }
   }
 
-  static final public void clase_parametros() throws ParseException {
+  static final public Clase_parametro clase_parametros() throws ParseException {
   Clase_parametro clase=null;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tVAL:
-        clase = jj_consume_token(tVAL);
+        jj_consume_token(tVAL);
+                 clase=Clase_parametro.VAL;
         break;
       case tREF:
-        clase = jj_consume_token(tREF);
+        jj_consume_token(tREF);
+                   clase=Clase_parametro.REF;
         break;
       default:
         jj_la1[11] = jj_gen;
@@ -414,9 +419,10 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en clase_parametros");
+        error_sintactico(e,"Tipo de parametro no encontrado");
     }
  {if (true) return clase;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void bloque_sentencias() throws ParseException {
@@ -425,7 +431,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       lista_sentencias();
       jj_consume_token(tFIN);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en bloque_sentencias");
+        error_sintactico(e,"Sintaxis de bloque de sentencias incorrecta");
     }
   }
 
@@ -449,7 +455,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         sentencia();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en lista_sentencias");
+        error_sintactico(e,"Estructura de sentencias incorrecta");
     }
   }
 
