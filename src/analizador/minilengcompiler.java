@@ -107,7 +107,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         tabla_simbolos.eliminar_programa();
            }
     } catch (ParseException e) {
-                error_sintactico(e,"Error en programa");
+                error_sintactico(e,"Error en definicion de programa");
     }
   }
 
@@ -249,8 +249,12 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void identificadores() throws ParseException {
+  Token t=null;
     try {
-      jj_consume_token(tIDENTIFICADOR);
+      p = jj_consume_token(tIDENTIFICADOR);
+                  if(p!=null){
+                        tabla_simbolos.introducir_programa(p.image,0);
+                        }
       label_3:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -382,6 +386,9 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tPRINCIPIO);
       lista_sentencias();
       jj_consume_token(tFIN);
+          tabla_simbolos.eliminar_variables(nivel);
+          tabla_simbolos.eliminar_acciones(nivel);
+          tabla_simbolos.eliminar_programa();
     } catch (ParseException e) {
         error_sintactico(e,"Error en bloque_sentencias");
     }
@@ -389,6 +396,7 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void lista_sentencias() throws ParseException {
     try {
+      nivel=nivel+1;
       label_6:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -406,6 +414,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         sentencia();
       }
+          nivel=nivel-1;
     } catch (ParseException e) {
         error_sintactico(e,"Error en lista_sentencias");
     }

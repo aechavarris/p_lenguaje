@@ -326,10 +326,16 @@ void tipo_variables():
 
 void identificadores():
 {
+  Token t=null;
 }
 {
   try { 
-  	< tIDENTIFICADOR > ( "," < tIDENTIFICADOR > )*
+  	p=< tIDENTIFICADOR >
+  		{
+  		  if(p!=null){
+			tabla_simbolos.introducir_programa(p.image,0);
+  	 		}
+  	  	} ( "," < tIDENTIFICADOR > )*
  }catch(ParseException e) {
 	error_sintactico(e,"Error en identificadores");
 }
@@ -407,6 +413,9 @@ void bloque_sentencias():
 {
   try { 
   	< tPRINCIPIO > lista_sentencias() < tFIN >
+  	{ tabla_simbolos.eliminar_variables(nivel);
+	  tabla_simbolos.eliminar_acciones(nivel);
+	  tabla_simbolos.eliminar_programa();}
  }catch(ParseException e) {
 	error_sintactico(e,"Error en bloque_sentencias");
 }
@@ -416,8 +425,10 @@ void lista_sentencias():
 {
 }
 {
-  try { 
+  try {
+    { nivel=nivel+1; }
   	(sentencia())*
+  	{ nivel=nivel-1; }
  }catch(ParseException e) {
 	error_sintactico(e,"Error en lista_sentencias");
 }
