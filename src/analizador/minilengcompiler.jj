@@ -1,8 +1,7 @@
 /**
- * Especificacion JavaCC para la Practica 2 (Procesadores de Lenguajes)
  * Marcos Nuez - 761319@unizar.es
  * Alvaro Echavarri - 737400@unizar.es
- * v1.2 - 2021/03/16
+ * v2 - 2021/04/13
  */
 
 options
