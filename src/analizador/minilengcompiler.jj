@@ -24,6 +24,7 @@ public class minilengcompiler {
   static boolean errorSintactico = false;
   static TablaSimbolos tabla_simbolos = new TablaSimbolos();
   static int nivel = 0;
+  static int direccion=3;
   static int ejecucion_correcta=1;
   
 	 public static void main(String args []) throws ParseException {
@@ -235,7 +236,7 @@ void programa():
  	   }
  	 }
   }catch(ParseException e) {
-		error_sintactico(e,"Error en definicion de programa");
+		error_sintactico(e,"Sintaxis de programa incorrecta");
 	}
 }
 
@@ -252,7 +253,7 @@ try {
  | 	(si())
  
 }catch(ParseException e) {
-	error_sintactico(e,"Error en sentencia");
+	error_sintactico(e,"Sintaxis de sentencia incorrecta");
 }
 }
 
@@ -263,7 +264,7 @@ void asignacion_invocacion_accion():
   try { 
   asignacion()|invocacion_accion()
 }catch(ParseException e) {
-	error_sintactico(e,"Error en asignacion");
+	error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
 }
 }
 
@@ -274,7 +275,7 @@ void asignacion():
   try { 
   < tOAS > expresion()
 }catch(ParseException e) {
-	error_sintactico(e,"Error en asignacion");
+	error_sintactico(e,"Sintaxis de asignacion incorrecta");
 }
 }
 
@@ -286,7 +287,7 @@ void invocacion_accion():
     
   <tIDENTIFICADOR>(< tFIN_SENTENCIA >|argumentos()< tFIN_SENTENCIA >)
 }catch(ParseException e) {
-	error_sintactico(e,"Error en invocacion_accion");
+	error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
 }
 }
 
@@ -297,47 +298,64 @@ void declaracion_variables():
   try { 
   	( declaracion() ";" )*
  }catch(ParseException e) {
-	error_sintactico(e,"Error en declaracion_variables");
+	error_sintactico(e,"Declaracion de variables incorrecta");
 }
 }
 
 void declaracion():
 {
+  Tipo_variable tipo=null;
+  ArrayList<Token > tokens=null;
 }
 {
   try { 
-  	tipo_variables() identificadores()
+  	tipo=tipo_variables() tokens=identificadores()
+  	{
+  	  for(int i=0;i<tokens.length();i++) {
+			tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
+			direccion=direccion+1; 
+  	  }
+  	}
  }catch(ParseException e) {
-	error_sintactico(e,"Error en declaracion");
+	error_sintactico(e,"Sintaxis incorrecta");
 }
 }
 
-void tipo_variables():
+Tipo_variable tipo_variables():
 {
+  Tipo_variable tipo=null;
 }
 {
   try { 
-  	< tENTERO > | < tCARACTER > | < tBOOLEANO >
+  	tipo=< tENTERO > | tipo=< tCARACTER > | tipo=< tBOOLEANO >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en tipo_variables");
+	error_sintactico(e,"No se ha encontrado tipo de variable");
 }
+{return tipo;}
 }
 
-void identificadores():
+ArrayList<Token> identificadores():
 {
   Token t=null;
+  ArrayList<Token > tokens=new ArrayList();
 }
 {
   try { 
-  	p=< tIDENTIFICADOR >
+  	t=< tIDENTIFICADOR >
   		{
-  		  if(p!=null){
-			tabla_simbolos.introducir_programa(p.image,0);
+  		  if(t!=null){
+				tokens.add(t);
   	 		}
-  	  	} ( "," < tIDENTIFICADOR > )*
+  	  	} ( "," t=< tIDENTIFICADOR >
+  		{
+  		  if(t!=null){
+			tokens.add(t);
+  	 		}
+  	  	} )*
  }catch(ParseException e) {
 	error_sintactico(e,"Error en identificadores");
 }
+{return tokens;}
 }
 
 void declaracion_acciones():
@@ -353,10 +371,16 @@ void declaracion_acciones():
 
 void declaracion_accion():
 {
+  int direccion_anterior=direccion;
 }
 {
-  try { 
-  	cabecera_accion() declaracion_variables() declaracion_acciones() bloque_sentencias()
+  try {
+     
+  	cabecera_accion() declaracion_variables() declaracion_acciones() { nivel=nivel+1; }bloque_sentencias()
+  	{ tabla_simbolos.eliminar_variables(nivel);
+  	  tabla_simbolos.eliminar_parametros(nivel);
+  	  direccion=direccion_anterior;
+  	  nivel=nivel-1; }
  }catch(ParseException e) {
 	error_sintactico(e,"Error en declaracion_accion");
 }
@@ -364,10 +388,17 @@ void declaracion_accion():
 
 void cabecera_accion():
 {
+  Token t=null;
 }
 {
   try { 
-  	< tACCION > < tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
+  	< tACCION > t=< tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
+  	{
+  		if(t!=null){
+			tabla_simbolo.introducir_accion(t.image,nivel,direccion);
+			direccion=direccion+1;
+  	 	}
+  	}
  }catch(ParseException e) {
 	error_sintactico(e,"Error en cabecera_accion");
 }
@@ -386,10 +417,19 @@ void parametros_formales():
 
 void parametros():
 {
+  ArrayList<Token > tokens=null;
+  Tipo_variable tipo=null;
+  Clase_parametro clase=null;
 }
 {
   try { 
-  	clase_parametros() tipo_variables() identificadores()
+  	clase=clase_parametros() tipo=tipo_variables() tokens=identificadores()
+  	{
+  	  for(int i=0;i<tokens.length();i++) {
+			tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+			direccion=direccion+1;
+  	  }
+  	}
  }catch(ParseException e) {
 	error_sintactico(e,"Error en parametros");
 }
@@ -397,13 +437,15 @@ void parametros():
 
 void clase_parametros():
 {
+  Clase_parametro clase=null;
 }
 {
   try { 
-  	< tVAL > | < tREF >
+  	clase=< tVAL > | clase=< tREF >
  }catch(ParseException e) {
 	error_sintactico(e,"Error en clase_parametros");
 }
+{returns clase;}
 }
 
 void bloque_sentencias():
@@ -412,9 +454,6 @@ void bloque_sentencias():
 {
   try { 
   	< tPRINCIPIO > lista_sentencias() < tFIN >
-  	{ tabla_simbolos.eliminar_variables(nivel);
-	  tabla_simbolos.eliminar_acciones(nivel);
-	  tabla_simbolos.eliminar_programa();}
  }catch(ParseException e) {
 	error_sintactico(e,"Error en bloque_sentencias");
 }
@@ -425,9 +464,7 @@ void lista_sentencias():
 }
 {
   try {
-    { nivel=nivel+1; }
   	(sentencia())*
-  	{ nivel=nivel-1; }
  }catch(ParseException e) {
 	error_sintactico(e,"Error en lista_sentencias");
 }
@@ -504,7 +541,8 @@ void si():
 }
 {
   try { 
-  	< tSI > expresion() < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+  	< tSI > expresion() < tENT >{ nivel=nivel+1; } lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+  	{ nivel=nivel-1; }
  }catch(ParseException e) {
 	error_sintactico(e,"Error en si");
 }

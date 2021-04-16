@@ -10,6 +10,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static boolean errorSintactico = false;
   static TablaSimbolos tabla_simbolos = new TablaSimbolos();
   static int nivel = 0;
+  static int direccion=3;
   static int ejecucion_correcta=1;
 
          public static void main(String args []) throws ParseException {
@@ -107,7 +108,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         tabla_simbolos.eliminar_programa();
            }
     } catch (ParseException e) {
-                error_sintactico(e,"Error en definicion de programa");
+                error_sintactico(e,"Sintaxis de programa incorrecta");
     }
   }
 
@@ -142,7 +143,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en sentencia");
+        error_sintactico(e,"Sintaxis de sentencia incorrecta");
     }
   }
 
@@ -161,7 +162,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en asignacion");
+        error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
     }
   }
 
@@ -170,7 +171,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tOAS);
       expresion();
     } catch (ParseException e) {
-        error_sintactico(e,"Error en asignacion");
+        error_sintactico(e,"Sintaxis de asignacion incorrecta");
     }
   }
 
@@ -191,7 +192,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en invocacion_accion");
+        error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
     }
   }
 
@@ -213,30 +214,37 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tFIN_SENTENCIA);
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en declaracion_variables");
+        error_sintactico(e,"Declaracion de variables incorrecta");
     }
   }
 
   static final public void declaracion() throws ParseException {
+  Tipo_variable tipo=null;
+  ArrayList<Token > tokens=null;
     try {
-      tipo_variables();
-      identificadores();
+      tipo = tipo_variables();
+      tokens = identificadores();
+          for(int i=0;i<tokens.length();i++) {
+                        tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
+                        direccion=direccion+1;
+          }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en declaracion");
+        error_sintactico(e,"Sintaxis incorrecta");
     }
   }
 
-  static final public void tipo_variables() throws ParseException {
+  static final public Tipo_variable tipo_variables() throws ParseException {
+  Tipo_variable tipo=null;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tENTERO:
-        jj_consume_token(tENTERO);
+        tipo = jj_consume_token(tENTERO);
         break;
       case tCARACTER:
-        jj_consume_token(tCARACTER);
+        tipo = jj_consume_token(tCARACTER);
         break;
       case tBOOLEANO:
-        jj_consume_token(tBOOLEANO);
+        tipo = jj_consume_token(tBOOLEANO);
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -244,16 +252,19 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en tipo_variables");
+        error_sintactico(e,"No se ha encontrado tipo de variable");
     }
+ {if (true) return tipo;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void identificadores() throws ParseException {
+  static final public ArrayList<Token> identificadores() throws ParseException {
   Token t=null;
+  ArrayList<Token > tokens=new ArrayList();
     try {
-      p = jj_consume_token(tIDENTIFICADOR);
-                  if(p!=null){
-                        tabla_simbolos.introducir_programa(p.image,0);
+      t = jj_consume_token(tIDENTIFICADOR);
+                  if(t!=null){
+                                tokens.add(t);
                         }
       label_3:
       while (true) {
@@ -266,11 +277,16 @@ public class minilengcompiler implements minilengcompilerConstants {
           break label_3;
         }
         jj_consume_token(tCOMA);
-        jj_consume_token(tIDENTIFICADOR);
+        t = jj_consume_token(tIDENTIFICADOR);
+                  if(t!=null){
+                        tokens.add(t);
+                        }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Error en identificadores");
     }
+ {if (true) return tokens;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void declaracion_acciones() throws ParseException {
@@ -293,20 +309,27 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void declaracion_accion() throws ParseException {
+  int direccion_anterior=direccion;
     try {
       cabecera_accion();
       declaracion_variables();
       declaracion_acciones();
+                                                                           nivel=nivel+1;
       bloque_sentencias();
+          tabla_simbolos.eliminar_variables(nivel);
+          tabla_simbolos.eliminar_parametros(nivel);
+          direccion=direccion_anterior;
+          nivel=nivel-1;
     } catch (ParseException e) {
         error_sintactico(e,"Error en declaracion_accion");
     }
   }
 
   static final public void cabecera_accion() throws ParseException {
+  Token t=null;
     try {
       jj_consume_token(tACCION);
-      jj_consume_token(tIDENTIFICADOR);
+      t = jj_consume_token(tIDENTIFICADOR);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
         parametros_formales();
@@ -316,6 +339,10 @@ public class minilengcompiler implements minilengcompilerConstants {
         ;
       }
       jj_consume_token(tFIN_SENTENCIA);
+                if(t!=null){
+                        tabla_simbolo.introducir_accion(t.image,nivel,direccion);
+                        direccion=direccion+1;
+                }
     } catch (ParseException e) {
         error_sintactico(e,"Error en cabecera_accion");
     }
@@ -353,23 +380,31 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void parametros() throws ParseException {
+  ArrayList<Token > tokens=null;
+  Tipo_variable tipo=null;
+  Clase_parametro clase=null;
     try {
-      clase_parametros();
-      tipo_variables();
-      identificadores();
+      clase = clase_parametros();
+      tipo = tipo_variables();
+      tokens = identificadores();
+          for(int i=0;i<tokens.length();i++) {
+                        tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+                        direccion=direccion+1;
+          }
     } catch (ParseException e) {
         error_sintactico(e,"Error en parametros");
     }
   }
 
   static final public void clase_parametros() throws ParseException {
+  Clase_parametro clase=null;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tVAL:
-        jj_consume_token(tVAL);
+        clase = jj_consume_token(tVAL);
         break;
       case tREF:
-        jj_consume_token(tREF);
+        clase = jj_consume_token(tREF);
         break;
       default:
         jj_la1[11] = jj_gen;
@@ -379,6 +414,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Error en clase_parametros");
     }
+ returns clase;
   }
 
   static final public void bloque_sentencias() throws ParseException {
@@ -386,9 +422,6 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tPRINCIPIO);
       lista_sentencias();
       jj_consume_token(tFIN);
-          tabla_simbolos.eliminar_variables(nivel);
-          tabla_simbolos.eliminar_acciones(nivel);
-          tabla_simbolos.eliminar_programa();
     } catch (ParseException e) {
         error_sintactico(e,"Error en bloque_sentencias");
     }
@@ -396,7 +429,6 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void lista_sentencias() throws ParseException {
     try {
-      nivel=nivel+1;
       label_6:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -414,7 +446,6 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         sentencia();
       }
-          nivel=nivel-1;
     } catch (ParseException e) {
         error_sintactico(e,"Error en lista_sentencias");
     }
@@ -501,6 +532,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tSI);
       expresion();
       jj_consume_token(tENT);
+                                      nivel=nivel+1;
       lista_sentencias();
       label_8:
       while (true) {
@@ -516,6 +548,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         lista_sentencias();
       }
       jj_consume_token(tFSI);
+          nivel=nivel-1;
     } catch (ParseException e) {
         error_sintactico(e,"Error en si");
     }

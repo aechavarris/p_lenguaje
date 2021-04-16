@@ -178,7 +178,6 @@ public class TablaSimbolos {
 		simbolo.introducir_variable(nombre, variable, nivel, dir);
 		return introducir_simbolo(simbolo);
 	}
-
 	/*
 	 * Si existe un simbolo en la tabla del mismo nivel y con el mismo nombre, lanza
 	 * una excepcion. De lo contrario, introduce un simbolo ACCION con los datos de
