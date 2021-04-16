@@ -9,7 +9,7 @@ Programa test3;
 
 Principio
 	d:=((25 div 3)+3=4 mod 5;
-	Mq d == 0
+	Mq d = 0
 		escribir((-2*-5(4 mod --2+5)));
 		Si d => 0 ent
 		si d or and 2=3

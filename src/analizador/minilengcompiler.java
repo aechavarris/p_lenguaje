@@ -16,6 +16,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static int ejecucion_correcta=1;
 
          public static void main(String args []) throws ParseException {
+           tabla_simbolos.inicializar_tabla();
             if (args.length != 0 ) {
                         File tmp = new File(args[0]);
                         String file = tmp.getAbsolutePath();
@@ -88,6 +89,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       p = jj_consume_token(tIDENTIFICADOR);
                   if(p!=null){
                         tabla_simbolos.introducir_programa(p.image,0);
+                        tabla_simbolos.imprimirTabla();
                   }
       jj_consume_token(tFIN_SENTENCIA);
       declaracion_variables();
@@ -108,6 +110,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         tabla_simbolos.eliminar_variables(nivel);
                         tabla_simbolos.eliminar_acciones(nivel);
                         tabla_simbolos.eliminar_programa();
+                        tabla_simbolos.imprimirTabla();
            }
     } catch (ParseException e) {
                 error_sintactico(e,"Sintaxis de programa incorrecta");
@@ -155,13 +158,9 @@ public class minilengcompiler implements minilengcompilerConstants {
       case tOAS:
         asignacion();
         break;
-      case tIDENTIFICADOR:
-        invocacion_accion();
-        break;
       default:
         jj_la1[2] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+        invocacion_accion();
       }
     } catch (ParseException e) {
         error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
@@ -179,19 +178,13 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void invocacion_accion() throws ParseException {
     try {
-      jj_consume_token(tIDENTIFICADOR);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case tFIN_SENTENCIA:
-        jj_consume_token(tFIN_SENTENCIA);
-        break;
       case tPA:
         argumentos();
-        jj_consume_token(tFIN_SENTENCIA);
         break;
       default:
         jj_la1[3] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
+        ;
       }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
@@ -230,6 +223,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                   try {
                         tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
                         direccion=direccion+1;
+                        tabla_simbolos.imprimirTabla();
                   } catch(SimboloYaDeclaradoException e) {
                       token = tokens.get(i);
                           error_semantico(token.image, token.beginLine, token.beginColumn, e);
@@ -324,11 +318,11 @@ public class minilengcompiler implements minilengcompilerConstants {
       cabecera_accion();
       declaracion_variables();
       declaracion_acciones();
-                                                                           nivel=nivel+1;
       bloque_sentencias();
           tabla_simbolos.eliminar_variables(nivel);
           tabla_simbolos.eliminar_parametros(nivel);
           direccion=direccion_anterior;
+          tabla_simbolos.imprimirTabla();
           nivel=nivel-1;
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de accion incorrecta");
@@ -340,6 +334,16 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       jj_consume_token(tACCION);
       t = jj_consume_token(tIDENTIFICADOR);
+                if(t != null){
+                  try {
+                        tabla_simbolos.introducir_accion(t.image,nivel,direccion);
+                        direccion = direccion+1;
+                        tabla_simbolos.imprimirTabla();
+                        nivel=nivel+1;
+                  } catch(SimboloYaDeclaradoException e) {
+                          error_semantico(t.image, t.beginLine, t.beginColumn, e);
+                    }
+                }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
         parametros_formales();
@@ -349,14 +353,6 @@ public class minilengcompiler implements minilengcompilerConstants {
         ;
       }
       jj_consume_token(tFIN_SENTENCIA);
-                if(t != null){
-                  try {
-                        tabla_simbolos.introducir_accion(t.image,nivel,direccion);
-                        direccion = direccion+1;
-                  } catch(SimboloYaDeclaradoException e) {
-                          error_semantico(t.image, t.beginLine, t.beginColumn, e);
-                    }
-                }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
     }
@@ -405,6 +401,7 @@ public class minilengcompiler implements minilengcompilerConstants {
             try {
                   tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
                   direccion = direccion+1;
+                  tabla_simbolos.imprimirTabla();
                 } catch(SimboloYaDeclaradoException e) {
                         token = tokens.get(i);
                         error_semantico(token.image, token.beginLine, token.beginColumn, e);
@@ -945,7 +942,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x0,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xf004c300,0x0,0x0,0xfb,0xfb,0xfb,0xfb,0x0,0x0,0x100,0x100,0xf004c200,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x2,0x2,0x4,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x2,0x8,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
+      jj_la1_2 = new int[] {0x0,0x2,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x2,0x8,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
    }
 
   /** Constructor with InputStream. */

@@ -4,7 +4,7 @@ programa adivinar;
 
  caracter respuesta, letra, min, max;
  booleano headivinado;
- caracter c, d;
+ caracter c,d;
 
 %-------------------------------------------------------------------
 accion siono;

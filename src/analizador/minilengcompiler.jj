@@ -30,6 +30,7 @@ public class minilengcompiler {
   static int ejecucion_correcta=1;
   
 	 public static void main(String args []) throws ParseException {
+	   tabla_simbolos.inicializar_tabla();
 	    if (args.length != 0 ) {
 			File tmp = new File(args[0]);
 			String file = tmp.getAbsolutePath();
@@ -226,6 +227,7 @@ void programa():
   		{
   		  if(p!=null){
 			tabla_simbolos.introducir_programa(p.image,0);
+			tabla_simbolos.imprimirTabla();
   	 	  }
   	  	}
   	   < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
@@ -235,6 +237,7 @@ void programa():
 			tabla_simbolos.eliminar_variables(nivel);
 			tabla_simbolos.eliminar_acciones(nivel);
 			tabla_simbolos.eliminar_programa();
+			tabla_simbolos.imprimirTabla();
  	   }
  	 }
   }catch(ParseException e) {
@@ -286,8 +289,7 @@ void invocacion_accion():
 }
 {
   try {
-    
-  <tIDENTIFICADOR>(< tFIN_SENTENCIA >|argumentos()< tFIN_SENTENCIA >)
+    (argumentos())?
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
 }
@@ -317,6 +319,7 @@ void declaracion():
 		  try { 
 			tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
 			direccion=direccion+1;
+			tabla_simbolos.imprimirTabla();
 		  } catch(SimboloYaDeclaradoException e) {
 		      token = tokens.get(i);
 			  error_semantico(token.image, token.beginLine, token.beginColumn, e);
@@ -385,10 +388,11 @@ void declaracion_accion():
 {
   try {
      
-  	cabecera_accion() declaracion_variables() declaracion_acciones() { nivel=nivel+1; }bloque_sentencias()
+  	cabecera_accion() declaracion_variables() declaracion_acciones() bloque_sentencias()
   	{ tabla_simbolos.eliminar_variables(nivel);
   	  tabla_simbolos.eliminar_parametros(nivel);
   	  direccion=direccion_anterior;
+  	  tabla_simbolos.imprimirTabla();
   	  nivel=nivel-1; }
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de accion incorrecta");
@@ -401,17 +405,19 @@ void cabecera_accion():
 }
 {
   try { 
-  	< tACCION > t=< tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
-  	{
+  	< tACCION > t=< tIDENTIFICADOR > {  
   		if(t != null){
   		  try {
 			tabla_simbolos.introducir_accion(t.image,nivel,direccion);
 			direccion = direccion+1;
+			tabla_simbolos.imprimirTabla();
+			nivel=nivel+1;
   		  } catch(SimboloYaDeclaradoException e) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
   	 	}
-  	}
+  	}(parametros_formales())?< tFIN_SENTENCIA >
+  	
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
 }
@@ -442,6 +448,7 @@ void parametros():
   	    try { 
 		  tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
 		  direccion = direccion+1;
+		  tabla_simbolos.imprimirTabla();
 		} catch(SimboloYaDeclaradoException e) {
 			token = tokens.get(i);
 			error_semantico(token.image, token.beginLine, token.beginColumn, e);
