@@ -300,7 +300,7 @@ public class TablaSimbolos {
 	 */
 	public void imprimirTabla() {
 		System.out.println("+" + new String(new char[59]).replace("\0", "-") + "+");
-		System.out.println("| Tabla de sÃ­mbolos                                         |");
+		System.out.println("| Tabla de s�mbolos                                         |");
 		System.out.println("+" + new String(new char[59]).replace("\0", "-") + "+");
 
 		for (int i = 0; i < tabla_hash.length; i++) {

@@ -3,6 +3,8 @@ package analizador;
 import java.io.*;
 import lib.aviso.*;
 import lib.semantico.*;
+import java.util.ArrayList;
+import lib.semantico.Simbolo.*;
 
 
 public class minilengcompiler implements minilengcompilerConstants {
@@ -86,7 +88,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       p = jj_consume_token(tIDENTIFICADOR);
                   if(p!=null){
                         tabla_simbolos.introducir_programa(p.image,0);
-                        }
+                  }
       jj_consume_token(tFIN_SENTENCIA);
       declaracion_variables();
       declaracion_acciones();
@@ -219,12 +221,12 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void declaracion() throws ParseException {
-  Tipo_variable tipo=null;
-  ArrayList<Token > tokens=null;
+  Tipo_variable tipo = null;
+  ArrayList<Token > tokens = null;
     try {
       tipo = tipo_variables();
       tokens = identificadores();
-          for(int i=0;i<tokens.length();i++) {
+          for(int i=0;i<tokens.size();i++) {
                         tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
                         direccion=direccion+1;
           }
@@ -260,7 +262,7 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public ArrayList<Token> identificadores() throws ParseException {
   Token t=null;
-  ArrayList<Token > tokens=new ArrayList();
+  ArrayList<Token> tokens = new ArrayList<Token>();
     try {
       t = jj_consume_token(tIDENTIFICADOR);
                   if(t!=null){
@@ -340,8 +342,8 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
       jj_consume_token(tFIN_SENTENCIA);
                 if(t!=null){
-                        tabla_simbolo.introducir_accion(t.image,nivel,direccion);
-                        direccion=direccion+1;
+                        tabla_simbolos.introducir_accion(t.image,nivel,direccion);
+                        direccion = direccion+1;
                 }
     } catch (ParseException e) {
         error_sintactico(e,"Error en cabecera_accion");
@@ -387,9 +389,9 @@ public class minilengcompiler implements minilengcompilerConstants {
       clase = clase_parametros();
       tipo = tipo_variables();
       tokens = identificadores();
-          for(int i=0;i<tokens.length();i++) {
+          for(int i=0; i < tokens.size(); i++) {
                         tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
-                        direccion=direccion+1;
+                        direccion = direccion+1;
           }
     } catch (ParseException e) {
         error_sintactico(e,"Error en parametros");
@@ -414,7 +416,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Error en clase_parametros");
     }
- returns clase;
+ {if (true) return clase;}
   }
 
   static final public void bloque_sentencias() throws ParseException {

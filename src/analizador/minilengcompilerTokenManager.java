@@ -3,6 +3,8 @@ package analizador;
 import java.io.*;
 import lib.aviso.*;
 import lib.semantico.*;
+import java.util.ArrayList;
+import lib.semantico.Simbolo.*;
 
 /** Token Manager. */
 public class minilengcompilerTokenManager implements minilengcompilerConstants
