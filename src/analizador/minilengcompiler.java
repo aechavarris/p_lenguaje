@@ -226,10 +226,15 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       tipo = tipo_variables();
       tokens = identificadores();
-          for(int i=0;i<tokens.size();i++) {
+                for(int i=0;i<tokens.size();i++) {
+                  try {
                         tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
                         direccion=direccion+1;
-          }
+                  } catch(SimboloYaDeclaradoException e) {
+                      token = tokens.get(i);
+                          error_semantico(token.image, token.beginLine, token.beginColumn, e);
+                    }
+                }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis incorrecta");
     }
@@ -344,9 +349,13 @@ public class minilengcompiler implements minilengcompilerConstants {
         ;
       }
       jj_consume_token(tFIN_SENTENCIA);
-                if(t!=null){
+                if(t != null){
+                  try {
                         tabla_simbolos.introducir_accion(t.image,nivel,direccion);
                         direccion = direccion+1;
+                  } catch(SimboloYaDeclaradoException e) {
+                          error_semantico(t.image, t.beginLine, t.beginColumn, e);
+                    }
                 }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
@@ -392,9 +401,14 @@ public class minilengcompiler implements minilengcompilerConstants {
       clase = clase_parametros();
       tipo = tipo_variables();
       tokens = identificadores();
-          for(int i=0; i < tokens.size(); i++) {
-                        tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
-                        direccion = direccion+1;
+          for(int i = 0; i < tokens.size(); i++) {
+            try {
+                  tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+                  direccion = direccion+1;
+                } catch(SimboloYaDeclaradoException e) {
+                        token = tokens.get(i);
+                        error_semantico(token.image, token.beginLine, token.beginColumn, e);
+                  }
           }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de parametros incorrecta");
