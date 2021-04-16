@@ -482,7 +482,7 @@ void leer():
   try { 
   	< tLEER > < tPA > identificadores() < tPC >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en leer");
+	error_sintactico(e,"Sintaxis de leer incorrecta");
 }
 }
 
@@ -493,7 +493,7 @@ void escribir():
   try { 
   	< tESCRIBIR > < tPA > lista_escribibles() < tPC >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en escribir");
+	error_sintactico(e,"Sintaxis de escribir incorrecta");
 }
 }
 
@@ -504,7 +504,7 @@ void caraent():
   try { 
   < tCARAENT ><tPA >(expresion())<tPC >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en caraent");
+	error_sintactico(e,"Sintaxis de caraent incorrecta");
 }
 }
 
@@ -515,7 +515,7 @@ void entacar():
   try { 
   < tENTACAR ><tPA >(expresion())<tPC >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en entacar");
+	error_sintactico(e,"Sintaxis de entacar incorrecta");
 }
 }
 
@@ -526,7 +526,7 @@ void lista_escribibles():
   try { 
   	( expresion() ) ( < tCOMA > (expresion() ) )*
 }catch(ParseException e) {
-	error_sintactico(e,"Error en lista_escribibles");
+	error_sintactico(e,"Estructura de escribir incorrecta ");
 }
 }
 
@@ -537,7 +537,7 @@ void mientras_que():
   try { 
   	< tMQ > expresion() lista_sentencias() < tFMQ >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en mientras_que");
+	error_sintactico(e,"Estructura de mientras que incorrecta");
 }
 }
 
@@ -549,7 +549,7 @@ void si():
   	< tSI > expresion() < tENT >{ nivel=nivel+1; } lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
   	{ nivel=nivel-1; }
  }catch(ParseException e) {
-	error_sintactico(e,"Error en si");
+	error_sintactico(e,"Estructura de si incorrecta");
 }
 }
 
@@ -560,7 +560,7 @@ void argumentos():
   try { 
   	< tPA > ( lista_expresiones() )? < tPC >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en argumentos");
+	error_sintactico(e,"Estructura de lista de argumentos incorrecta");
 }
 }
 
@@ -571,7 +571,7 @@ void lista_expresiones():
   try { 
   	expresion()(","expresion())*
  }catch(ParseException e) {
-	error_sintactico(e,"Error en lista_expresiones");
+	error_sintactico(e,"Estructura de lista de expresiones incorrecta");
 }
 }
 
@@ -582,7 +582,7 @@ void seleccion():
   try { 
   	< tPRINCIPIO > < tIDENTIFICADOR > < tLLAVE_IZQ > (sentencia())* < tLLAVE_DCHA >
  }catch(ParseException e) {
-	error_sintactico(e,"Error en seleccion");
+	error_sintactico(e,"Sintaxis de seleccion incorrecta");
 }
 }
 
@@ -593,7 +593,7 @@ void expresion():
   try { 
    factor()( (operador()) factor() )*
  }catch(ParseException e) {
-	error_sintactico(e,"Error en expresion");
+	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
 }
 
@@ -606,7 +606,7 @@ void operador():
 
 	 
 }catch(ParseException e) {
-	error_sintactico(e,"Error en operador_relacional");
+	error_sintactico(e,"No se ha encontrado un operador valido");
 }
 }
 
@@ -618,7 +618,7 @@ void operador2():
     operador_multiplicativo()|operador3()
 	 
 }catch(ParseException e) {
-	error_sintactico(e,"Error en operador_relacional");
+	error_sintactico(e,"");
 }
 }
 
@@ -630,7 +630,7 @@ void operador3():
     operador_relacional()
 	 
 }catch(ParseException e) {
-	error_sintactico(e,"Error en operador_relacional");
+	error_sintactico(e,"");
 }
 }
 
@@ -648,7 +648,7 @@ void operador_relacional():
 	| < tAND >
 	| < tOR >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en operador_relacional");
+	error_sintactico(e,"Operador relacional no encontrado");
 }
 }
 
@@ -660,7 +660,7 @@ void operador_aditivo():
   < tRESTA >
 	| < tSUMA >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en operador_adictivo");
+	error_sintactico(e,"Operador aditivo no encontrado");
 }
 }
 
@@ -674,7 +674,7 @@ void operador_multiplicativo():
 	| < tDIV1 >
 	| < tMOD >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en operador_multiplicativo");
+	error_sintactico(e,"Operador multiplicativo no encontrado");
 }
 }
 
@@ -685,7 +685,7 @@ void factor():
   try { 
   (< tRESTA >|< tNOT >)? factor2()
 }catch(ParseException e) {
-	error_sintactico(e,"Error en factor");
+	error_sintactico(e,"Factor no encontrado");
 }
 }
 
@@ -706,6 +706,6 @@ void factor2():
 | < tTRUE >
 | < tFALSE >
 }catch(ParseException e) {
-	error_sintactico(e,"Error en factor2");
+	error_sintactico(e,"Sintaxis de factor incorrecta");
 }
 }

@@ -466,7 +466,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       identificadores();
       jj_consume_token(tPC);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en leer");
+        error_sintactico(e,"Sintaxis de leer incorrecta");
     }
   }
 
@@ -477,7 +477,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       lista_escribibles();
       jj_consume_token(tPC);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en escribir");
+        error_sintactico(e,"Sintaxis de escribir incorrecta");
     }
   }
 
@@ -488,7 +488,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       expresion();
       jj_consume_token(tPC);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en caraent");
+        error_sintactico(e,"Sintaxis de caraent incorrecta");
     }
   }
 
@@ -499,7 +499,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       expresion();
       jj_consume_token(tPC);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en entacar");
+        error_sintactico(e,"Sintaxis de entacar incorrecta");
     }
   }
 
@@ -520,7 +520,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         expresion();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en lista_escribibles");
+        error_sintactico(e,"Estructura de escribir incorrecta ");
     }
   }
 
@@ -531,7 +531,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       lista_sentencias();
       jj_consume_token(tFMQ);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en mientras_que");
+        error_sintactico(e,"Estructura de mientras que incorrecta");
     }
   }
 
@@ -558,7 +558,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tFSI);
           nivel=nivel-1;
     } catch (ParseException e) {
-        error_sintactico(e,"Error en si");
+        error_sintactico(e,"Estructura de si incorrecta");
     }
   }
 
@@ -587,7 +587,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
       jj_consume_token(tPC);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en argumentos");
+        error_sintactico(e,"Estructura de lista de argumentos incorrecta");
     }
   }
 
@@ -608,7 +608,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         expresion();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en lista_expresiones");
+        error_sintactico(e,"Estructura de lista de expresiones incorrecta");
     }
   }
 
@@ -636,7 +636,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
       jj_consume_token(tLLAVE_DCHA);
     } catch (ParseException e) {
-        error_sintactico(e,"Error en seleccion");
+        error_sintactico(e,"Sintaxis de seleccion incorrecta");
     }
   }
 
@@ -670,7 +670,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         factor();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en expresion");
+        error_sintactico(e,"Sintaxis de expresion incorrecta");
     }
   }
 
@@ -701,7 +701,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en operador_relacional");
+        error_sintactico(e,"No se ha encontrado un operador valido");
     }
   }
 
@@ -730,7 +730,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en operador_relacional");
+        error_sintactico(e,"");
     }
   }
 
@@ -738,7 +738,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       operador_relacional();
     } catch (ParseException e) {
-        error_sintactico(e,"Error en operador_relacional");
+        error_sintactico(e,"");
     }
   }
 
@@ -775,7 +775,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en operador_relacional");
+        error_sintactico(e,"Operador relacional no encontrado");
     }
   }
 
@@ -794,7 +794,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en operador_adictivo");
+        error_sintactico(e,"Operador aditivo no encontrado");
     }
   }
 
@@ -819,7 +819,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en operador_multiplicativo");
+        error_sintactico(e,"Operador multiplicativo no encontrado");
     }
   }
 
@@ -847,7 +847,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
       factor2();
     } catch (ParseException e) {
-        error_sintactico(e,"Error en factor");
+        error_sintactico(e,"Factor no encontrado");
     }
   }
 
@@ -901,7 +901,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         throw new ParseException();
       }
     } catch (ParseException e) {
-        error_sintactico(e,"Error en factor2");
+        error_sintactico(e,"Sintaxis de factor incorrecta");
     }
   }
 
