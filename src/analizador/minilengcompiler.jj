@@ -313,10 +313,15 @@ void declaracion():
   try { 
   	tipo=tipo_variables() tokens=identificadores()
   	{
-  	  for(int i=0;i<tokens.size();i++) {
+		for(int i=0;i<tokens.size();i++) {
+		  try { 
 			tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
-			direccion=direccion+1; 
-  	  }
+			direccion=direccion+1;
+		  } catch(SimboloYaDeclaradoException e) {
+		      token = tokens.get(i);
+			  error_semantico(token.image, token.beginLine, token.beginColumn, e);
+		    }	
+  	  	}  
   	}
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis incorrecta");
@@ -398,9 +403,13 @@ void cabecera_accion():
   try { 
   	< tACCION > t=< tIDENTIFICADOR > (parametros_formales())?< tFIN_SENTENCIA >
   	{
-  		if(t!=null){
+  		if(t != null){
+  		  try {
 			tabla_simbolos.introducir_accion(t.image,nivel,direccion);
 			direccion = direccion+1;
+  		  } catch(SimboloYaDeclaradoException e) {
+			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
+  		    }
   	 	}
   	}
  }catch(ParseException e) {
@@ -429,9 +438,14 @@ void parametros():
   try { 
   	clase=clase_parametros() tipo=tipo_variables() tokens=identificadores()
   	{
-  	  for(int i=0; i < tokens.size(); i++) {
-			tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
-			direccion = direccion+1;
+  	  for(int i = 0; i < tokens.size(); i++) {
+  	    try { 
+		  tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+		  direccion = direccion+1;
+		} catch(SimboloYaDeclaradoException e) {
+			token = tokens.get(i);
+			error_semantico(token.image, token.beginLine, token.beginColumn, e);
+		  }	
   	  }
   	}
  }catch(ParseException e) {
