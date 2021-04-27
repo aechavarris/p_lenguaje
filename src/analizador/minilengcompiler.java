@@ -9,6 +9,7 @@ import lib.semantico.Simbolo.*;
 public class minilengcompiler implements minilengcompilerConstants {
 
   static boolean errorSintactico = false;
+  static boolean errorSemantico = false;
   static TablaSimbolos tabla_simbolos = new TablaSimbolos();
   static int nivel = 0;
   static int direccion=3;
@@ -36,6 +37,11 @@ public class minilengcompiler implements minilengcompilerConstants {
 
                     if ( errorSintactico ) {
                                 System.out.println("Hay uno o m\u00e1s errores sint\u00e1cticos");
+                                System.exit(1);
+                    }
+
+                    if ( errorSemantico ) {
+                                System.out.println("Hay uno o m\u00e1s errores sem\u00e1nticos");
                                 System.exit(1);
                     }
 
@@ -72,6 +78,10 @@ public class minilengcompiler implements minilengcompilerConstants {
 
         private static void error_semantico(String name, int f, int col, Exception except) {
                 // ERRORES SEMÁNTICOS
+                if ( !errorSemantico ) {
+                        errorSemantico = true;
+                }
+
                 if (except instanceof SimboloNoEncontradoException) {
                         System.out.println("ERROR SEM\u00c1NTICO: <No se ha encontrado el s\u00edmbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
             }
