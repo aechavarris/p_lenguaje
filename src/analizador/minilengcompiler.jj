@@ -20,7 +20,6 @@ import lib.semantico.*;
 import java.util.ArrayList;
 import lib.semantico.Simbolo.*;
 
-
 public class minilengcompiler {
   
   static boolean errorSintactico = false;
@@ -694,21 +693,39 @@ void factor():
 
 void factor2():
 {
+  Token t=null;
+  Simbolo s=null;
+  Elemento e=new Elemento();
 }
 {
-  try { 
+  try {
+     
    < tPA > expresion() < tPC >
-| < tENTACAR > < tPA > expresion() < tPC >
-| < tCARAENT > < tPA > expresion() < tPC >
-| < tIDENTIFICADOR >
-| < tENTERO >
-| < tVALOR_CARACTER >
-| < tVALOR_CADENA >
-| < tVALOR_CADENA_VACIA >
-| < tVALOR_ENTERO >
-| < tTRUE >
-| < tFALSE >
-}catch(ParseException e) {
-	error_sintactico(e,"Sintaxis de factor incorrecta");
+	| < tENTACAR > < tPA > expresion() < tPC >
+	| < tCARAENT > < tPA > expresion() < tPC >
+	| t=< tIDENTIFICADOR > {
+	   try {
+	     	s=tabla_simbolos.buscar_simbolo(t.image);
+	     }catch(SimboloNoEncontradoException es) {
+	       
+			error_semantico(t.image, t.beginLine, t.beginColumn, es);
+			try {
+				tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
+				direccion++;
+				
+			}catch(SimboloYaDeclaradoException ex) {}
+			
+		}
+	}
+	| < tENTERO >
+	| < tVALOR_CARACTER > 
+	| < tVALOR_CADENA >
+	| < tVALOR_CADENA_VACIA >
+	| < tVALOR_ENTERO >
+	| < tTRUE >
+	| < tFALSE >
+}catch(ParseException esc) {
+	error_sintactico(esc,"Sintaxis de factor incorrecta");
 }
+
 }

@@ -6,7 +6,6 @@ import lib.semantico.*;
 import java.util.ArrayList;
 import lib.semantico.Simbolo.*;
 
-
 public class minilengcompiler implements minilengcompilerConstants {
 
   static boolean errorSintactico = false;
@@ -851,6 +850,9 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void factor2() throws ParseException {
+  Token t=null;
+  Simbolo s=null;
+  Elemento e=new Elemento();
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
@@ -871,7 +873,19 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tPC);
         break;
       case tIDENTIFICADOR:
-        jj_consume_token(tIDENTIFICADOR);
+        t = jj_consume_token(tIDENTIFICADOR);
+           try {
+                s=tabla_simbolos.buscar_simbolo(t.image);
+             }catch(SimboloNoEncontradoException es) {
+
+                        error_semantico(t.image, t.beginLine, t.beginColumn, es);
+                        try {
+                                tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
+                                direccion++;
+
+                        }catch(SimboloYaDeclaradoException ex) {}
+
+                }
         break;
       case tENTERO:
         jj_consume_token(tENTERO);
@@ -899,8 +913,8 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-    } catch (ParseException e) {
-        error_sintactico(e,"Sintaxis de factor incorrecta");
+    } catch (ParseException esc) {
+        error_sintactico(esc,"Sintaxis de factor incorrecta");
     }
   }
 
