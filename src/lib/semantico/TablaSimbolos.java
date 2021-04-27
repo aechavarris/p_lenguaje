@@ -145,17 +145,7 @@ public class TablaSimbolos {
 			if (s.getNombre().equals(simbolo.getNombre()) && s.getNivel() == simbolo.getNivel()) {
 				throw new SimboloYaDeclaradoException();
 			}
-			// Si hay un simbolo ya declarado con ese nombre en otro nivel, mostrar un aviso
-			else if (s.getNombre().equals(simbolo.getNombre())) {
-				Token t = minilengcompiler.token;
-				if (simbolo.ES_VECTOR()) {
-					// Evitar que el token sea ']'
-					t.image = simbolo.nombre;
-				}
-				Aviso.deteccion("Este sÃ­mbolo, definido en el nivel " + simbolo.nivel +
-						", va a ocultar a otro definido con el mismo nombre en el nivel " + s.nivel + "",
-						t);
-			}
+			
 		}
 
 		// Si no se ha lanzado la excepciÃ³n, se aÃ±ade

@@ -567,8 +567,8 @@ void si():
 }
 {
   try { 
-  	< tSI > expresion() < tENT >{ nivel=nivel+1; } lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
-  	{ nivel=nivel-1; }
+  	< tSI > expresion() < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de si incorrecta");
 }
@@ -611,53 +611,37 @@ void expresion():
 {
 }
 {
-  try { 
-   factor()( (operador()) factor() )*
+  try {
+   expresion2() (operador_relacional() expresion2())*
+ }catch(ParseException e) {
+	error_sintactico(e,"Sintaxis de expresion incorrecta");
+}
+}
+void expresion2():
+{
+}
+{
+  try {
+    (operador_aditivo())? expresion3() ((operador_aditivo()|< tOR >) expresion3())*
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
 }
 
-void operador():
+void expresion3():
 {
 }
 {
   try {
-    operador_aditivo()|operador2()
-
-	 
-}catch(ParseException e) {
-	error_sintactico(e,"No se ha encontrado un operador valido");
-}
-}
-
-void operador2():
-{
-}
-{
-  try {
-    operador_multiplicativo()|operador3()
-	 
-}catch(ParseException e) {
-	error_sintactico(e,"");
-}
-}
-
-void operador3():
-{
-}
-{
-  try {
-    operador_relacional()
-	 
-}catch(ParseException e) {
-	error_sintactico(e,"");
+   factor()( (operador_multiplicativo()|< tAND >) factor() )*
+ }catch(ParseException e) {
+	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
 }
 
 void operador_relacional():
 {
-}
+} 
 {
   try { 
 	 < tMENOR >
@@ -666,8 +650,6 @@ void operador_relacional():
 	| < tMAI >
 	| < tIGUAL >
 	| < tNI >
-	| < tAND >
-	| < tOR >
 }catch(ParseException e) {
 	error_sintactico(e,"Operador relacional no encontrado");
 }
@@ -704,7 +686,7 @@ void factor():
 }
 {
   try { 
-  (< tRESTA >|< tNOT >)? factor2()
+  (< tNOT >)? factor2()
 }catch(ParseException e) {
 	error_sintactico(e,"Factor no encontrado");
 }
