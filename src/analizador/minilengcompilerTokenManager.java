@@ -5,6 +5,7 @@ import lib.aviso.*;
 import lib.semantico.*;
 import java.util.ArrayList;
 import lib.semantico.Simbolo.*;
+import lib.semantico.Elemento.*;
 
 /** Token Manager. */
 public class minilengcompilerTokenManager implements minilengcompilerConstants

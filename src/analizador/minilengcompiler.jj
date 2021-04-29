@@ -16,10 +16,11 @@ PARSER_BEGIN(minilengcompiler)
 package analizador;
 import java.io.*;
 import lib.aviso.*;
-import lib.semantico.*;
+import lib.semantico.*; 
 import java.util.ArrayList;
 import lib.semantico.Simbolo.*;
-
+import lib.semantico.Elemento.*;
+ 
 public class minilengcompiler {
   
   static boolean errorSintactico = false;
@@ -101,6 +102,12 @@ public class minilengcompiler {
 	    }
 		else if (except instanceof SimboloYaDeclaradoException) {
 			System.out.println("ERROR SEMÁNTICO: <Ya ha sido declarado el símbolo llamado: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof OutOfBoundsIntExcepction) {
+			System.out.println("ERROR SEMÁNTICO: <Entero fuera de rango dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof WrongExpresionException) {
+			System.out.println("ERROR SEMÁNTICO: <Expresion no valida dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof DivZeroException) {
+			System.out.println("ERROR SEMÁNTICO: <Division por 0 encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
 		}
 		ejecucion_correcta=0;
  	}  
@@ -616,8 +623,9 @@ void seleccion():
 }
 }
 
-void expresion():
+Elemento expresion():
 {
+  Elemento el=new Elemento();
 }
 {
   try {
@@ -625,83 +633,207 @@ void expresion():
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
+	{return el;}
 }
-void expresion2():
+
+Elemento expresion2():
 {
+  op o1=null;
+  op o2=null;
+  Token t=null;
+  Elemento el=new Elemento();
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
 }
 {
   try {
-    (operador_aditivo())? expresion3() ((operador_aditivo()|< tOR >) expresion3())*
+    (o1=operador_aditivo())? el1=expresion3() ((o2=operador_aditivo()|t=< tOR >) el2=expresion3(){
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
+     	if(o2!=null) {
+       		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
+         		if(el1.getEntero()!=null && el2.getEntero()!=null) {
+					el.setTipo(Tipo_variable.ENTERO);
+					switch (o) {
+						case SUMA:
+							el.setEntero(el1.getEntero()+el2.getEntero());
+							break;
+						case RESTA:
+							el.setEntero(el1.getEntero()-el2.getEntero());
+					}
+         		}
+        	}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+        	}
+     	}else if(t!=null) {
+			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
+				el.setTipo(Tipo_variable.BOOLEANO);
+				if(el1.getBool()!=null && el2.getBool()!=null) {
+					el.setBool(el1.getBool() || el2.getBool());
+				}
+			}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+			}
+    	}
+   	}else if(el1.getTipo()==Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO){
+		el=el2;
+   	}else if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()==Tipo_variable.DESCONOCIDO){
+		el=el1;
+   	}else {
+   	  el.setTipo(Tipo_variable.DESCONOCIDO);
+   	}
+  })*
+    
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
+	{
+	  if(o1.op==RESTA) {
+		return -el;
+	}
+	return el;
+	}
 }
 
-void expresion3():
+Elemento expresion3():
 {
+  op o=null;
+  Token t=null;
+  Elemento el=new Elemento();
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
 }
 {
   try {
-   factor()( (operador_multiplicativo()|< tAND >) factor() )*
+   el1=factor()( (o=operador_multiplicativo()|t=< tAND >) el2=factor() {
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
+     	if(o!=null) {
+       		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
+         		if(el1.getEntero()!=null && el2.getEntero()!=null) {
+					el.setTipo(Tipo_variable.ENTERO);
+					switch (o) {
+						case MULL:
+				
+							el.setEntero(el1.getEntero()*el2.getEntero());
+							break;
+						case DIV:
+							if(el2.getEntero()==0) {
+								error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
+							}else { 
+								el.setEntero(el1.getEntero()/el2.getEntero());
+							}
+							break;
+						case DIV1:
+							if(el2.getEntero()==0) {
+								error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
+							}else { 
+								el.setEntero(el1.getEntero()/el2.getEntero());
+							}
+							break;
+						case MOD:
+							if(el2.getEntero()==0) {
+								error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
+							}else {
+							el.setEntero(el1.getEntero()%el2.getEntero());
+							}
+					}
+         		}
+        	}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+			}
+     	}else if(t!=null) {
+			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
+				el.setTipo(Tipo_variable.BOOLEANO);
+				if(el1.getBool()!=null && el2.getBool()!=null) {
+					el.setBool(el1.getBool() && el2.getBool());
+				}
+			}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+			}
+    	}
+   	}else if(el1.getTipo()==Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO){
+		el=el2;
+   	}else if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()==Tipo_variable.DESCONOCIDO){
+		el=el1;
+   	}else {
+   	  el.setTipo(Tipo_variable.DESCONOCIDO);
+   	}
+  })*
+   
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
+	{return el;}
 }
 
-void operador_relacional():
+op operador_relacional():
 {
 } 
 {
   try { 
-	 < tMENOR >
-	| < tMAYOR >
-	| < tMEI >
-	| < tMAI >
-	| < tIGUAL >
-	| < tNI >
+	 < tMENOR >	{return op.MENOR;}
+	| < tMAYOR >{return op.MAYOR;}
+	| < tMEI >	{return op.MEI;}
+	| < tMAI >	{return op.MAI;}
+	| < tIGUAL >{return op.IGUAL;}
+	| < tNI >	{return op.NI;}
+	
 }catch(ParseException e) {
 	error_sintactico(e,"Operador relacional no encontrado");
 }
+
 }
 
-void operador_aditivo():
+op operador_aditivo():
 {
 }
 {
   try { 
-  < tRESTA >
-	| < tSUMA >
+  < tRESTA >	{return op.RESTA;}
+	| < tSUMA >	{return op.SUMA;}
 }catch(ParseException e) {
 	error_sintactico(e,"Operador aditivo no encontrado");
 }
 }
 
-void operador_multiplicativo():
+op operador_multiplicativo():
 {
 } 
 {
   try { 
-  < tMULL >
-	| < tDIV >
-	| < tDIV1 >
-	| < tMOD >
+  < tMULL >		{return op.MULL;}
+	| < tDIV >	{return op.DIV;}
+	| < tDIV1 >	{return op.DIV1;}
+	| < tMOD >	{return op.MOD;}
 }catch(ParseException e) {
 	error_sintactico(e,"Operador multiplicativo no encontrado");
 }
 }
 
-void factor():
+Elemento factor():
 {
+  Token t=null;
+  Elemento el=new Elemento();
 }
 {
   try { 
-  (< tNOT >)? factor2()
+  (t=< tNOT >)? el=factor2() {
+	if(t!=null ) {
+		if(el.getTipo()==Tipo_variable.DESCONOCIDO || el.getTipo()==Tipo_variable.BOOLEANO) {
+			if(el.getBool()!=null) {
+				el.setBool(!el.getBool());
+			}
+		}else {
+			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		} 
+	}
+  }
 }catch(ParseException e) {
 	error_sintactico(e,"Factor no encontrado");
 }
+	{return el;}
 }
 
-void factor2():
+Elemento factor2():
 {
   Token t=null;
   Simbolo s=null;
@@ -710,32 +842,98 @@ void factor2():
 {
   try {
      
-   < tPA > expresion() < tPC >
-	| < tENTACAR > < tPA > expresion() < tPC >
-	| < tCARAENT > < tPA > expresion() < tPC >
+   < tPA > e=expresion() < tPC >
+	| t=< tENTACAR > < tPA > e=expresion() {
+	  	Character c=null;
+		if(e.getTipo()==Tipo_variable.ENTERO && e.getEntero()!=null) {
+		  
+			if(e.getEntero() <0 || e.getEntero() >255 ) {
+			  error_semantico(t.image, t.beginLine, t.beginColumn, new OutOfBoundsIntExcepction());
+			}else {
+			  c=(char)e.getEntero().intValue();
+			}
+		}else {
+		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		} 
+		e=new Elemento();
+		e.setTipo(Tipo_variable.CHAR);
+		e.setCaracter(c);
+
+	} < tPC >
+	| t=< tCARAENT > < tPA > e=expresion(){
+	  	Integer en=null;
+		if(e.getTipo()==Tipo_variable.CHAR && e.getCaracter()!=null) {
+			en=(int)e.getCaracter().charValue();
+		}else {
+		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		} 
+		e=new Elemento();
+		e.setTipo(Tipo_variable.ENTERO);
+		e.setEntero(en);
+
+	} < tPC >
 	| t=< tIDENTIFICADOR > {
 	   try {
 	     	s=tabla_simbolos.buscar_simbolo(t.image);
+	     	if(s.ES_PARAMETRO()) {
+				e.setPara(s.getParametro());
+	     	}
+	     	
 	     }catch(SimboloNoEncontradoException es) {
 	       
 			error_semantico(t.image, t.beginLine, t.beginColumn, es);
 			try {
-				tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
+				s=tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
 				direccion++;
+				e.setTipo(Tipo_variable.DESCONOCIDO);
 				
+				if(s.ES_PARAMETRO()) {
+					e.setPara(s.getParametro());
+	     		}
 			}catch(SimboloYaDeclaradoException ex) {}
 			
 		}
+	} 
+	| t=< tVALOR_CARACTER >{
+	  
+		e.setTipo(Tipo_variable.CHAR);
+		e.setCaracter(t.image.charAt(1));
+		
+	} 
+	| t=< tVALOR_CADENA >{
+	  
+		e.setTipo(Tipo_variable.CADENA);
+		e.setCadena(t.image);
+		
 	}
-	| < tENTERO >
-	| < tVALOR_CARACTER > 
-	| < tVALOR_CADENA >
-	| < tVALOR_CADENA_VACIA >
-	| < tVALOR_ENTERO >
-	| < tTRUE >
-	| < tFALSE >
+	| t=< tVALOR_CADENA_VACIA >{
+	  
+		e.setTipo(Tipo_variable.CADENA);
+		e.setCadena(t.image);
+		
+	}
+	| t=< tVALOR_ENTERO >{
+	  
+		e.setTipo(Tipo_variable.ENTERO);
+		e.setEntero(Integer.parseInt(t.image));
+		
+	}
+	| t=< tTRUE >{
+	  
+		e.setTipo(Tipo_variable.BOOLEANO);
+		e.setBool(true);
+		
+	}
+	| t=< tFALSE >{
+	  
+		e.setTipo(Tipo_variable.BOOLEANO);
+		e.setBool(false);
+		
+	}
+
+	
 }catch(ParseException esc) {
 	error_sintactico(esc,"Sintaxis de factor incorrecta");
 }
-
+{return e;}
 }
