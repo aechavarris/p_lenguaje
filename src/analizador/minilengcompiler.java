@@ -743,7 +743,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
                         if(el1.getEntero()!=null && el2.getEntero()!=null) {
                                         el.setTipo(Tipo_variable.ENTERO);
-                                        switch (o) {
+                                        switch (o2) {
                                                 case SUMA:
                                                         el.setEntero(el1.getEntero()+el2.getEntero());
                                                         break;
@@ -775,9 +775,9 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de expresion incorrecta");
     }
-          if(o1.op==RESTA) {
-                {if (true) return -el;}
-        }
+          //if(o1.op==RESTA) {
+                //return -el;
+          //}
         {if (true) return el;}
     throw new Error("Missing return statement in function");
   }
