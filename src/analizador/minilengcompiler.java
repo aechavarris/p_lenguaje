@@ -93,8 +93,16 @@ public class minilengcompiler implements minilengcompilerConstants {
                 }else if (except instanceof WrongExpresionException) {
                         System.out.println("ERROR SEM\u00c1NTICO: <Expresion no valida dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
                 }else if (except instanceof DivZeroException) {
-                        System.out.println("ERROR SEM\u00c1NTICO: <Division por 0 encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
+                        System.out.println("ERROR SEM\u00c1NTICO: <Division por 0 encontrada dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+                }else if (except instanceof WrongTypeException) {
+                        System.out.println("ERROR SEM\u00c1NTICO: <Tipo incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+                }else if (except instanceof WrongParameterException) {
+                        System.out.println("ERROR SEM\u00c1NTICO: <Parametro incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+                }else if (except instanceof WrongActionException) {
+                        System.out.println("ERROR SEM\u00c1NTICO: <Accion incorrecta encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
                 }
+
+
                 ejecucion_correcta=0;
         }
 
@@ -134,6 +142,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void sentencia() throws ParseException {
+  Token t=null;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tLEER:
@@ -145,8 +154,8 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tFIN_SENTENCIA);
         break;
       case tIDENTIFICADOR:
-        jj_consume_token(tIDENTIFICADOR);
-        asignacion_invocacion_accion();
+        t = jj_consume_token(tIDENTIFICADOR);
+        asignacion_invocacion_accion(t);
         jj_consume_token(tFIN_SENTENCIA);
         break;
       case tPRINCIPIO:
@@ -168,22 +177,22 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   }
 
-  static final public void asignacion_invocacion_accion() throws ParseException {
+  static final public void asignacion_invocacion_accion(Token t) throws ParseException {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tOAS:
-        asignacion();
+        asignacion(t);
         break;
       default:
         jj_la1[2] = jj_gen;
-        invocacion_accion();
+        invocacion_accion(t);
       }
     } catch (ParseException e) {
         error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
     }
   }
 
-  static final public void asignacion() throws ParseException {
+  static final public void asignacion(Token t) throws ParseException {
     try {
       jj_consume_token(tOAS);
       expresion();
@@ -192,11 +201,20 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   }
 
-  static final public void invocacion_accion() throws ParseException {
+  static final public void invocacion_accion(Token t) throws ParseException {
+  Simbolo accion=new Simbolo();
+    try {
+        accion=tabla_simbolos.buscar_simbolo(t.image);
+        if(accion.getVariable()!=Tipo_variable.DESCONOCIDO && !accion.ES_ACCION()) {
+                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+        }
+    }catch(SimboloNoEncontradoException e) {
+      error_semantico(t.image, t.beginLine, t.beginColumn, e);
+    }
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
-        argumentos();
+        argumentos(accion);
         break;
       default:
         jj_la1[3] = jj_gen;
@@ -531,8 +549,12 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void lista_escribibles() throws ParseException {
+  Token t=null;
+  Elemento el=new Elemento();
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
     try {
-      expresion();
+      el1 = expresion();
       label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -543,8 +565,14 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_la1[13] = jj_gen;
           break label_7;
         }
-        jj_consume_token(tCOMA);
-        expresion();
+        t = jj_consume_token(tCOMA);
+        el2 = expresion();
+        if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA) &&
+                (el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA)) {
+
+        }else {
+                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongTypeException());
+        }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de escribir incorrecta ");
@@ -552,9 +580,14 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void mientras_que() throws ParseException {
+  Elemento el=null;
+  Token t=null;
     try {
-      jj_consume_token(tMQ);
-      expresion();
+      t = jj_consume_token(tMQ);
+      el = expresion();
+                if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
+                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                }
       lista_sentencias();
       jj_consume_token(tFMQ);
     } catch (ParseException e) {
@@ -563,9 +596,14 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public void si() throws ParseException {
+  Elemento el=null;
+  Token t=null;
     try {
-      jj_consume_token(tSI);
-      expresion();
+      t = jj_consume_token(tSI);
+      el = expresion();
+                if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
+                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                }
       jj_consume_token(tENT);
       lista_sentencias();
       label_8:
@@ -587,7 +625,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   }
 
-  static final public void argumentos() throws ParseException {
+  static final public void argumentos(Simbolo accion) throws ParseException {
     try {
       jj_consume_token(tPA);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -604,7 +642,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       case tVALOR_CADENA:
       case tVALOR_CADENA_VACIA:
       case tIDENTIFICADOR:
-        lista_expresiones();
+        lista_expresiones(accion);
         break;
       default:
         jj_la1[15] = jj_gen;
@@ -616,9 +654,36 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   }
 
-  static final public void lista_expresiones() throws ParseException {
+  static final public void lista_expresiones(Simbolo accion) throws ParseException {
+  Token t=null;
+  ArrayList<Simbolo> paraList=null;
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
+  Integer i=0;
+  Simbolo parametro=null;
+  boolean error=false;
+    if(accion!=null && accion.ES_ACCION() && accion.getVariable()!=Tipo_variable.DESCONOCIDO){
+      paraList=accion.getListaParametros();
+        }
     try {
-      expresion();
+      el1 = expresion();
+                if(paraList!=null && paraList.size()>i){
+                        parametro=paraList.get(i);
+                        i++;
+                        if(el1!=null && parametro!=null && el1.getTipo()!=Tipo_variable.DESCONOCIDO) {
+                          if(parametro.ES_REFERENCIA() && el1.getPara()==Clase_parametro.VAL) {
+                            error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+                            error=true;
+                          }
+                          if(el1.getTipo()!=parametro.getVariable()) {
+                            error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+                            error=true;
+                          }
+                        }
+                }else {
+                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+                        error=true;
+                }
       label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -629,12 +694,34 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_la1[16] = jj_gen;
           break label_9;
         }
-        jj_consume_token(tCOMA);
-        expresion();
+        t = jj_consume_token(tCOMA);
+        el2 = expresion();
+                if(paraList!=null && paraList.size()>i){
+                        parametro=paraList.get(i);
+                        i++;
+                        if(el2!=null && parametro!=null && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
+                          if(parametro.ES_REFERENCIA() && el2.getPara()==Clase_parametro.VAL) {
+                            error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+                            error=true;
+                          }
+                          if(el2.getTipo()!=parametro.getVariable()) {
+                            error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+                            error=true;
+                          }
+                        }
+                }else {
+                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+                        error=true;
+                }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de lista de expresiones incorrecta");
     }
+        if(!error && paraList!=null) {
+          if(i!=paraList.size()) {
+            error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+          }
+        }
   }
 
   static final public void seleccion() throws ParseException {
@@ -666,7 +753,12 @@ public class minilengcompiler implements minilengcompilerConstants {
   }
 
   static final public Elemento expresion() throws ParseException {
+  op o1=null;
+  op o2=null;
+  Token t=null;
   Elemento el=new Elemento();
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
     try {
       expresion2();
       label_11:
@@ -686,6 +778,96 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         operador_relacional();
         expresion2();
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
+        if(o2!=null) {
+                if(el1.getTipo()==el2.getTipo()) {
+                        el.setTipo(Tipo_variable.BOOLEANO);
+                        if((el1.getEntero()!=null && el2.getEntero()!=null)) {
+
+                                        switch (o2) {
+                                                case MAYOR:
+
+                                                        el.setBool(el1.getEntero()>el2.getEntero());
+                                                        break;
+                                                case MENOR:
+                                                        el.setBool(el1.getEntero()<el2.getEntero());
+                                                        break;
+                                                case IGUAL:
+                                                        el.setBool(el1.getEntero()==el2.getEntero());
+                                                        break;
+                                                case MAI:
+                                                        el.setBool(el1.getEntero()>=el2.getEntero());
+                                                        break;
+                                                case MEI:
+                                                        el.setBool(el1.getEntero()<=el2.getEntero());
+                                                        break;
+                                                case NI:
+                                                        el.setBool(el1.getEntero()!=el2.getEntero());
+                                        }
+                        }else if(el1.getBool()!=null && el2.getBool()!=null) {
+                                        switch (o2) {
+                                                case IGUAL:
+                                                        el.setBool(el1.getBool()==el2.getBool());
+                                                        break;
+                                                case NI:
+                                                        el.setBool(el1.getBool()!=el2.getBool());
+                                                        break;
+                                                default:
+                                                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                                        }
+                        }else if(el1.getCadena()!=null && el2.getCadena()!=null) {
+                                        switch (o2) {
+                                                case IGUAL:
+                                                        el.setBool(el1.getCadena()==el2.getCadena());
+                                                        break;
+                                                case NI:
+                                                        el.setBool(el1.getCadena()!=el2.getCadena());
+                                                        break;
+                                                default:
+                                                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                                        }
+                        }else if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                        switch (o2) {
+                                                case MAYOR:
+
+                                                        el.setBool(el1.getCaracter()>el2.getCaracter());
+                                                        break;
+                                                case MENOR:
+                                                        el.setBool(el1.getCaracter()<el2.getCaracter());
+                                                        break;
+                                                case IGUAL:
+                                                        el.setBool(el1.getCaracter()==el2.getCaracter());
+                                                        break;
+                                                case MAI:
+                                                        el.setBool(el1.getCaracter()>=el2.getCaracter());
+                                                        break;
+                                                case MEI:
+                                                        el.setBool(el1.getCaracter()<=el2.getCaracter());
+                                                        break;
+                                                case NI:
+                                                        el.setBool(el1.getCaracter()!=el2.getCaracter());
+                                        }
+                        }
+                }else {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                }
+        }else if(t!=null) {
+                        if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
+                                el.setTipo(Tipo_variable.BOOLEANO);
+                                if(el1.getBool()!=null && el2.getBool()!=null) {
+                                        el.setBool(el1.getBool() || el2.getBool());
+                                }
+                        }else {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                        }
+        }
+        }else if(el1.getTipo()==Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO){
+                el=el2;
+        }else if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()==Tipo_variable.DESCONOCIDO){
+                el=el1;
+        }else {
+          el.setTipo(Tipo_variable.DESCONOCIDO);
+        }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de expresion incorrecta");
@@ -751,7 +933,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         el.setEntero(el1.getEntero()-el2.getEntero());
                                         }
                         }
-                }else {
+                }else if(t!=null){
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
         }else if(t!=null) {
@@ -852,7 +1034,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         }
                                         }
                         }
-                }else {
+                }else if(t!=null){
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                         }
         }else if(t!=null) {
@@ -1070,31 +1252,37 @@ public class minilengcompiler implements minilengcompilerConstants {
         break;
       case tVALOR_CARACTER:
         t = jj_consume_token(tVALOR_CARACTER);
+                e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.CHAR);
                 e.setCaracter(t.image.charAt(1));
         break;
       case tVALOR_CADENA:
         t = jj_consume_token(tVALOR_CADENA);
+                e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.CADENA);
                 e.setCadena(t.image);
         break;
       case tVALOR_CADENA_VACIA:
         t = jj_consume_token(tVALOR_CADENA_VACIA);
+                e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.CADENA);
                 e.setCadena(t.image);
         break;
       case tVALOR_ENTERO:
         t = jj_consume_token(tVALOR_ENTERO);
+                e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.ENTERO);
                 e.setEntero(Integer.parseInt(t.image));
         break;
       case tTRUE:
         t = jj_consume_token(tTRUE);
+                e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.BOOLEANO);
                 e.setBool(true);
         break;
       case tFALSE:
         t = jj_consume_token(tFALSE);
+                e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.BOOLEANO);
                 e.setBool(false);
         break;

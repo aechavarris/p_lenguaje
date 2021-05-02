@@ -65,4 +65,6 @@ public class Elemento {
 	public void setBool(Boolean bool) {
 		this.bool = bool;
 	}
+	
+	
 }

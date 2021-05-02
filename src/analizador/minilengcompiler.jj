@@ -107,8 +107,16 @@ public class minilengcompiler {
 		}else if (except instanceof WrongExpresionException) {
 			System.out.println("ERROR SEMÁNTICO: <Expresion no valida dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof DivZeroException) {
-			System.out.println("ERROR SEMÁNTICO: <Division por 0 encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
+			System.out.println("ERROR SEMÁNTICO: <Division por 0 encontrada dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof WrongTypeException) {
+			System.out.println("ERROR SEMÁNTICO: <Tipo incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof WrongParameterException) {
+			System.out.println("ERROR SEMÁNTICO: <Parametro incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof WrongActionException) {
+			System.out.println("ERROR SEMÁNTICO: <Accion incorrecta encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
 		}
+		
+		
 		ejecucion_correcta=0;
  	}  
 }
@@ -263,12 +271,13 @@ void programa():
 
 void sentencia():
 {
+  Token t=null;
 }
 {
 try { 
   	(leer()) < tFIN_SENTENCIA >
  |  (escribir()) < tFIN_SENTENCIA >
- |  < tIDENTIFICADOR > (asignacion_invocacion_accion()) < tFIN_SENTENCIA >
+ |  t=< tIDENTIFICADOR > (asignacion_invocacion_accion(t)) < tFIN_SENTENCIA >
  |	(seleccion()) 
  |	(mientras_que())
  | 	(si())
@@ -278,18 +287,18 @@ try {
 }
 }
 
-void asignacion_invocacion_accion():
+void asignacion_invocacion_accion(Token t):
 {
 }
 {
   try { 
-  asignacion()|invocacion_accion()
+  asignacion(t)|invocacion_accion(t)
 }catch(ParseException e) {
 	error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
 }
 }
 
-void asignacion():
+void asignacion(Token t):
 {
 }
 {
@@ -300,12 +309,23 @@ void asignacion():
 }
 }
 
-void invocacion_accion():
+void invocacion_accion(Token t):
 {
+  Simbolo accion=new Simbolo();
 }
 {
+  {
+    try { 
+    	accion=tabla_simbolos.buscar_simbolo(t.image);
+    	if(accion.getVariable()!=Tipo_variable.DESCONOCIDO && !accion.ES_ACCION()) {
+			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+    	}
+    }catch(SimboloNoEncontradoException e) {
+      error_semantico(t.image, t.beginLine, t.beginColumn, e);
+    }
+  }
   try {
-    (argumentos())?
+    (argumentos(accion))?
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
 }
@@ -558,10 +578,21 @@ void entacar():
 
 void lista_escribibles():
 {
+  Token t=null;
+  Elemento el=new Elemento();
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
 }
 {
   try { 
-  	( expresion() ) ( < tCOMA > (expresion() ) )*
+  	( el1=expresion() ) ( t=< tCOMA > (el2=expresion() ) {
+	if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA) &&
+		(el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA)) {
+		
+	}else {
+		error_semantico(t.image, t.beginLine, t.beginColumn, new WrongTypeException());
+	} 
+  	   })*                 
 }catch(ParseException e) {
 	error_sintactico(e,"Estructura de escribir incorrecta ");
 }
@@ -569,10 +600,18 @@ void lista_escribibles():
 
 void mientras_que():
 {
+  Elemento el=null;
+  Token t=null;
 }
 {
   try { 
-  	< tMQ > expresion() lista_sentencias() < tFMQ >
+  	t=< tMQ > el=expresion() {
+
+		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
+			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		}
+
+  	} lista_sentencias() < tFMQ >
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de mientras que incorrecta");
 }
@@ -580,35 +619,106 @@ void mientras_que():
 
 void si():
 {
+  Elemento el=null;
+  Token t=null;
 }
 {
   try { 
-  	< tSI > expresion() < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+  	t=< tSI > el=expresion()
+  	{
+
+		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
+			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		}
+
+  	} < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
 
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de si incorrecta");
 }
 }
 
-void argumentos():
+void argumentos(Simbolo accion):
 {
 }
 {
   try { 
-  	< tPA > ( lista_expresiones() )? < tPC >
+  	< tPA > ( lista_expresiones(accion) )? < tPC >
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de lista de argumentos incorrecta");
 }
 }
 
-void lista_expresiones():
+void lista_expresiones(Simbolo accion):
 {
+  Token t=null;
+  ArrayList<Simbolo> paraList=null;
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
+  Integer i=0;
+  Simbolo parametro=null;
+  boolean error=false;
 }
 {
+  {
+    if(accion!=null && accion.ES_ACCION() && accion.getVariable()!=Tipo_variable.DESCONOCIDO){
+      paraList=accion.getListaParametros();
+  	}
+  }
   try { 
-  	expresion()(","expresion())*
+  	el1=expresion()
+	{
+  	  
+		if(paraList!=null && paraList.size()>i){
+			parametro=paraList.get(i);
+			i++;
+			if(el1!=null && parametro!=null && el1.getTipo()!=Tipo_variable.DESCONOCIDO) {
+			  if(parametro.ES_REFERENCIA() && el1.getPara()==Clase_parametro.VAL) {
+			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error=true;
+			  }
+			  if(el1.getTipo()!=parametro.getVariable()) {
+			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error=true;
+			  } 
+			} 
+		}else {
+			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+			error=true;
+		}
+	}
+  	   
+  	(t=< tCOMA >el2=expresion()
+  	   
+	{
+  	  
+		if(paraList!=null && paraList.size()>i){
+			parametro=paraList.get(i);
+			i++;
+			if(el2!=null && parametro!=null && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
+			  if(parametro.ES_REFERENCIA() && el2.getPara()==Clase_parametro.VAL) {
+			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error=true;
+			  }
+			  if(el2.getTipo()!=parametro.getVariable()) {
+			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error=true;
+			  } 
+			} 
+		}else {
+			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+			error=true;
+		}
+	})*
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de lista de expresiones incorrecta");
+}
+{
+	if(!error && paraList!=null) {
+	  if(i!=paraList.size()) {
+	    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+	  }
+	}
 }
 }
 
@@ -625,11 +735,107 @@ void seleccion():
 
 Elemento expresion():
 {
+  op o1=null;
+  op o2=null;
+  Token t=null;
   Elemento el=new Elemento();
+  Elemento el1=new Elemento();
+  Elemento el2=new Elemento();
 }
 {
   try {
-   expresion2() (operador_relacional() expresion2())*
+   expresion2() (operador_relacional() expresion2(){
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
+     	if(o2!=null) {
+       		if(el1.getTipo()==el2.getTipo()) {
+       		  	el.setTipo(Tipo_variable.BOOLEANO);
+         		if((el1.getEntero()!=null && el2.getEntero()!=null)) {
+         		  	
+					switch (o2) {
+						case MAYOR:
+							
+							el.setBool(el1.getEntero()>el2.getEntero());
+							break;
+						case MENOR:
+							el.setBool(el1.getEntero()<el2.getEntero());
+							break;
+						case IGUAL:
+							el.setBool(el1.getEntero()==el2.getEntero());
+							break;
+						case MAI:
+							el.setBool(el1.getEntero()>=el2.getEntero());
+							break;
+						case MEI: 
+							el.setBool(el1.getEntero()<=el2.getEntero());
+							break;
+						case NI:
+							el.setBool(el1.getEntero()!=el2.getEntero());
+					}
+         		}else if(el1.getBool()!=null && el2.getBool()!=null) {
+					switch (o2) {
+						case IGUAL:
+							el.setBool(el1.getBool()==el2.getBool());
+							break;
+						case NI:
+							el.setBool(el1.getBool()!=el2.getBool());
+							break;
+						default:
+							error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+					}
+         		}else if(el1.getCadena()!=null && el2.getCadena()!=null) {
+					switch (o2) {
+						case IGUAL:
+							el.setBool(el1.getCadena()==el2.getCadena());
+							break;
+						case NI:
+							el.setBool(el1.getCadena()!=el2.getCadena());
+							break;
+						default:
+							error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+					}  
+         		}else if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+					switch (o2) {
+						case MAYOR:
+							
+							el.setBool(el1.getCaracter()>el2.getCaracter());
+							break;
+						case MENOR:
+							el.setBool(el1.getCaracter()<el2.getCaracter());
+							break;
+						case IGUAL:
+							el.setBool(el1.getCaracter()==el2.getCaracter());
+							break;
+						case MAI:
+							el.setBool(el1.getCaracter()>=el2.getCaracter());
+							break;
+						case MEI: 
+							el.setBool(el1.getCaracter()<=el2.getCaracter());
+							break;
+						case NI:
+							el.setBool(el1.getCaracter()!=el2.getCaracter());
+					}
+         		}
+        	}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+        	}
+     	}else if(t!=null) {
+			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
+				el.setTipo(Tipo_variable.BOOLEANO);
+				if(el1.getBool()!=null && el2.getBool()!=null) {
+					el.setBool(el1.getBool() || el2.getBool());
+				}
+			}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+			}
+    	}
+   	}else if(el1.getTipo()==Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO){
+		el=el2;
+   	}else if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()==Tipo_variable.DESCONOCIDO){
+		el=el1;
+   	}else {
+   	  el.setTipo(Tipo_variable.DESCONOCIDO);
+   	}
+  })*
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
@@ -661,7 +867,7 @@ Elemento expresion2():
 							el.setEntero(el1.getEntero()-el2.getEntero());
 					}
          		}
-        	}else {
+        	}else if(t!=null){
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
         	}
      	}else if(t!=null) {
@@ -737,7 +943,7 @@ Elemento expresion3():
 							}
 					}
          		}
-        	}else {
+        	}else if(t!=null){
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 			}
      	}else if(t!=null) {
@@ -843,7 +1049,7 @@ Elemento factor2():
   try {
      
    < tPA > e=expresion() < tPC >
-	| t=< tENTACAR > < tPA > e=expresion() {
+	| t=< tENTACAR > < tPA > e=expresion() { 
 	  	Character c=null;
 		if(e.getTipo()==Tipo_variable.ENTERO && e.getEntero()!=null) {
 		  
@@ -895,37 +1101,37 @@ Elemento factor2():
 		}
 	} 
 	| t=< tVALOR_CARACTER >{
-	  
+	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CHAR);
 		e.setCaracter(t.image.charAt(1));
 		
 	} 
 	| t=< tVALOR_CADENA >{
-	  
+	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CADENA);
 		e.setCadena(t.image);
 		
 	}
 	| t=< tVALOR_CADENA_VACIA >{
-	  
+	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CADENA);
 		e.setCadena(t.image);
 		
 	}
 	| t=< tVALOR_ENTERO >{
-	  
+	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.ENTERO);
 		e.setEntero(Integer.parseInt(t.image));
 		
 	}
 	| t=< tTRUE >{
-	  
+	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.BOOLEANO);
 		e.setBool(true);
 		
 	}
 	| t=< tFALSE >{
-	  
+	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.BOOLEANO);
 		e.setBool(false);
 		
