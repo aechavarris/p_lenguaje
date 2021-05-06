@@ -202,7 +202,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
                         el.setTipo(s.getVariable());
-                        if(s.ES_VALOR() || s.ES_ACCION() ||s.ES_PROGRAMA()) {
+                        if(s.ES_ACCION() ||s.ES_PROGRAMA()) {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
                         }
                 }catch(SimboloNoEncontradoException e) {
@@ -219,7 +219,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                 }
       jj_consume_token(tOAS);
       el1 = expresion();
-    System.out.println(el.getTipo()+" "+el1.getTipo());
         if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
 
                 if(el1.getTipo()!= el.getTipo()) {
@@ -396,12 +395,18 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void cabecera_accion() throws ParseException {
   Token t=null;
+  Simbolo s=null;
+  boolean encontrado=false;
+  ArrayList<Simbolo > parametros=new ArrayList<Simbolo>();
     try {
       jj_consume_token(tACCION);
       t = jj_consume_token(tIDENTIFICADOR);
                 if(t != null){
                   try {
-                        tabla_simbolos.introducir_accion(t.image,nivel,direccion);
+                        s=tabla_simbolos.introducir_accion(t.image,nivel,direccion);
+                        if(s!=null) {
+                                encontrado=true;
+                        }
                         direccion = direccion+1;
                         tabla_simbolos.imprimirTabla();
                   } catch(SimboloYaDeclaradoException e) {
@@ -410,7 +415,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
-        parametros_formales();
+        parametros = parametros_formales();
         break;
       default:
         jj_la1[8] = jj_gen;
@@ -420,15 +425,26 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
     }
+  if(encontrado) {
+
+        s.setListaParametros(parametros);
+  }
   }
 
-  static final public void parametros_formales() throws ParseException {
+  static final public ArrayList<Simbolo> parametros_formales() throws ParseException {
+  ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
+  ArrayList<Simbolo> parametros1=new ArrayList<Simbolo>();
+  ArrayList<Simbolo> parametros2=new ArrayList<Simbolo>();
     try {
       jj_consume_token(tPA);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tVAL:
       case tREF:
-        parametros();
+        parametros1 = parametros();
+                                    System.out.println(parametros1);
+        for(Simbolo s:parametros1) {
+                parametros.add(s);
+        }
         label_5:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -440,7 +456,11 @@ public class minilengcompiler implements minilengcompilerConstants {
             break label_5;
           }
           jj_consume_token(tFIN_SENTENCIA);
-          parametros();
+          parametros2 = parametros();
+                                                 System.out.println(parametros2);
+        for(Simbolo s:parametros2) {
+                parametros.add(s);
+        }
         }
         break;
       default:
@@ -451,19 +471,24 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de parametros de accion incorrecta");
     }
+ {if (true) return parametros;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void parametros() throws ParseException {
+  static final public ArrayList<Simbolo > parametros() throws ParseException {
   ArrayList<Token > tokens=null;
   Tipo_variable tipo=null;
   Clase_parametro clase=null;
+  Simbolo s=null;
+  ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
     try {
       clase = clase_parametros();
       tipo = tipo_variables();
       tokens = identificadores();
           for(int i = 0; i < tokens.size(); i++) {
             try {
-                  tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+                  s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+                  parametros.add(s);
                   direccion = direccion+1;
                   tabla_simbolos.imprimirTabla();
                 } catch(SimboloYaDeclaradoException e) {
@@ -474,6 +499,8 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de parametros incorrecta");
     }
+ {if (true) return parametros;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public Clase_parametro clase_parametros() throws ParseException {
@@ -536,11 +563,33 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void leer() throws ParseException {
   ArrayList<Token> iden=new ArrayList<Token>();
+  Token t=null;
+  Token t1=null;
+  Simbolo s=null;
     try {
-      jj_consume_token(tLEER);
+      t1 = jj_consume_token(tLEER);
       jj_consume_token(tPA);
       iden = identificadores();
       jj_consume_token(tPC);
+                for(int n=0;n<iden.size();n++) {
+                  t=iden.get(n);
+                  try {
+                        s=tabla_simbolos.buscar_simbolo(t.image);
+                        if(!(s.ES_VARIABLE()||s.ES_PARAMETRO()&& s.ES_REFERENCIA())) {
+                                if(!(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.DESCONOCIDO
+                                        || s.getVariable()==Tipo_variable.CHAR|| s.getVariable()==Tipo_variable.CADENA)) {
+                                        error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
+                                }
+                        }
+                  }catch(SimboloNoEncontradoException e) {
+                    error_semantico(t.image, t.beginLine, t.beginColumn, e);
+                    try {
+                        s=tabla_simbolos.introducir_variable(t.image,Tipo_variable.DESCONOCIDO,nivel,direccion);
+                        direccion=direccion +1;
+                   }catch(SimboloYaDeclaradoException es) { }
+
+                   }
+                }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de leer incorrecta");
     }
@@ -712,6 +761,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                           }
                         }
                 }else {
+
                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
                         error=true;
                 }
@@ -1323,7 +1373,6 @@ public class minilengcompiler implements minilengcompilerConstants {
         t = jj_consume_token(tIDENTIFICADOR);
            try {
                 s=tabla_simbolos.buscar_simbolo(t.image);
-                System.out.println("ENCUENTRO SIMBOLO: "+t.image+" "+s.getVariable());
                 if(s.ES_PARAMETRO()) {
                                 e.setPara(s.getParametro());
                 }if(s.ES_PROGRAMA()) {

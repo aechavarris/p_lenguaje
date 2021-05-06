@@ -313,7 +313,7 @@ void asignacion(Token t):
     		try { 
     			s=tabla_simbolos.buscar_simbolo(t.image);
     			el.setTipo(s.getVariable());
-    			if(s.ES_VALOR() || s.ES_ACCION() ||s.ES_PROGRAMA()) {
+    			if(s.ES_ACCION() ||s.ES_PROGRAMA()) {
 					error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
     			}
     		}catch(SimboloNoEncontradoException e) {
@@ -331,7 +331,6 @@ void asignacion(Token t):
  		} 
   < tOAS > el1=expresion()
   {
-    System.out.println(el.getTipo()+" "+el1.getTipo());
 	if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
 	  
 		if(el1.getTipo()!= el.getTipo()) {
@@ -473,42 +472,68 @@ void declaracion_accion():
 void cabecera_accion():
 {
   Token t=null;
+  Simbolo s=null;
+  boolean encontrado=false;
+  ArrayList<Simbolo > parametros=new ArrayList<Simbolo>();
 }
 {
   try { 
   	< tACCION > t=< tIDENTIFICADOR > {  
   		if(t != null){
   		  try {
-			tabla_simbolos.introducir_accion(t.image,nivel,direccion);
+			s=tabla_simbolos.introducir_accion(t.image,nivel,direccion);
+			if(s!=null) {
+				encontrado=true;
+			}
 			direccion = direccion+1;
 			tabla_simbolos.imprimirTabla();
   		  } catch(SimboloYaDeclaradoException e) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
   	 	}
-  	}(parametros_formales())?< tFIN_SENTENCIA >
+  	}(parametros=parametros_formales())?< tFIN_SENTENCIA >
   	
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis en definicion de accion incorrecta");
 }
+{
+  if(encontrado) {
+    
+	s.setListaParametros(parametros);
+  }
+}
 }
 
-void parametros_formales():
+ArrayList<Simbolo> parametros_formales():
 {
+  ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
+  ArrayList<Simbolo> parametros1=new ArrayList<Simbolo>();
+  ArrayList<Simbolo> parametros2=new ArrayList<Simbolo>();
 }
 {
   try { 
-  < tPA >(parametros() (< tFIN_SENTENCIA > parametros())*)?< tPC >
+  < tPA >(parametros1=parametros() {System.out.println(parametros1);
+	for(Simbolo s:parametros1) {
+		parametros.add(s);
+	}
+  } (< tFIN_SENTENCIA > parametros2=parametros(){System.out.println(parametros2);
+	for(Simbolo s:parametros2) {
+		parametros.add(s);
+	}	
+  })*)?< tPC >
 }catch(ParseException e) {
 	error_sintactico(e,"Estructura de parametros de accion incorrecta");
 }
+{return parametros;}
 }
 
-void parametros():
+ArrayList<Simbolo > parametros():
 {
   ArrayList<Token > tokens=null;
   Tipo_variable tipo=null;
   Clase_parametro clase=null;
+  Simbolo s=null;
+  ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
 }
 {
   try { 
@@ -516,7 +541,8 @@ void parametros():
   	{
   	  for(int i = 0; i < tokens.size(); i++) {
   	    try { 
-		  tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+		  s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+		  parametros.add(s);
 		  direccion = direccion+1;
 		  tabla_simbolos.imprimirTabla();
 		} catch(SimboloYaDeclaradoException e) {
@@ -524,10 +550,12 @@ void parametros():
 			error_semantico(token.image, token.beginLine, token.beginColumn, e);
 		  }	
   	  }
+  	  
   	}
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de parametros incorrecta");
 }
+{return parametros;}
 }
 
 Clase_parametro clase_parametros():
@@ -569,10 +597,34 @@ void lista_sentencias():
 void leer():
 {
   ArrayList<Token> iden=new ArrayList<Token>();
+  Token t=null;
+  Token t1=null;
+  Simbolo s=null;
 }
 {
   try { 
-  	< tLEER > < tPA > iden=identificadores() < tPC >
+  	t1=< tLEER > < tPA > iden=identificadores() < tPC >
+  	{
+		for(int n=0;n<iden.size();n++) {
+		  t=iden.get(n);
+		  try {
+			s=tabla_simbolos.buscar_simbolo(t.image);
+			if(!(s.ES_VARIABLE()||s.ES_PARAMETRO()&& s.ES_REFERENCIA())) {
+				if(!(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.DESCONOCIDO
+					|| s.getVariable()==Tipo_variable.CHAR|| s.getVariable()==Tipo_variable.CADENA)) {
+				  	error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
+				}
+			}
+		  }catch(SimboloNoEncontradoException e) {
+		    error_semantico(t.image, t.beginLine, t.beginColumn, e);
+		    try { 
+		    	s=tabla_simbolos.introducir_variable(t.image,Tipo_variable.DESCONOCIDO,nivel,direccion);
+		    	direccion=direccion +1;
+		   }catch(SimboloYaDeclaradoException es) { }
+		    
+		   }
+		}
+  	}
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de leer incorrecta");
 }
@@ -703,7 +755,6 @@ void lista_expresiones(Simbolo accion):
   try { 
   	el1=expresion()
 	{
-  	  
 		if(paraList!=null && paraList.size()>i){
 			parametro=paraList.get(i);
 			i++;
@@ -718,6 +769,7 @@ void lista_expresiones(Simbolo accion):
 			  } 
 			} 
 		}else {
+		  	
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
 			error=true;
 		}
@@ -1180,7 +1232,6 @@ Elemento factor2():
 	| t=< tIDENTIFICADOR > {
 	   try {
 	     	s=tabla_simbolos.buscar_simbolo(t.image);
-	     	System.out.println("ENCUENTRO SIMBOLO: "+t.image+" "+s.getVariable());
 	     	if(s.ES_PARAMETRO()) {
 				e.setPara(s.getParametro());
 	     	}if(s.ES_PROGRAMA()) {
