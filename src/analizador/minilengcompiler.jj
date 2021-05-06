@@ -114,6 +114,8 @@ public class minilengcompiler {
 			System.out.println("ERROR SEMÁNTICO: <Parametro incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof WrongActionException) {
 			System.out.println("ERROR SEMÁNTICO: <Accion incorrecta encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof SimboloNoAsignableException) {
+			System.out.println("ERROR SEMÁNTICO: <Simbolo no asignable encontrado en: " + name + "> en (<" + f  + ", " + col + ">)");
 		}
 		
 		
@@ -257,6 +259,7 @@ void programa():
   	   < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
  	 (bloque_sentencias())*
  	 {
+ 	   
  	   if(ejecucion_correcta==1) {
 			tabla_simbolos.eliminar_variables(nivel);
 			tabla_simbolos.eliminar_acciones(nivel);
@@ -300,10 +303,42 @@ void asignacion_invocacion_accion(Token t):
 
 void asignacion(Token t):
 {
+  Simbolo s=null;
+  Elemento el=new Elemento();
+  Elemento el1=new Elemento();
 }
 {
-  try { 
-  < tOAS > expresion()
+  try {
+ 		{
+    		try { 
+    			s=tabla_simbolos.buscar_simbolo(t.image);
+    			el.setTipo(s.getVariable());
+    			if(s.ES_VALOR() || s.ES_ACCION() ||s.ES_PROGRAMA()) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
+    			}
+    		}catch(SimboloNoEncontradoException e) {
+      			error_semantico(t.image, t.beginLine, t.beginColumn, e);
+      			try {
+					s=tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
+					direccion++;
+					el.setTipo(Tipo_variable.DESCONOCIDO);
+				
+					if(s.ES_PARAMETRO()) {
+						el.setPara(s.getParametro());
+	     			}
+				}catch(SimboloYaDeclaradoException ex) {}
+    		}  
+ 		} 
+  < tOAS > el1=expresion()
+  {
+    System.out.println(el.getTipo()+" "+el1.getTipo());
+	if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
+	  
+		if(el1.getTipo()!= el.getTipo()) {
+			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
+		}
+	}
+  }
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de asignacion incorrecta");
 }
@@ -424,7 +459,7 @@ void declaracion_accion():
 {
   try {
      
-  	cabecera_accion() declaracion_variables() declaracion_acciones() bloque_sentencias()
+  	cabecera_accion() { nivel=nivel+1;} declaracion_variables() declaracion_acciones() bloque_sentencias()
   	{ tabla_simbolos.eliminar_variables(nivel);
   	  tabla_simbolos.eliminar_parametros(nivel);
   	  direccion=direccion_anterior;
@@ -447,7 +482,6 @@ void cabecera_accion():
 			tabla_simbolos.introducir_accion(t.image,nivel,direccion);
 			direccion = direccion+1;
 			tabla_simbolos.imprimirTabla();
-			nivel=nivel+1;
   		  } catch(SimboloYaDeclaradoException e) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
@@ -534,10 +568,11 @@ void lista_sentencias():
 
 void leer():
 {
+  ArrayList<Token> iden=new ArrayList<Token>();
 }
 {
   try { 
-  	< tLEER > < tPA > identificadores() < tPC >
+  	< tLEER > < tPA > iden=identificadores() < tPC >
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de leer incorrecta");
 }
@@ -651,7 +686,7 @@ void argumentos(Simbolo accion):
 
 void lista_expresiones(Simbolo accion):
 {
-  Token t=null;
+  Token t=token;
   ArrayList<Simbolo> paraList=null;
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
@@ -737,21 +772,41 @@ Elemento expresion():
 {
   op o1=null;
   op o2=null;
-  Token t=null;
+  Token t=token;
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
 }
 {
   try {
-   expresion2() (operador_relacional() expresion2(){
-     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
-     	if(o2!=null) {
+   el1=expresion2(){
+	el.setTipo(el1.getTipo());
+	if(el1.getTipo()!=null) {
+		switch(el1.getTipo()) {
+		case ENTERO:
+			el.setEntero(el1.getEntero());
+			break;
+		case BOOLEANO:
+			el.setBool(el1.getBool());
+			break;
+		case CHAR:
+			el.setCaracter(el1.getCaracter());
+			break;
+		case CADENA:
+			el.setCadena(el1.getCadena());
+		}
+	}
+   } (o1=operador_relacional() el2=expresion2(){
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
+       	
+     	if(o1!=null) {
+     	  	
        		if(el1.getTipo()==el2.getTipo()) {
+       		  
        		  	el.setTipo(Tipo_variable.BOOLEANO);
          		if((el1.getEntero()!=null && el2.getEntero()!=null)) {
          		  	
-					switch (o2) {
+					switch (o1) {
 						case MAYOR:
 							
 							el.setBool(el1.getEntero()>el2.getEntero());
@@ -772,7 +827,7 @@ Elemento expresion():
 							el.setBool(el1.getEntero()!=el2.getEntero());
 					}
          		}else if(el1.getBool()!=null && el2.getBool()!=null) {
-					switch (o2) {
+					switch (o1) {
 						case IGUAL:
 							el.setBool(el1.getBool()==el2.getBool());
 							break;
@@ -783,7 +838,7 @@ Elemento expresion():
 							error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 					}
          		}else if(el1.getCadena()!=null && el2.getCadena()!=null) {
-					switch (o2) {
+					switch (o1) {
 						case IGUAL:
 							el.setBool(el1.getCadena()==el2.getCadena());
 							break;
@@ -794,7 +849,7 @@ Elemento expresion():
 							error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 					}  
          		}else if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
-					switch (o2) {
+					switch (o1) {
 						case MAYOR:
 							
 							el.setBool(el1.getCaracter()>el2.getCaracter());
@@ -853,7 +908,37 @@ Elemento expresion2():
 }
 {
   try {
-    (o1=operador_aditivo())? el1=expresion3() ((o2=operador_aditivo()|t=< tOR >) el2=expresion3(){
+    (o1=operador_aditivo())? el1=expresion3() {
+	el.setTipo(el1.getTipo());
+	if(el1.getTipo()!=null) {
+		switch(el1.getTipo()) {
+			case ENTERO:
+				if(o1==op.RESTA) {
+					el.setEntero(-el1.getEntero());
+	 			 }else { 
+					el.setEntero(el1.getEntero());
+				}
+				break;
+			case BOOLEANO:
+				if(o1==op.RESTA) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+	 			 }
+				el.setBool(el1.getBool());
+				break;
+			case CHAR:
+				if(o1==op.RESTA) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+	 			 }
+				el.setCaracter(el1.getCaracter());
+				break;
+			case CADENA:
+				if(o1==op.RESTA) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+	 			 }
+				el.setCadena(el1.getCadena());
+		}
+	}
+   } ((o2=operador_aditivo()|t=< tOR >) el2=expresion3(){
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
      	if(o2!=null) {
        		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
@@ -893,9 +978,6 @@ Elemento expresion2():
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
 	{
-	  //if(o1.op==RESTA) {
-		//return -el;
-	  //}
 	return el;
 	}
 }
@@ -910,7 +992,24 @@ Elemento expresion3():
 }
 {
   try {
-   el1=factor()( (o=operador_multiplicativo()|t=< tAND >) el2=factor() {
+   el1=factor() {
+	el.setTipo(el1.getTipo());
+	if(el1.getTipo()!=null) {
+		switch(el1.getTipo()) {
+			case ENTERO:
+				el.setEntero(el1.getEntero());
+				break;
+			case BOOLEANO:
+				el.setBool(el1.getBool());
+				break;
+			case CHAR:
+				el.setCaracter(el1.getCaracter());
+				break;
+			case CADENA:
+				el.setCadena(el1.getCadena());
+		}
+	}
+   }( (o=operador_multiplicativo()|t=< tAND >) el2=factor() {
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
      	if(o!=null) {
        		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
@@ -1051,7 +1150,7 @@ Elemento factor2():
    < tPA > e=expresion() < tPC >
 	| t=< tENTACAR > < tPA > e=expresion() { 
 	  	Character c=null;
-		if(e.getTipo()==Tipo_variable.ENTERO && e.getEntero()!=null) {
+		if(e.getTipo()==Tipo_variable.ENTERO && e.getEntero()!=null) { 
 		  
 			if(e.getEntero() <0 || e.getEntero() >255 ) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, new OutOfBoundsIntExcepction());
@@ -1081,12 +1180,16 @@ Elemento factor2():
 	| t=< tIDENTIFICADOR > {
 	   try {
 	     	s=tabla_simbolos.buscar_simbolo(t.image);
+	     	System.out.println("ENCUENTRO SIMBOLO: "+t.image+" "+s.getVariable());
 	     	if(s.ES_PARAMETRO()) {
 				e.setPara(s.getParametro());
+	     	}if(s.ES_PROGRAMA()) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+	     	}if(s.ES_ACCION()) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 	     	}
-	     	
+	     	e.setTipo(s.getVariable());
 	     }catch(SimboloNoEncontradoException es) {
-	       
 			error_semantico(t.image, t.beginLine, t.beginColumn, es);
 			try {
 				s=tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
