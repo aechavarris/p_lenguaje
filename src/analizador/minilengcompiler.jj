@@ -105,13 +105,13 @@ public class minilengcompiler {
 		}else if (except instanceof OutOfBoundsIntExcepction) {
 			System.out.println("ERROR SEMÁNTICO: <Entero fuera de rango dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof WrongExpresionException) {
-			System.out.println("ERROR SEMÁNTICO: <Expresion no valida dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+			System.out.println("ERROR SEMÁNTICO: <Expresion no valida cerca de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof DivZeroException) {
 			System.out.println("ERROR SEMÁNTICO: <Division por 0 encontrada dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof WrongTypeException) {
-			System.out.println("ERROR SEMÁNTICO: <Tipo incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+			System.out.println("ERROR SEMÁNTICO: <Tipo incorrecto cerca de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof WrongParameterException) {
-			System.out.println("ERROR SEMÁNTICO: <Parametro incorrecto encontrado dentro de: " + name + "> en (<" + f  + ", " + col + ">)");
+			System.out.println("ERROR SEMÁNTICO: <Parametro incorrecto cerca de: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof WrongActionException) {
 			System.out.println("ERROR SEMÁNTICO: <Accion incorrecta encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof SimboloNoAsignableException) {
@@ -331,10 +331,26 @@ void asignacion(Token t):
  		} 
   < tOAS > el1=expresion()
   {
+    
 	if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
-	  
+	  	
 		if(el1.getTipo()!= el.getTipo()) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
+		}else {
+			switch(el1.getTipo()) {
+				case ENTERO:
+					break;
+				case CHAR:
+				
+					break;
+				case BOOLEANO:
+				
+					break;
+				case CADENA:
+				
+					break;
+				default:
+			}
 		}
 	}
   }
@@ -458,12 +474,12 @@ void declaracion_accion():
 {
   try {
      
-  	cabecera_accion() { nivel=nivel+1;} declaracion_variables() declaracion_acciones() bloque_sentencias()
+  	cabecera_accion() declaracion_variables() declaracion_acciones() bloque_sentencias()
   	{ tabla_simbolos.eliminar_variables(nivel);
   	  tabla_simbolos.eliminar_parametros(nivel);
   	  direccion=direccion_anterior;
   	  tabla_simbolos.imprimirTabla();
-  	  nivel=nivel-1; }
+  	  nivel=nivel-1;}
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de accion incorrecta");
 }
@@ -491,6 +507,7 @@ void cabecera_accion():
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
   	 	}
+  	 	nivel=nivel+1;
   	}(parametros=parametros_formales())?< tFIN_SENTENCIA >
   	
  }catch(ParseException e) {
@@ -512,11 +529,11 @@ ArrayList<Simbolo> parametros_formales():
 }
 {
   try { 
-  < tPA >(parametros1=parametros() {System.out.println(parametros1);
+  < tPA >(parametros1=parametros() {
 	for(Simbolo s:parametros1) {
 		parametros.add(s);
 	}
-  } (< tFIN_SENTENCIA > parametros2=parametros(){System.out.println(parametros2);
+  } (< tFIN_SENTENCIA > parametros2=parametros(){
 	for(Simbolo s:parametros2) {
 		parametros.add(s);
 	}	
@@ -539,15 +556,27 @@ ArrayList<Simbolo > parametros():
   try { 
   	clase=clase_parametros() tipo=tipo_variables() tokens=identificadores()
   	{
+  	  
   	  for(int i = 0; i < tokens.size(); i++) {
-  	    try { 
+  	    try {
 		  s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
 		  parametros.add(s);
 		  direccion = direccion+1;
 		  tabla_simbolos.imprimirTabla();
 		} catch(SimboloYaDeclaradoException e) {
-			token = tokens.get(i);
-			error_semantico(token.image, token.beginLine, token.beginColumn, e);
+		  	boolean end=false;
+		  	Integer n=1;
+		  	token = tokens.get(i);
+		  	while(!end) {
+		   	 try {
+					s=tabla_simbolos.introducir_parametro(token.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
+					end=true;
+		  			parametros.add(s);
+		  			direccion = direccion+1;
+		  			tabla_simbolos.imprimirTabla();
+				} catch(SimboloYaDeclaradoException es) {n=n+1;}
+		  	}
+		  	error_semantico(token.image, token.beginLine, token.beginColumn, e);
 		  }	
   	  }
   	  
@@ -640,24 +669,62 @@ void escribir():
 	error_sintactico(e,"Sintaxis de escribir incorrecta");
 }
 }
-
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////RECORDATORIO////////////////////////////////////
+////////////////////////////AÑADIR !NULL PARA ELEMENTO//////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 void caraent():
 {
+  Token t=null;
+  Elemento el=new Elemento();
 }
 {
   try { 
-  < tCARAENT ><tPA >(expresion())<tPC >
+  t=< tCARAENT ><tPA >(el=expresion(){
+	  	Integer en=null;
+		if(el.getTipo()==Tipo_variable.CHAR ) {
+		  if(el.getCaracter()!=null) {
+			en=(int)el.getCaracter().charValue();
+		}
+		}else {
+		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		} 
+		el.setTipo(Tipo_variable.ENTERO);
+		el.setEntero(en);
+
+	})<tPC >
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de caraent incorrecta");
 }
 }
-
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////RECORDATORIO////////////////////////////////////
+////////////////////////////AÑADIR !NULL PARA ELEMENTO//////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 void entacar():
 {
+  Elemento el=new Elemento();
+  Token t=null;
 }
 {
   try { 
-  < tENTACAR ><tPA >(expresion())<tPC >
+  t=< tENTACAR ><tPA >(el=expresion(){ 
+	  	Character c=null;
+		if(el.getTipo()==Tipo_variable.ENTERO) { 
+		  if(el.getEntero()!=null) {
+			if(el.getEntero() <0 || el.getEntero() >255 ) {
+			  error_semantico(t.image, t.beginLine, t.beginColumn, new OutOfBoundsIntExcepction());
+			}else {
+			  c=(char)el.getEntero().intValue();
+			}
+			}
+		}else {
+		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+		} 
+		el.setTipo(Tipo_variable.CHAR);
+		el.setCaracter(c);
+
+	})<tPC >
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de entacar incorrecta");
 }
@@ -673,8 +740,8 @@ void lista_escribibles():
 {
   try { 
   	( el1=expresion() ) ( t=< tCOMA > (el2=expresion() ) {
-	if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA) &&
-		(el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA)) {
+	if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA ||el1.getTipo()==Tipo_variable.ENTERO) &&
+		(el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.ENTERO)) {
 		
 	}else {
 		error_semantico(t.image, t.beginLine, t.beginColumn, new WrongTypeException());
@@ -745,56 +812,68 @@ void lista_expresiones(Simbolo accion):
   Integer i=0;
   Simbolo parametro=null;
   boolean error=false;
+  boolean noPara=false;
 }
 {
   {
     if(accion!=null && accion.ES_ACCION() && accion.getVariable()!=Tipo_variable.DESCONOCIDO){
       paraList=accion.getListaParametros();
+      
   	}
   }
   try { 
   	el1=expresion()
 	{
+	  	
 		if(paraList!=null && paraList.size()>i){
 			parametro=paraList.get(i);
 			i++;
 			if(el1!=null && parametro!=null && el1.getTipo()!=Tipo_variable.DESCONOCIDO) {
 			  if(parametro.ES_REFERENCIA() && el1.getPara()==Clase_parametro.VAL) {
-			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
 			    error=true;
 			  }
 			  if(el1.getTipo()!=parametro.getVariable()) {
-			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
+			    error=true;
+			  }if(el1.isComplex() && parametro.ES_REFERENCIA()) {
+				error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
 			    error=true;
 			  } 
 			} 
 		}else {
-		  	
-			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
-			error=true;
+		  	if(accion.getNombre()!=null) { 
+				error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
+				error=true;
+			}
 		}
 	}
   	   
   	(t=< tCOMA >el2=expresion()
   	   
 	{
-  	  
+
 		if(paraList!=null && paraList.size()>i){
 			parametro=paraList.get(i);
 			i++;
 			if(el2!=null && parametro!=null && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
 			  if(parametro.ES_REFERENCIA() && el2.getPara()==Clase_parametro.VAL) {
-			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
 			    error=true;
 			  }
 			  if(el2.getTipo()!=parametro.getVariable()) {
-			    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongParameterException());
+			    error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
+			    error=true;
+			  }if(el2.isComplex() && parametro.ES_REFERENCIA()) {
+				error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
 			    error=true;
 			  } 
 			} 
 		}else {
-			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
-			error=true;
+		  	if(accion.getNombre()!=null) {
+				error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
+				error=true;
+			}
 		}
 	})*
  }catch(ParseException e) {
@@ -803,7 +882,7 @@ void lista_expresiones(Simbolo accion):
 {
 	if(!error && paraList!=null) {
 	  if(i!=paraList.size()) {
-	    error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
+	    error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
 	  }
 	}
 }
@@ -833,6 +912,7 @@ Elemento expresion():
   try {
    el1=expresion2(){
 	el.setTipo(el1.getTipo());
+	el.setComplex(el1.isComplex());
 	if(el1.getTipo()!=null) {
 		switch(el1.getTipo()) {
 		case ENTERO:
@@ -852,7 +932,7 @@ Elemento expresion():
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
        	
      	if(o1!=null) {
-     	  	
+     	  	el.setComplex(true);
        		if(el1.getTipo()==el2.getTipo()) {
        		  
        		  	el.setTipo(Tipo_variable.BOOLEANO);
@@ -960,8 +1040,9 @@ Elemento expresion2():
 }
 {
   try {
-    (o1=operador_aditivo())? el1=expresion3() {
+    (o1=operador_aditivo() {el.setComplex(true);})? el1=expresion3() {
 	el.setTipo(el1.getTipo());
+	el.setComplex(el1.isComplex());
 	if(el1.getTipo()!=null) {
 		switch(el1.getTipo()) {
 			case ENTERO:
@@ -993,6 +1074,7 @@ Elemento expresion2():
    } ((o2=operador_aditivo()|t=< tOR >) el2=expresion3(){
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
      	if(o2!=null) {
+     	  	el.setComplex(true);
        		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
          		if(el1.getEntero()!=null && el2.getEntero()!=null) {
 					el.setTipo(Tipo_variable.ENTERO);
@@ -1008,6 +1090,7 @@ Elemento expresion2():
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
         	}
      	}else if(t!=null) {
+     	  	el.setComplex(true);
 			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
 				el.setTipo(Tipo_variable.BOOLEANO);
 				if(el1.getBool()!=null && el2.getBool()!=null) {
@@ -1064,6 +1147,7 @@ Elemento expresion3():
    }( (o=operador_multiplicativo()|t=< tAND >) el2=factor() {
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
      	if(o!=null) {
+     	  el.setComplex(true);
        		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
          		if(el1.getEntero()!=null && el2.getEntero()!=null) {
 					el.setTipo(Tipo_variable.ENTERO);
@@ -1098,6 +1182,7 @@ Elemento expresion3():
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 			}
      	}else if(t!=null) {
+     	  	el.setComplex(true);
 			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
 				el.setTipo(Tipo_variable.BOOLEANO);
 				if(el1.getBool()!=null && el2.getBool()!=null) {
@@ -1189,7 +1274,10 @@ Elemento factor():
 }
 	{return el;}
 }
-
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////RECORDATORIO////////////////////////////////////
+////////////////////////////AÑADIR !NULL PARA ELEMENTO//////////////////////////////
+///////////////////////////////EN CARAENT Y ENTACAR/////////////////////////////////
 Elemento factor2():
 {
   Token t=null;
@@ -1202,12 +1290,13 @@ Elemento factor2():
    < tPA > e=expresion() < tPC >
 	| t=< tENTACAR > < tPA > e=expresion() { 
 	  	Character c=null;
-		if(e.getTipo()==Tipo_variable.ENTERO && e.getEntero()!=null) { 
-		  
+		if(e.getTipo()==Tipo_variable.ENTERO ) { 
+		  if(e.getEntero()!=null) { 
 			if(e.getEntero() <0 || e.getEntero() >255 ) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, new OutOfBoundsIntExcepction());
 			}else {
 			  c=(char)e.getEntero().intValue();
+			}
 			}
 		}else {
 		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -1219,8 +1308,10 @@ Elemento factor2():
 	} < tPC >
 	| t=< tCARAENT > < tPA > e=expresion(){
 	  	Integer en=null;
-		if(e.getTipo()==Tipo_variable.CHAR && e.getCaracter()!=null) {
+		if(e.getTipo()==Tipo_variable.CHAR ) {
+		  if(e.getCaracter()!=null) { 
 			en=(int)e.getCaracter().charValue();
+			}
 		}else {
 		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 		} 

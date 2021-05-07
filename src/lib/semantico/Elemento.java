@@ -15,6 +15,13 @@ public class Elemento {
 	private Integer entero;
 	private Character caracter;
 	private String cadena;
+	private boolean complex;
+	public boolean isComplex() {
+		return complex;
+	}
+	public void setComplex(boolean complex) {
+		this.complex = complex;
+	}
 	public op getOperando() {
 		return operando;
 	}
@@ -34,6 +41,7 @@ public class Elemento {
 		this.entero=null;
 		this.caracter=null;
 		this.bool=null;
+		this.complex=false;
 	}
 	public Tipo_variable getTipo() {
 		return tipo;
