@@ -1,6 +1,7 @@
 package lib.semantico;
 
 import lib.semantico.Simbolo.Clase_parametro;
+import lib.semantico.Simbolo.Tipo_simbolo;
 import lib.semantico.Simbolo.Tipo_variable;
 
 public class Elemento {
@@ -11,6 +12,13 @@ public class Elemento {
 		IGUAL,OR,AND,MOD,MAI,MEI,NI
 	}
 	private op operando;
+	public Tipo_simbolo getSimbolo() {
+		return simbolo;
+	}
+	public void setSimbolo(Tipo_simbolo simbolo) {
+		this.simbolo = simbolo;
+	}
+	private Tipo_simbolo simbolo;
 	private Clase_parametro para;
 	private Integer entero;
 	private Character caracter;

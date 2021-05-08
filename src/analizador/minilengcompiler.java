@@ -20,7 +20,7 @@ public class minilengcompiler implements minilengcompilerConstants {
            tabla_simbolos.inicializar_tabla();
             if (args.length != 0 ) {
                         File tmp = new File(args[0]);
-                        String file = tmp.getAbsolutePath();
+                        String file = tmp.getAbsolutePath()+".ml";
                         try {
                                 minilengcompiler parser = new minilengcompiler(new FileInputStream(file));
                         }
@@ -202,7 +202,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
                         el.setTipo(s.getVariable());
-                        if(s.ES_ACCION() ||s.ES_PROGRAMA()) {
+                        if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
                         }
                 }catch(SimboloNoEncontradoException e) {
@@ -239,6 +239,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 default:
                         }
                 }
+        }else {
+                error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
         }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de asignacion incorrecta");
@@ -599,7 +601,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                   t=iden.get(n);
                   try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
-                        if(!(s.ES_VARIABLE()||s.ES_PARAMETRO()&& s.ES_REFERENCIA())) {
+                        if(!(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA()))) {
                                 if(!(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.DESCONOCIDO
                                         || s.getVariable()==Tipo_variable.CHAR|| s.getVariable()==Tipo_variable.CADENA)) {
                                         error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
@@ -813,7 +815,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         parametro=paraList.get(i);
                         i++;
                         if(el1!=null && parametro!=null && el1.getTipo()!=Tipo_variable.DESCONOCIDO) {
-                          if(parametro.ES_REFERENCIA() && el1.getPara()==Clase_parametro.VAL) {
+                          if(parametro.ES_REFERENCIA() && el1.getPara()==null) {
                             error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
                             error=true;
                           }
@@ -847,7 +849,9 @@ public class minilengcompiler implements minilengcompilerConstants {
                         parametro=paraList.get(i);
                         i++;
                         if(el2!=null && parametro!=null && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
-                          if(parametro.ES_REFERENCIA() && el2.getPara()==Clase_parametro.VAL) {
+
+                          if(parametro.ES_REFERENCIA() && el2.getSimbolo()!=Tipo_simbolo.PARAMETRO &&
+                                 el2.getSimbolo()!=Tipo_simbolo.VARIABLE) {
                             error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
                             error=true;
                           }
@@ -914,6 +918,8 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       el1 = expresion2();
         el.setTipo(el1.getTipo());
+        el.setPara(el1.getPara());
+        el.setSimbolo(el1.getSimbolo());
         el.setComplex(el1.isComplex());
         if(el1.getTipo()!=null) {
                 switch(el1.getTipo()) {
@@ -1068,6 +1074,8 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
       el1 = expresion3();
         el.setTipo(el1.getTipo());
+        el.setPara(el1.getPara());
+        el.setSimbolo(el1.getSimbolo());
         el.setComplex(el1.isComplex());
         if(el1.getTipo()!=null) {
                 switch(el1.getTipo()) {
@@ -1125,6 +1133,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         el2 = expresion3();
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
         if(o2!=null) {
+          t=token;
                 el.setComplex(true);
                 if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
                         if(el1.getEntero()!=null && el2.getEntero()!=null) {
@@ -1175,6 +1184,8 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       el1 = factor();
         el.setTipo(el1.getTipo());
+        el.setPara(el1.getPara());
+        el.setSimbolo(el1.getSimbolo());
         if(el1.getTipo()!=null) {
                 switch(el1.getTipo()) {
                         case ENTERO:
@@ -1222,7 +1233,9 @@ public class minilengcompiler implements minilengcompilerConstants {
         el2 = factor();
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
         if(o!=null) {
+          t=token;
           el.setComplex(true);
+
                 if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
                         if(el1.getEntero()!=null && el2.getEntero()!=null) {
                                         el.setTipo(Tipo_variable.ENTERO);
@@ -1232,6 +1245,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         el.setEntero(el1.getEntero()*el2.getEntero());
                                                         break;
                                                 case DIV:
+
                                                         if(el2.getEntero()==0) {
                                                                 error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
                                                         }else {
@@ -1239,6 +1253,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         }
                                                         break;
                                                 case DIV1:
+
                                                         if(el2.getEntero()==0) {
                                                                 error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
                                                         }else {
@@ -1458,6 +1473,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         t = jj_consume_token(tIDENTIFICADOR);
            try {
                 s=tabla_simbolos.buscar_simbolo(t.image);
+                e.setSimbolo(s.getTipo());
                 if(s.ES_PARAMETRO()) {
                                 e.setPara(s.getParametro());
                 }if(s.ES_PROGRAMA()) {
@@ -1466,6 +1482,23 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
                 e.setTipo(s.getVariable());
+                //Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
+                //con un valor por defecto, mas adelante se le dara el valor correspondiente
+                switch (e.getTipo()) {
+                                case ENTERO:
+                                e.setEntero(1);
+                                break;
+                                case BOOLEANO:
+                                e.setBool(true);
+                                break;
+                                case CHAR:
+                                e.setCaracter('A');
+                                break;
+                                case CADENA:
+                                e.setCadena("A");
+                                break;
+                                default:
+                }
              }catch(SimboloNoEncontradoException es) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, es);
                         try {

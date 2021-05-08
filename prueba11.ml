@@ -1,50 +1,47 @@
+%-------------------------------------------------------------------
 programa adivinar;
+%-------------------------------------------------------------------
 
  caracter respuesta, letra, min, max;
  booleano headivinado;
+ entero t;
  caracter c, d;
 
-accion siono;
+%-----------------------------------------------------------
+accion mcd(Val entero  a,b;ref entero x );
+%-----------------------------------------------------------
+%Una serie de asignaciones de parametros pro referencia -> ok
+entero r;
+Principio
+        r:=a mod b;
+		  
+        Mq r<>0
+				leer(x);
+				escribir(x);             
+        FMq
+Fin
 
- caracter c,ln;
-
- principio
-  c := " ";
-  mq (c <> "S") and (c <> "N")
-    escribir("(S/N)?");
-    leer(c, ln);
-  fmq
-  respuesta := c;
- fin
-
-accion pedirletra;
-
- caracter c,ln;
-
- principio
-  c := " ";
-  mq (c < "A") or (c > "Z")
-    escribir("letra:");
-    leer(c, ln);
-  fmq
-  respuesta := c;
- fin
-
+%-------------------------------------------------------------------
 principio
+%-------------------------------------------------------------------
  escribir("Piensa en una letra e intentare adivinarla.", 
           entacar(13),entacar(10));
  escribir("Listo?");
- siono;
+ leer(c);
+ 
+ %ERROR MODULO 0
+ t:= 1 mod 0;
+ mcd(3,3,t);
  min := "A";
  max := "Z";
  headivinado := false;
  mq (min <> max) and not headivinado
    letra := entacar((caraent(min) + caraent(max)) div 2);
    escribir("(", min, ",", max, ")",": has pensado en la letra ", letra, "?");
-   siono;
-   si (respuesta = "N") ent
+   
+   %ERROR SI
+   si (respuesta + "N") ent
      escribir("La letra que has pensado es mayor?");
-     siono;
      si respuesta = "S" ent
       min := entacar(caraent(letra) + 1);
      si_no

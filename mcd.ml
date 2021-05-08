@@ -8,7 +8,7 @@ Principio
 Fin
 accion a2 (val entero b);
 	booleano m;
-	accion a3(ref entero n,pez);
+	accion a3(ref entero n,n,pez);
 	Principio
 		n:=n+1;
 	Fin
