@@ -8,7 +8,7 @@ options
 {
   static = true;
   ignore_case = true;
-  
+  //debug_parser=true;
 }
 
 PARSER_BEGIN(minilengcompiler) 
@@ -336,9 +336,11 @@ void asignacion(Token t):
 	  	
 		if(el1.getTipo()!= el.getTipo()) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
-		}else {
+		}else if(el1.getSimbolo()==Tipo_simbolo.VARIABLE || el1.getSimbolo()==Tipo_simbolo.PARAMETRO){
+		  
 			switch(el1.getTipo()) {
 				case ENTERO:
+				
 					break;
 				case CHAR:
 				
@@ -397,20 +399,21 @@ void declaracion_variables():
 void declaracion():
 {
   Tipo_variable tipo = null;
-  ArrayList<Token > tokens = null;
+  ArrayList<Token > listaID = null;
+  Token t=null;
 }
 {
   try { 
-  	tipo=tipo_variables() tokens=identificadores()
+  	tipo=tipo_variables() listaID=identificadores()
   	{
-		for(int i=0;i<tokens.size();i++) {
+		for(int i=0;i<listaID.size();i++) {
 		  try { 
-			tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
+			tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
 			direccion=direccion+1;
 			tabla_simbolos.imprimirTabla();
 		  } catch(SimboloYaDeclaradoException e) {
-		      token = tokens.get(i);
-			  error_semantico(token.image, token.beginLine, token.beginColumn, e);
+		      t = listaID.get(i);
+			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
 		    }	
   	  	}  
   	}
@@ -437,25 +440,25 @@ Tipo_variable tipo_variables():
 ArrayList<Token> identificadores():
 {
   Token t=null;
-  ArrayList<Token> tokens = new ArrayList<Token>();
+  ArrayList<Token> listaID = new ArrayList<Token>();
 }
 {
   try { 
   	t=< tIDENTIFICADOR >
   		{
   		  if(t!=null){
-				tokens.add(t);
+				listaID.add(t);
   	 		}
   	  	} ( "," t=< tIDENTIFICADOR >
   		{
   		  if(t!=null){
-			tokens.add(t);
+			listaID.add(t);
   	 		}
   	  	} )*
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis en definicion de identificadores incorrecta");
 }
-{return tokens;}
+{return listaID;}
 }
 
 void declaracion_acciones():
@@ -552,6 +555,7 @@ ArrayList<Simbolo > parametros():
   Tipo_variable tipo=null;
   Clase_parametro clase=null;
   Simbolo s=null;
+  Token t=null;
   ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
 }
 {
@@ -566,20 +570,21 @@ ArrayList<Simbolo > parametros():
 		  direccion = direccion+1;
 		  tabla_simbolos.imprimirTabla();
 		} catch(SimboloYaDeclaradoException e) {
+		  	//System.out.println("SIMBOLO YA EXISTE");
 		  	boolean end=false;
 		  	Integer n=1;
-		  	token = tokens.get(i);
+		  	t = tokens.get(i);
 		  	while(!end) {
 		   	 try {
-					s=tabla_simbolos.introducir_parametro(token.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
+					s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
 					end=true;
 		  			parametros.add(s);
 		  			direccion = direccion+1;
 		  			tabla_simbolos.imprimirTabla();
 				} catch(SimboloYaDeclaradoException es) {n=n+1;}
 		  	}
-		  	error_semantico(token.image, token.beginLine, token.beginColumn, e);
-		  }	
+		  	error_semantico(t.image, t.beginLine, t.beginColumn, e);
+		  }
   	  }
   	  
   	}
@@ -1350,21 +1355,23 @@ Elemento factor2():
 	     	e.setTipo(s.getVariable());
 	     	//Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
 	     	//con un valor por defecto, mas adelante se le dara el valor correspondiente
-	     	switch (e.getTipo()) {
-				case ENTERO:
-				e.setEntero(1);
-				break;
-				case BOOLEANO:
-				e.setBool(true);
-				break;
-				case CHAR:
-				e.setCaracter('A');
-				break;
-				case CADENA:
-				e.setCadena("A");
-				break;
-				default:
-	     	}
+	     	if(e.getSimbolo()==Tipo_simbolo.VARIABLE || e.getSimbolo()==Tipo_simbolo.PARAMETRO) { 
+	     		switch (e.getTipo()) {
+					case ENTERO:
+					e.setEntero(1);
+					break;
+					case BOOLEANO:
+					e.setBool(true);
+					break;
+					case CHAR:
+					e.setCaracter('A');
+					break;
+					case CADENA:
+					e.setCadena("A");
+					break;
+					default:
+	     		}
+	    	}
 	     }catch(SimboloNoEncontradoException es) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, es);
 			try {

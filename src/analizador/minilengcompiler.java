@@ -223,9 +223,11 @@ public class minilengcompiler implements minilengcompilerConstants {
 
                 if(el1.getTipo()!= el.getTipo()) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
-                }else {
+                }else if(el1.getSimbolo()==Tipo_simbolo.VARIABLE || el1.getSimbolo()==Tipo_simbolo.PARAMETRO){
+
                         switch(el1.getTipo()) {
                                 case ENTERO:
+
                                         break;
                                 case CHAR:
 
@@ -295,18 +297,19 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void declaracion() throws ParseException {
   Tipo_variable tipo = null;
-  ArrayList<Token > tokens = null;
+  ArrayList<Token > listaID = null;
+  Token t=null;
     try {
       tipo = tipo_variables();
-      tokens = identificadores();
-                for(int i=0;i<tokens.size();i++) {
+      listaID = identificadores();
+                for(int i=0;i<listaID.size();i++) {
                   try {
-                        tabla_simbolos.introducir_variable(tokens.get(i).image,tipo,nivel,direccion);
+                        tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
                         direccion=direccion+1;
                         tabla_simbolos.imprimirTabla();
                   } catch(SimboloYaDeclaradoException e) {
-                      token = tokens.get(i);
-                          error_semantico(token.image, token.beginLine, token.beginColumn, e);
+                      t = listaID.get(i);
+                          error_semantico(t.image, t.beginLine, t.beginColumn, e);
                     }
                 }
     } catch (ParseException e) {
@@ -344,11 +347,11 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public ArrayList<Token> identificadores() throws ParseException {
   Token t=null;
-  ArrayList<Token> tokens = new ArrayList<Token>();
+  ArrayList<Token> listaID = new ArrayList<Token>();
     try {
       t = jj_consume_token(tIDENTIFICADOR);
                   if(t!=null){
-                                tokens.add(t);
+                                listaID.add(t);
                         }
       label_3:
       while (true) {
@@ -363,13 +366,13 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tCOMA);
         t = jj_consume_token(tIDENTIFICADOR);
                   if(t!=null){
-                        tokens.add(t);
+                        listaID.add(t);
                         }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis en definicion de identificadores incorrecta");
     }
- {if (true) return tokens;}
+ {if (true) return listaID;}
     throw new Error("Missing return statement in function");
   }
 
@@ -495,6 +498,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   Tipo_variable tipo=null;
   Clase_parametro clase=null;
   Simbolo s=null;
+  Token t=null;
   ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
     try {
       clase = clase_parametros();
@@ -507,19 +511,20 @@ public class minilengcompiler implements minilengcompilerConstants {
                   direccion = direccion+1;
                   tabla_simbolos.imprimirTabla();
                 } catch(SimboloYaDeclaradoException e) {
+                        //System.out.println("SIMBOLO YA EXISTE");
                         boolean end=false;
                         Integer n=1;
-                        token = tokens.get(i);
+                        t = tokens.get(i);
                         while(!end) {
                          try {
-                                        s=tabla_simbolos.introducir_parametro(token.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
+                                        s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
                                         end=true;
                                         parametros.add(s);
                                         direccion = direccion+1;
                                         tabla_simbolos.imprimirTabla();
                                 } catch(SimboloYaDeclaradoException es) {n=n+1;}
                         }
-                        error_semantico(token.image, token.beginLine, token.beginColumn, e);
+                        error_semantico(t.image, t.beginLine, t.beginColumn, e);
                   }
           }
     } catch (ParseException e) {
@@ -1484,20 +1489,22 @@ public class minilengcompiler implements minilengcompilerConstants {
                 e.setTipo(s.getVariable());
                 //Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
                 //con un valor por defecto, mas adelante se le dara el valor correspondiente
-                switch (e.getTipo()) {
-                                case ENTERO:
-                                e.setEntero(1);
-                                break;
-                                case BOOLEANO:
-                                e.setBool(true);
-                                break;
-                                case CHAR:
-                                e.setCaracter('A');
-                                break;
-                                case CADENA:
-                                e.setCadena("A");
-                                break;
-                                default:
+                if(e.getSimbolo()==Tipo_simbolo.VARIABLE || e.getSimbolo()==Tipo_simbolo.PARAMETRO) {
+                        switch (e.getTipo()) {
+                                        case ENTERO:
+                                        e.setEntero(1);
+                                        break;
+                                        case BOOLEANO:
+                                        e.setBool(true);
+                                        break;
+                                        case CHAR:
+                                        e.setCaracter('A');
+                                        break;
+                                        case CADENA:
+                                        e.setCadena("A");
+                                        break;
+                                        default:
+                        }
                 }
              }catch(SimboloNoEncontradoException es) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, es);
