@@ -91,9 +91,9 @@ public class TablaSimbolos {
 	private int h(String cadena) {
 		int h = 0;
 		for (int i = 0; i < cadena.length(); i++) {
-			h = T[h ^ cadena.charAt(i)];
+			h = T[(h ^ cadena.charAt(i))%M];
 		}
-		return h;
+		return h%M;
 	}
 
 	/*
