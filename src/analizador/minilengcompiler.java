@@ -251,6 +251,8 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public void invocacion_accion(Token t) throws ParseException {
   Simbolo accion=new Simbolo();
+  ArrayList<Simbolo> paraList=null;
+  boolean hayLista=false;
     try {
         accion=tabla_simbolos.buscar_simbolo(t.image);
         if(accion.getVariable()!=Tipo_variable.DESCONOCIDO && !accion.ES_ACCION()) {
@@ -263,11 +265,21 @@ public class minilengcompiler implements minilengcompilerConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
         argumentos(accion);
+                         hayLista=true;
         break;
       default:
         jj_la1[3] = jj_gen;
         ;
       }
+     {
+          if(accion!=null && accion.ES_ACCION() && accion.getVariable()!=Tipo_variable.DESCONOCIDO){
+                paraList=accion.getListaParametros();
+
+                }
+                if(paraList.size() >0 && !hayLista) {
+                        error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
+                }
+        }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
     }
@@ -606,9 +618,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                   t=iden.get(n);
                   try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
-                        if(!(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA()))) {
-                                if(!(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.DESCONOCIDO
-                                        || s.getVariable()==Tipo_variable.CHAR|| s.getVariable()==Tipo_variable.CADENA)) {
+                        if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
+                                if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
                                         error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
                                 }
                         }
@@ -820,7 +831,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         parametro=paraList.get(i);
                         i++;
                         if(el1!=null && parametro!=null && el1.getTipo()!=Tipo_variable.DESCONOCIDO) {
-                          if(parametro.ES_REFERENCIA() && el1.getPara()==null) {
+                          if(parametro.ES_REFERENCIA() && el1.getPara()!=Clase_parametro.REF) {
                             error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongParameterException());
                             error=true;
                           }
@@ -834,6 +845,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
                 }else {
                         if(accion.getNombre()!=null) {
+
                                 error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
                                 error=true;
                         }
@@ -1481,6 +1493,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                 e.setSimbolo(s.getTipo());
                 if(s.ES_PARAMETRO()) {
                                 e.setPara(s.getParametro());
+                }if(s.ES_VARIABLE()) {
+                                e.setPara(Clase_parametro.REF);
                 }if(s.ES_PROGRAMA()) {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }if(s.ES_ACCION()) {
