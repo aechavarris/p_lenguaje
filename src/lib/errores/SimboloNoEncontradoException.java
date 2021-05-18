@@ -1,4 +1,4 @@
-package lib.aviso;
+package lib.errores;
 
 public class SimboloNoEncontradoException extends Exception {
 

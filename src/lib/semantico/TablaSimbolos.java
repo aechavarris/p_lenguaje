@@ -10,11 +10,10 @@
 
 package lib.semantico;
 
+import lib.errores.Aviso;
+import lib.errores.SimboloNoEncontradoException;
+import lib.errores.SimboloYaDeclaradoException;
 import lib.semantico.Simbolo.*;
-
-import lib.aviso.Aviso;
-import lib.aviso.SimboloNoEncontradoException;
-import lib.aviso.SimboloYaDeclaradoException;
 
 import java.util.Random;
 

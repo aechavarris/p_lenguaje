@@ -1,4 +1,4 @@
-package lib.aviso;
+package lib.errores;
 
 import analizador.Token;
 

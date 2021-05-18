@@ -15,7 +15,8 @@ PARSER_BEGIN(minilengcompiler)
 
 package analizador;
 import java.io.*;
-import lib.aviso.*;
+import lib.errores.*;
+import lib.codigo.*;
 import lib.semantico.*; 
 import java.util.ArrayList;
 import lib.semantico.Simbolo.*;
@@ -29,7 +30,7 @@ public class minilengcompiler {
   static int nivel = 0;
   static int direccion=3;
   static int ejecucion_correcta=1;
-  
+  static Codigo codigo;
 	 public static void main(String args []) throws ParseException {
 	   tabla_simbolos.inicializar_tabla();
 	    if (args.length != 0 ) {
@@ -37,6 +38,7 @@ public class minilengcompiler {
 			String file = tmp.getAbsolutePath()+".ml";
 			try {
 				minilengcompiler parser = new minilengcompiler(new FileInputStream(file));
+				codigo=new Codigo(file);
 			}  
 			catch (FileNotFoundException e) {
 				System.out.printf("No existe el fichero: "+ file + "\n"); 

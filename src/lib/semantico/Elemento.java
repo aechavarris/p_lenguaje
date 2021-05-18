@@ -1,5 +1,6 @@
 package lib.semantico;
 
+import lib.codigo.Codigo;
 import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_simbolo;
 import lib.semantico.Simbolo.Tipo_variable;
