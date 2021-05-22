@@ -1,0 +1,212 @@
+; Programa fibbonaci.
+	ENP  L0
+; Accion cambiar_de_linea
+L1:
+; Comienzo de la accion cambiar_de_linea.
+; Escribir.
+; caracter ''
+	STC  13
+	WRT  0
+; caracter '
+'
+	STC  10
+	WRT  0
+; Fin de la accion cambiar_de_linea.
+	CSF
+; Accion dato
+L2:
+; Accion pedir_dato
+L3:
+; Comienzo de la accion pedir_dato.
+; Escribir.
+; cadena '"Escribe un numero: "'
+	STC  34
+	WRT  0
+	STC  69
+	WRT  0
+	STC  115
+	WRT  0
+	STC  99
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  98
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  117
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  34
+	WRT  0
+; Fin de la accion pedir_dato.
+	CSF
+; Comienzo de la accion dato.
+; Direccion de la variable dato.
+	SRF  1  6
+; Asignacion.
+; Direccion de la variable correcto.
+; Asignacion.
+L4:
+; MQ
+; Salir del bucle si la guarda se evalua a falso
+	JMF  L5
+; Direccion de la variable correcto.
+; Asignacion.
+; SI.
+; ENT.
+; Escribir.
+; cadena '"El numero debe ser postivo."'
+	STC  34
+	WRT  0
+	STC  69
+	WRT  0
+	STC  108
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  117
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  100
+	WRT  0
+	STC  101
+	WRT  0
+	STC  98
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  115
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  32
+	WRT  0
+	STC  112
+	WRT  0
+	STC  111
+	WRT  0
+	STC  115
+	WRT  0
+	STC  116
+	WRT  0
+	STC  105
+	WRT  0
+	STC  118
+	WRT  0
+	STC  111
+	WRT  0
+	STC  46
+	WRT  0
+	STC  34
+	WRT  0
+; Fin de la iteracion. Saltar a la cabecera del bucle. 
+	JMP  L4
+; Fin MQ.
+JMF  L5
+; Fin de la accion dato.
+	CSF
+; Accion fib
+L6:
+; Comienzo de la accion fib.
+; SI.
+; ENT.
+; Direccion de la variable r.
+	SRF  1  7
+; Asignacion.
+; Direccion de la variable r.
+	SRF  1  7
+; Asignacion.
+; Fin de la accion fib.
+	CSF
+; Comienzo del programa fibbonaci.
+L0:
+; Escribir.
+; cadena '"Fibbonaci("'
+	STC  34
+	WRT  0
+	STC  70
+	WRT  0
+	STC  105
+	WRT  0
+	STC  98
+	WRT  0
+	STC  98
+	WRT  0
+	STC  111
+	WRT  0
+	STC  110
+	WRT  0
+	STC  97
+	WRT  0
+	STC  99
+	WRT  0
+	STC  105
+	WRT  0
+	STC  40
+	WRT  0
+	STC  34
+	WRT  0
+; entero '1'
+	STC  1
+	WRT  0
+; cadena '") es: "'
+	STC  34
+	WRT  0
+	STC  41
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  34
+	WRT  0
+; entero '1'
+	STC  1
+	WRT  0
+; Fin de programa fibbonaci.
+	LVP

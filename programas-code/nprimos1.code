@@ -1,17 +1,17 @@
 ; Programa NPRIMOS.
      ENP  L0
-; Acción ES_PRIMO.
+; Acciï¿½n ES_PRIMO.
 L1:
-; Comienzo de la acción ES_PRIMO.
-; Dirección de la variable J.
+; Comienzo de la acciï¿½n ES_PRIMO.
+; Direcciï¿½n de la variable J.
      SRF   0  3
      STC   2
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable DIVISIBLE.
+; Direcciï¿½n de la variable DIVISIBLE.
      SRF   0  4
      STC   0
-; Asignación.
+; Asignaciï¿½n.
      ASG  
 L2:
 ; MQ.
@@ -29,9 +29,9 @@ L2:
      DRF  
      NGB  
      AND  
-; Salir del bucle si la guarda se evalúa a falso.
+; Salir del bucle si la guarda se evalï¿½a a falso.
      JMF  L3
-; Dirección de la variable DIVISIBLE.
+; Direcciï¿½n de la variable DIVISIBLE.
      SRF   0  4
 ; Acceso a la variable I.
      SRF   1  4
@@ -42,18 +42,18 @@ L2:
      MOD  
      STC   0
      EQ  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable J.
+; Direcciï¿½n de la variable J.
      SRF   0  3
 ; Acceso a la variable J.
      SRF   0  3
      DRF  
      STC   1
      PLUS  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Fin de la iteración. Saltar a la cabecera del bucle.
+; Fin de la iteraciï¿½n. Saltar a la cabecera del bucle.
      JMP  L2
 L3:
 ; Fin MQ.
@@ -94,19 +94,19 @@ L3:
      WRT   0
 L4:
 ; Fin SI.
-; Fin de la acción / función ES_PRIMO.
+; Fin de la acciï¿½n / funciï¿½n ES_PRIMO.
      CSF  
 ; Comienzo del programa NPRIMOS.
 L0:
-; Dirección de la variable N.
+; Direcciï¿½n de la variable N.
      SRF   0  3
      STC  100
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable I.
+; Direcciï¿½n de la variable I.
      SRF   0  4
      STC   2
-; Asignación.
+; Asignaciï¿½n.
      ASG  
 L5:
 ; MQ.
@@ -117,20 +117,20 @@ L5:
      SRF   0  3
      DRF  
      LTE  
-; Salir del bucle si la guarda se evalúa a falso.
+; Salir del bucle si la guarda se evalï¿½a a falso.
      JMF  L6
-; Invocación a ES_PRIMO.
+; Invocaciï¿½n a ES_PRIMO.
      OSF   4  0 L1
-; Dirección de la variable I.
+; Direcciï¿½n de la variable I.
      SRF   0  4
 ; Acceso a la variable I.
      SRF   0  4
      DRF  
      STC   1
      PLUS  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Fin de la iteración. Saltar a la cabecera del bucle.
+; Fin de la iteraciï¿½n. Saltar a la cabecera del bucle.
      JMP  L5
 L6:
 ; Fin MQ.

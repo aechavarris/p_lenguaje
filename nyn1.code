@@ -1,0 +1,105 @@
+; Programa noventa_y_nueve.
+	ENP  L0
+; Comienzo del programa noventa_y_nueve.
+L0:
+; Direccion de la variable n.
+; Asignacion.
+	ASG
+L1:
+; MQ
+; Salir del bucle si la guarda se evalua a falso
+	JMF  L2
+; Escribir.
+; cadena 'n: '.
+	STC  110
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Leer.
+	SRF  0 5
+	RD  1
+; Fin de la iteracion. Saltar a la cabecera del bucle. 
+	JMP  L1
+L2:
+; Fin MQ.
+; Escribir.
+; entero '1'.
+	STC  1
+	WRT  1
+; cadena ' se convierte en '.
+	STC  32
+	WRT  0
+	STC  115
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  99
+	WRT  0
+	STC  111
+	WRT  0
+	STC  110
+	WRT  0
+	STC  118
+	WRT  0
+	STC  105
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  116
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+; Direccion de la variable x.
+; Asignacion.
+	ASG
+; Direccion de la variable y.
+; Asignacion.
+	ASG
+; Direccion de la variable m.
+; Asignacion.
+	ASG
+; SI.
+; ENT.
+; Direccion de la variable n.
+; Asignacion.
+	ASG
+; Direccion de la variable n.
+; Asignacion.
+	ASG
+; Direccion de la variable x.
+; Asignacion.
+	ASG
+; Direccion de la variable y.
+; Asignacion.
+	ASG
+; Direccion de la variable m.
+; Asignacion.
+	ASG
+; Direccion de la variable n.
+; Asignacion.
+	ASG
+; Escribir.
+; entero '1'.
+	STC  1
+	WRT  1
+; caracter ''.
+	STC  13
+; caracter '
+'.
+	STC  10
+; Fin de programa noventa_y_nueve.
+	LVP
