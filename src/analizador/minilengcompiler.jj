@@ -91,7 +91,7 @@ public class minilengcompiler {
 			errorSintactico = true;
    		}
    		ejecucion_correcta=0;
-  	}
+  	 }
 
   	private static void error_semantico(String name, int f, int col, Exception except) {
   		// ERRORES SEMÁNTICOS
