@@ -77,7 +77,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         errorSintactico = true;
                 }
                 ejecucion_correcta=0;
-        }
+         }
 
         private static void error_semantico(String name, int f, int col, Exception except) {
                 // ERRORES SEMÁNTICOS
@@ -113,6 +113,8 @@ public class minilengcompiler implements minilengcompilerConstants {
   static final public void programa() throws ParseException {
   Token p=null;
   String etiqueta="";
+  ArrayList<String> declaraciones=new ArrayList<String>();
+  ArrayList<String> bloque=new ArrayList<String>();
     try {
       jj_consume_token(tPROGRAMA);
       p = jj_consume_token(tIDENTIFICADOR);
@@ -120,14 +122,10 @@ public class minilengcompiler implements minilengcompilerConstants {
                     etiqueta=codigo.getEtiqueta();
                         tabla_simbolos.introducir_programa(p.image,0);
                         tabla_simbolos.imprimirTabla();
-                        codigo.escribir("; Programa "+p.image+".",false);
-                        codigo.escribir("ENP  "+etiqueta,true);
                   }
       jj_consume_token(tFIN_SENTENCIA);
       declaracion_variables();
-      declaracion_acciones();
-                codigo.escribir("; Comienzo del programa "+p.image+".",false);
-                        codigo.escribir(etiqueta+":",false);
+      declaraciones = declaracion_acciones();
       label_1:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -138,16 +136,24 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_la1[0] = jj_gen;
           break label_1;
         }
-        bloque_sentencias();
+        bloque = bloque_sentencias();
       }
+           codigo.escribir("; Programa "+p.image+".\u005cn");
+           codigo.escribir("\u005ct"+"ENP  "+etiqueta+"\u005cn");
+           for(int n=0; n<declaraciones.size();n++) {
+                        codigo.escribir(declaraciones.get(n));
+           }
+
+           codigo.escribir("; Comienzo del programa "+p.image+".\u005cn");
+           codigo.escribir(etiqueta+":\u005cn");
            if(ejecucion_correcta==1) {
                         tabla_simbolos.eliminar_variables(nivel);
                         tabla_simbolos.eliminar_acciones(nivel);
                         tabla_simbolos.eliminar_programa();
                         tabla_simbolos.imprimirTabla();
                         try {
-                                codigo.escribir("; Fin de programa "+p.image+".",false);
-                                codigo.escribir("LVP",true);
+                                codigo.escribir("; Fin de programa "+p.image+".\u005cn");
+                                codigo.escribir("\u005ct"+"LVP"+"\u005cn");
                                 codigo.finCodigo(ejecucion_correcta);
                         }catch(IOException e) {
                           System.out.println("Ha ocurrido un error al crear el fichero .code");
@@ -158,31 +164,33 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   }
 
-  static final public void sentencia() throws ParseException {
+  static final public ArrayList< String> sentencia() throws ParseException {
   Token t=null;
+  ArrayList<String> sentencia=new ArrayList<String>();
+  ArrayList<String> s=new ArrayList<String>();
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tLEER:
-        leer();
+        s = leer();
         jj_consume_token(tFIN_SENTENCIA);
         break;
       case tESCRIBIR:
-        escribir();
+        s = escribir();
         jj_consume_token(tFIN_SENTENCIA);
         break;
       case tIDENTIFICADOR:
         t = jj_consume_token(tIDENTIFICADOR);
-        asignacion_invocacion_accion(t);
+        s = asignacion_invocacion_accion(t);
         jj_consume_token(tFIN_SENTENCIA);
         break;
       case tPRINCIPIO:
-        seleccion();
+        s = seleccion();
         break;
       case tMQ:
-        mientras_que();
+        s = mientras_que();
         break;
       case tSI:
-        si();
+        s = si();
         break;
       default:
         jj_la1[1] = jj_gen;
@@ -192,27 +200,40 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de sentencia incorrecta");
     }
+  for(int n=0;n<s.size();n++) {
+        sentencia.add(s.get(n));
+  }
+  {if (true) return sentencia;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void asignacion_invocacion_accion(Token t) throws ParseException {
+  static final public ArrayList<String> asignacion_invocacion_accion(Token t) throws ParseException {
+  ArrayList<String> asig=new ArrayList<String>();
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tOAS:
-        asignacion(t);
+        asig = asignacion(t);
         break;
       default:
         jj_la1[2] = jj_gen;
-        invocacion_accion(t);
+        asig = invocacion_accion(t);
       }
     } catch (ParseException e) {
         error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
     }
+        for(int n=0;n<asig.size();n++) {
+                System.out.println(asig.get(n));
+        }
+  System.out.println(asig.get(asig.size()-2));
+  {if (true) return asig;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void asignacion(Token t) throws ParseException {
+  static final public ArrayList< String> asignacion(Token t) throws ParseException {
   Simbolo s=null;
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
+  ArrayList< String> asig=new ArrayList< String>();
     try {
                 try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
@@ -220,15 +241,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                         if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
                         }
-                        codigo.escribir("; Direccion de la variable "+t.image+".",false);
-                        if(s.ES_REFERENCIA()) {
-                                        codigo.escribir("SRF  1  "+s.getDir(),true);
-                        }
-                        if(s.ES_VALOR()) {
-                                        codigo.escribir("SRF  0  "+s.getDir(),true);
-                        }
-                        codigo.escribir("; Asignacion.",false);
-                        codigo.escribir("ASG",true);
+                        asig.add("; Direccion de la variable "+t.image+".\u005cn");
+                        asig.add("\u005ct"+"SRF  "+(s.getNivel()-nivel)+"  "+s.getDir()+"\u005cn");
                 }catch(SimboloNoEncontradoException e) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, e);
                         try {
@@ -248,19 +262,23 @@ public class minilengcompiler implements minilengcompilerConstants {
                 if(el1.getTipo()!= el.getTipo()) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
                 }else if(el1.getSimbolo()==Tipo_simbolo.VARIABLE || el1.getSimbolo()==Tipo_simbolo.PARAMETRO){
-
+                  System.out.println(t.image+" "+el1.getTipo());
                         switch(el1.getTipo()) {
                                 case ENTERO:
-
+                                        System.out.println(t.image+" "+el1.getEntero());
+                                        asig.add("\u005ct"+"STC  "+el1.getEntero()+"\u005cn");
                                         break;
                                 case CHAR:
-
+                                        asig.add("\u005ct"+"STC  "+(int)el1.getCaracter()+"\u005cn");
                                         break;
                                 case BOOLEANO:
-
+                                        if(el1.getBool()==true) {
+                                                asig.add("\u005ct"+"STC  1"+"\u005cn");
+                                        }else {
+                                                asig.add("\u005ct"+"STC  0"+"\u005cn");
+                                        }
                                         break;
                                 case CADENA:
-
                                         break;
                                 default:
                         }
@@ -271,10 +289,15 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de asignacion incorrecta");
     }
+  asig.add("; Asignacion.\u005cn");
+  asig.add("\u005ct"+"ASG"+"\u005cn");
+  {if (true) return asig;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void invocacion_accion(Token t) throws ParseException {
+  static final public ArrayList< String> invocacion_accion(Token t) throws ParseException {
   Simbolo accion=new Simbolo();
+  ArrayList< String> invocacion=new ArrayList< String>();
   ArrayList<Simbolo> paraList=null;
   boolean hayLista=false;
     try {
@@ -307,6 +330,10 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
     }
+  invocacion.add("; Invocacion a "+t.image+".\u005cn");
+  invocacion.add("\u005ct"+"OSF  "+accion.getDir()+"  "+(accion.getNivel()-nivel)+"\u005cn");
+  {if (true) return invocacion;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void declaracion_variables() throws ParseException {
@@ -412,7 +439,9 @@ public class minilengcompiler implements minilengcompilerConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public void declaracion_acciones() throws ParseException {
+  static final public ArrayList<String> declaracion_acciones() throws ParseException {
+  ArrayList<String> declaraciones=new ArrayList<String>();
+  ArrayList<String> declaracion=new ArrayList< String>();
     try {
       label_4:
       while (true) {
@@ -424,24 +453,40 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_la1[7] = jj_gen;
           break label_4;
         }
-        declaracion_accion();
+        declaracion = declaracion_accion();
+          for(int n=0;n<declaracion.size();n++) {
+                declaraciones.add(declaracion.get(n));
+          }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Declaracion de acciones incorrecta");
     }
+ {if (true) return declaraciones;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void declaracion_accion() throws ParseException {
+  static final public ArrayList<String> declaracion_accion() throws ParseException {
   int direccion_anterior=direccion;
   Token t=null;
+  ArrayList<String> declaracion=new ArrayList<String>();
+  ArrayList<String> declaracion2=new ArrayList<String>();
+  ArrayList< String> bloque=new ArrayList< String>();
     try {
       t = cabecera_accion();
       declaracion_variables();
-      declaracion_acciones();
-                codigo.escribir("; Comienzo de la accion "+t.image+".",false);
-      bloque_sentencias();
-          codigo.escribir("; Fin de la accion "+t.image+".",false);
-          codigo.escribir("CSF",true);
+          declaracion.add("; Accion "+t.image+".\u005cn");
+          declaracion.add(codigo.getEtiqueta()+":\u005cn");
+      declaracion2 = declaracion_acciones();
+                for(int n=0;n<declaracion2.size();n++) {
+                        declaracion.add(declaracion2.get(n));
+                }
+                declaracion.add("; Comienzo de la accion "+t.image+".\u005cn");
+      bloque = bloque_sentencias();
+          for(int n=0;n<bloque.size();n++) {
+                declaracion.add(bloque.get(n));
+          }
+          declaracion.add("; Fin de la accion "+t.image+".\u005cn");
+          declaracion.add("\u005ct"+"CSF"+"\u005cn");
           tabla_simbolos.eliminar_variables(nivel);
           tabla_simbolos.eliminar_parametros(nivel);
           direccion=direccion_anterior;
@@ -450,6 +495,8 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de accion incorrecta");
     }
+ {if (true) return declaracion;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public Token cabecera_accion() throws ParseException {
@@ -468,8 +515,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
                         direccion = direccion+1;
                         tabla_simbolos.imprimirTabla();
-                        codigo.escribir("; Accion "+t.image,false);
-                        codigo.escribir(codigo.getEtiqueta()+":",false);
                   } catch(SimboloYaDeclaradoException e) {
                           error_semantico(t.image, t.beginLine, t.beginColumn, e);
                     }
@@ -602,17 +647,22 @@ public class minilengcompiler implements minilengcompilerConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public void bloque_sentencias() throws ParseException {
+  static final public ArrayList<String> bloque_sentencias() throws ParseException {
+ ArrayList<String> bloque =new ArrayList<String>();
     try {
       jj_consume_token(tPRINCIPIO);
-      lista_sentencias();
+      bloque = lista_sentencias();
       jj_consume_token(tFIN);
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de bloque de sentencias incorrecta");
     }
+ {if (true) return bloque;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void lista_sentencias() throws ParseException {
+  static final public ArrayList<String> lista_sentencias() throws ParseException {
+  ArrayList<String> sentencias =new ArrayList<String>();
+  ArrayList<String> s =new ArrayList<String>();
     try {
       label_6:
       while (true) {
@@ -629,15 +679,21 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_la1[12] = jj_gen;
           break label_6;
         }
-        sentencia();
+        s = sentencia();
+                for(int n=0;n<s.size();n++) {
+                        sentencias.add(s.get(n));
+                }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de sentencias incorrecta");
     }
+ {if (true) return sentencias;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void leer() throws ParseException {
+  static final public ArrayList< String> leer() throws ParseException {
   ArrayList<Token> iden=new ArrayList<Token>();
+  ArrayList< String> l=new ArrayList< String>();
   Token t=null;
   Token t1=null;
   Simbolo s=null;
@@ -650,12 +706,16 @@ public class minilengcompiler implements minilengcompilerConstants {
                   t=iden.get(n);
                   try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
-                        codigo.escribir("; Leer.",false);
-                        codigo.escribir("SRF  0 "+s.getDir(),true);
-                        codigo.escribir("RD  1",true);
+                        l.add("; Leer.\u005cn");
+                        l.add("\u005ct"+"SRF  "+(s.getNivel()-nivel)+"  "+s.getDir()+"\u005cn");
                         if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
                                 if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
                                         error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
+                                }
+                                if(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.BOOLEANO) {
+                                        l.add("\u005ct"+"RD  1"+"\u005cn");
+                                }if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
+                                        l.add("\u005ct"+"RD  0"+"\u005cn");
                                 }
                         }
                   }catch(SimboloNoEncontradoException e) {
@@ -670,17 +730,26 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de leer incorrecta");
     }
+ {if (true) return l;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void escribir() throws ParseException {
+  static final public ArrayList< String> escribir() throws ParseException {
+  ArrayList< String> lista=new ArrayList< String>();
+  ArrayList< String> l=new ArrayList< String>();
     try {
       jj_consume_token(tESCRIBIR);
       jj_consume_token(tPA);
-      lista_escribibles();
+      l = lista_escribibles();
       jj_consume_token(tPC);
+                for(int n=0;n<l.size();n++) {
+                        lista.add(l.get(n));
+                }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de escribir incorrecta");
     }
+ {if (true) return lista;}
+    throw new Error("Missing return statement in function");
   }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -741,41 +810,42 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   }
 
-  static final public void lista_escribibles() throws ParseException {
+  static final public ArrayList< String> lista_escribibles() throws ParseException {
   Token t=null;
+  ArrayList< String> lista=new ArrayList< String>();
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
     try {
       el1 = expresion();
-                codigo.escribir("; Escribir.",false);
+                lista.add("; Escribir.\u005cn");
                 if(el1.getTipo()==Tipo_variable.CHAR) {
-                        codigo.escribir("; caracter '"+el1.getCaracter()+"'.",false);
-                        codigo.escribir("STC  "+(int)el1.getCaracter(),true);
-                        if(el1.getPara()==Clase_parametro.VAL) {
-                                codigo.escribir("WRT  0",true);
-                        }if(el1.getPara()==Clase_parametro.REF) {
-                                codigo.escribir("WRT  1",true);
+                  lista.add("; caracter '"+el1.getCaracter()+"'.\u005cn");
+                  lista.add("\u005ct"+"STC  "+(int)el1.getCaracter()+"\u005cn");
+                        if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                        }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
                         }
 
                 }else if(el1.getTipo()==Tipo_variable.CADENA){
                         String tmp=el1.getCadena().substring(1,el1.getCadena().length()-1);
-                        codigo.escribir("; cadena '"+tmp+"'.",false);
+                        lista.add("; cadena '"+tmp+"'.\u005cn");
                         for(int i=0;i<tmp.length();i++) {
-                          codigo.escribir("STC  "+(int)tmp.charAt(i),true);
-                          if(el1.getPara()==Clase_parametro.VAL) {
-                                codigo.escribir("WRT  0",true);
-                         }if(el1.getPara()==Clase_parametro.REF) {
-                                codigo.escribir("WRT  1",true);
-                         }
+                          lista.add("\u005ct"+"STC  "+(int)tmp.charAt(i)+"\u005cn");
+                        if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                        }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
+                        }
                         }
                 }else {
-                        codigo.escribir("; entero '"+Integer.toString(el1.getEntero())+"'.",false);
-                        codigo.escribir("STC  "+el1.getEntero(),true);
-                        if(el1.getPara()==Clase_parametro.VAL) {
-                                codigo.escribir("WRT  0",true);
-                        }if(el1.getPara()==Clase_parametro.REF) {
-                                codigo.escribir("WRT  1",true);
+                        lista.add("; entero '"+Integer.toString(el1.getEntero())+"'.\u005cn");
+                        lista.add("\u005ct"+"STC  "+el1.getEntero()+"\u005cn");
+                        if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                        }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
                         }
                 }
       label_7:
@@ -793,28 +863,28 @@ public class minilengcompiler implements minilengcompilerConstants {
         if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA ||el1.getTipo()==Tipo_variable.ENTERO) &&
                 (el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.ENTERO)) {
                 if(el2.getTipo()==Tipo_variable.CHAR) {
-                        codigo.escribir("; caracter '"+el2.getCaracter()+"'.",false);
-                        codigo.escribir("STC  "+(int)el2.getCaracter(),true);
-                        if(el2.getPara()==Clase_parametro.VAL) {
-                                codigo.escribir("WRT  0",true);
-                        }if(el2.getPara()==Clase_parametro.REF) {
-                                codigo.escribir("WRT  1",true);
+                        lista.add("; caracter '"+el2.getCaracter()+"'.\u005cn");
+                        lista.add("\u005ct"+"STC  "+(int)el2.getCaracter()+"\u005cn");
+                        if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
+                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                        }if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
+                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
                         }
                 }else if(el2.getTipo()==Tipo_variable.CADENA){
                         String tmp=el2.getCadena().substring(1,el2.getCadena().length()-1);
-                        codigo.escribir("; cadena '"+tmp+"'.",false);
+                        lista.add("; cadena '"+tmp+"'.\u005cn");
                         for(int i=0;i<tmp.length();i++) {
-                          codigo.escribir("STC  "+(int)tmp.charAt(i),true);
-                          if(el2.getPara()==Clase_parametro.VAL) {
-                                codigo.escribir("WRT  0",true);
-                         }if(el2.getPara()==Clase_parametro.REF) {
-                                codigo.escribir("WRT  1",true);
-                         }
+                          lista.add("\u005ct"+"STC  "+(int)tmp.charAt(i)+"\u005cn");
+                        if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
+                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                        }if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
+                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
+                        }
                         }
                 }else {
-                        codigo.escribir("; entero '"+Integer.toString(el2.getEntero())+"'.",false);
-                        codigo.escribir("STC  "+el2.getEntero(),true);
-                        codigo.escribir("WRT  0",true);
+                        lista.add("; entero '"+Integer.toString(el2.getEntero())+"'.\u005cn");
+                        lista.add("\u005ct"+"STC  "+el2.getEntero()+"\u005cn");
+                        lista.add("\u005ct"+"WRT  1"+"\u005cn");
                 }
         }else {
                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongTypeException());
@@ -823,44 +893,54 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de escribir incorrecta ");
     }
+ {if (true) return lista;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void mientras_que() throws ParseException {
+  static final public ArrayList< String> mientras_que() throws ParseException {
   Elemento el=null;
   Token t=null;
   String etiqueta1="";
   String etiqueta2="";
+  ArrayList< String> mq=new ArrayList<String >();
+  ArrayList< String>lista=new ArrayList< String>();
     try {
       t = jj_consume_token(tMQ);
                 etiqueta1=codigo.getEtiqueta();
-                codigo.escribir(etiqueta1+":",false);
-                codigo.escribir("; MQ",false);
+                mq.add(etiqueta1+":\u005cn");
+                mq.add(etiqueta1+"; MQ\u005cn");
       el = expresion();
                 etiqueta2=codigo.getEtiqueta();
-                codigo.escribir("; Salir del bucle si la guarda se evalua a falso",false);
-                codigo.escribir("JMF  "+etiqueta2,true);
+                mq.add("; Salir del bucle si la guarda se evalua a falso.\u005cn");
+                mq.add("\u005ct"+"JMF  "+etiqueta2+"\u005cn");
                 if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
         }
-      lista_sentencias();
-                codigo.escribir("; Fin de la iteracion. Saltar a la cabecera del bucle. ",false);
-                codigo.escribir("JMP  "+etiqueta1,true);
-                codigo.escribir(etiqueta2+":",false);
-                codigo.escribir("; Fin MQ.",false);
+      lista = lista_sentencias();
+                for(int n=0;n<lista.size();n++) {
+                        mq.add(lista.get(n));
+                }
+                mq.add("; Fin de la iteracion. Saltar a la cabecera del bucle.\u005cn");
+                mq.add("\u005ct"+"JMP  "+etiqueta1+"\u005cn");
+                mq.add(etiqueta2+":"+"\u005cn");
+                mq.add("; Fin MQ."+"\u005cn");
       jj_consume_token(tFMQ);
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de mientras que incorrecta");
     }
+ {if (true) return mq;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void si() throws ParseException {
+  static final public ArrayList< String> si() throws ParseException {
   Elemento el=null;
   Token t=null;
+  ArrayList< String> s=new ArrayList< String>();
     try {
       t = jj_consume_token(tSI);
-                codigo.escribir("; SI.",false);
+                s.add("; SI.\u005cn");
       el = expresion();
-                codigo.escribir("; ENT.",false);
+                s.add("; ENT.\u005cn");
                 if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
@@ -883,6 +963,8 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de si incorrecta");
     }
+ {if (true) return s;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void argumentos(Simbolo accion) throws ParseException {
@@ -999,32 +1081,19 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
   }
 
-  static final public void seleccion() throws ParseException {
+  static final public ArrayList< String> seleccion() throws ParseException {
+  ArrayList< String> s=new ArrayList < String>();
     try {
       jj_consume_token(tPRINCIPIO);
       jj_consume_token(tIDENTIFICADOR);
       jj_consume_token(tLLAVE_IZQ);
-      label_10:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case tPRINCIPIO:
-        case tMQ:
-        case tSI:
-        case tESCRIBIR:
-        case tLEER:
-        case tIDENTIFICADOR:
-          ;
-          break;
-        default:
-          jj_la1[17] = jj_gen;
-          break label_10;
-        }
-        sentencia();
-      }
+      s = lista_sentencias();
       jj_consume_token(tLLAVE_DCHA);
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de seleccion incorrecta");
     }
+ {if (true) return s;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public Elemento expresion() throws ParseException {
@@ -1055,7 +1124,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         el.setCadena(el1.getCadena());
                 }
         }
-      label_11:
+      label_10:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tMAYOR:
@@ -1067,8 +1136,8 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[18] = jj_gen;
-          break label_11;
+          jj_la1[17] = jj_gen;
+          break label_10;
         }
         o1 = operador_relacional();
         el2 = expresion2();
@@ -1188,7 +1257,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                             el.setComplex(true);
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[18] = jj_gen;
         ;
       }
       el1 = expresion3();
@@ -1224,7 +1293,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 el.setCadena(el1.getCadena());
                 }
         }
-      label_12:
+      label_11:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tSUMA:
@@ -1233,8 +1302,8 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[20] = jj_gen;
-          break label_12;
+          jj_la1[19] = jj_gen;
+          break label_11;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tSUMA:
@@ -1245,7 +1314,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           t = jj_consume_token(tOR);
           break;
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[20] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1320,7 +1389,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 el.setCadena(el1.getCadena());
                 }
         }
-      label_13:
+      label_12:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tMOD:
@@ -1331,8 +1400,8 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[22] = jj_gen;
-          break label_13;
+          jj_la1[21] = jj_gen;
+          break label_12;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case tMOD:
@@ -1345,7 +1414,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           t = jj_consume_token(tAND);
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[22] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1444,7 +1513,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.NI;}
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[23] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1466,7 +1535,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.SUMA;}
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[24] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1496,7 +1565,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.MOD;}
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[25] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1515,7 +1584,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         t = jj_consume_token(tNOT);
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[26] = jj_gen;
         ;
       }
       el = factor2();
@@ -1673,7 +1742,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 e.setBool(false);
         break;
       default:
-        jj_la1[28] = jj_gen;
+        jj_la1[27] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1694,7 +1763,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[29];
+  static final private int[] jj_la1 = new int[28];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -1704,13 +1773,13 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xf000000,0x0,0xca8000,0x80000000,0xc000000,0xc000000,0xc000000,0x70200000,0x70200000,0x80000000,0xc000000,0x70200000,0x0,0x3000000,};
+      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xf000000,0x0,0x80000000,0xc000000,0xc000000,0xc000000,0x70200000,0x70200000,0x80000000,0xc000000,0x70200000,0x0,0x3000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x0,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xf004c100,0x0,0x0,0x3b,0x0,0x80,0x80,0x40,0x40,0x3b,0x0,0x0,0x100,0xf004c000,};
+      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x0,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xf004c100,0x0,0x3b,0x0,0x80,0x80,0x40,0x40,0x3b,0x0,0x0,0x100,0xf004c000,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x2,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x2,0x8,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
+      jj_la1_2 = new int[] {0x0,0x2,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x2,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
    }
 
   /** Constructor with InputStream. */
@@ -1731,7 +1800,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1745,7 +1814,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1762,7 +1831,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1772,7 +1841,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1788,7 +1857,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1797,7 +1866,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1853,7 +1922,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 28; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

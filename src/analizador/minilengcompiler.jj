@@ -249,6 +249,8 @@ void programa():
 {
   Token p=null;
   String etiqueta="";
+  ArrayList<String> declaraciones=new ArrayList<String>();
+  ArrayList<String> bloque=new ArrayList<String>();
 }
 {
   try { 
@@ -257,27 +259,29 @@ void programa():
   		  if(p!=null){
   		    etiqueta=codigo.getEtiqueta();
 			tabla_simbolos.introducir_programa(p.image,0);
-			tabla_simbolos.imprimirTabla();
-			codigo.escribir("; Programa "+p.image+".",false);
-			codigo.escribir("ENP  "+etiqueta,true); 
+			tabla_simbolos.imprimirTabla(); 
   	 	  } 
   	  	}
-  	   < tFIN_SENTENCIA > (declaracion_variables()) (declaracion_acciones())
-  	   {
-  	     	codigo.escribir("; Comienzo del programa "+p.image+".",false);
-			codigo.escribir(etiqueta+":",false);
-  	   }
- 	 (bloque_sentencias())*
+  	   < tFIN_SENTENCIA > (declaracion_variables()) (declaraciones=declaracion_acciones())
+
+ 	 (bloque=bloque_sentencias())*
  	 {
- 	   
+ 	   codigo.escribir("; Programa "+p.image+".\n");
+	   codigo.escribir("\t"+"ENP  "+etiqueta+"\n");
+	   for(int n=0; n<declaraciones.size();n++) {
+			codigo.escribir(declaraciones.get(n));
+	   }
+			
+  	   codigo.escribir("; Comienzo del programa "+p.image+".\n");
+	   codigo.escribir(etiqueta+":\n");
  	   if(ejecucion_correcta==1) {
 			tabla_simbolos.eliminar_variables(nivel);
 			tabla_simbolos.eliminar_acciones(nivel);
 			tabla_simbolos.eliminar_programa();
 			tabla_simbolos.imprimirTabla();
 			try {
-			 	codigo.escribir("; Fin de programa "+p.image+".",false);
-			 	codigo.escribir("LVP",true);
+			 	codigo.escribir("; Fin de programa "+p.image+".\n");
+			 	codigo.escribir("\t"+"LVP"+"\n");
 				codigo.finCodigo(ejecucion_correcta);
 			}catch(IOException e) {
 			  System.out.println("Ha ocurrido un error al crear el fichero .code");
@@ -289,40 +293,54 @@ void programa():
 	}
 }
 
-void sentencia():
+ArrayList< String> sentencia():
 {
   Token t=null;
+  ArrayList<String> sentencia=new ArrayList<String>();
+  ArrayList<String> s=new ArrayList<String>();
 }
 {
 try { 
-  	(leer()) < tFIN_SENTENCIA >
- |  (escribir()) < tFIN_SENTENCIA >
- |  t=< tIDENTIFICADOR > (asignacion_invocacion_accion(t)) < tFIN_SENTENCIA >
- |	(seleccion()) 
- |	(mientras_que())
- | 	(si())
+  	(s=leer()) < tFIN_SENTENCIA >
+ |  (s=escribir()) < tFIN_SENTENCIA >
+ |  t=< tIDENTIFICADOR > (s=asignacion_invocacion_accion(t)) < tFIN_SENTENCIA >
+ |	(s=seleccion()) 
+ |	(s=mientras_que())
+ | 	(s=si())
  
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de sentencia incorrecta");
 }
+{
+  for(int n=0;n<s.size();n++) {
+	sentencia.add(s.get(n));
+  }
+  return sentencia;}
 }
 
-void asignacion_invocacion_accion(Token t):
+ArrayList<String> asignacion_invocacion_accion(Token t):
 {
+  ArrayList<String> asig=new ArrayList<String>();
 }
 {
   try { 
-  asignacion(t)|invocacion_accion(t)
+  asig=asignacion(t)|asig=invocacion_accion(t)
 }catch(ParseException e) {
 	error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
 }
+{	for(int n=0;n<asig.size();n++) {
+		System.out.println(asig.get(n));
+	}
+  System.out.println(asig.get(asig.size()-2));
+  return asig;}
 }
 
-void asignacion(Token t):
+ArrayList< String> asignacion(Token t):
 {
   Simbolo s=null;
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
+  ArrayList< String> asig=new ArrayList< String>();
 }
 {
   try {
@@ -333,15 +351,8 @@ void asignacion(Token t):
     			if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
 					error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
     			}
-    			codigo.escribir("; Direccion de la variable "+t.image+".",false);
-    			if(s.ES_REFERENCIA()) {
-					codigo.escribir("SRF  1  "+s.getDir(),true);
-    			}
-    			if(s.ES_VALOR()) {
-					codigo.escribir("SRF  0  "+s.getDir(),true);
-    			}
-    			codigo.escribir("; Asignacion.",false);
-    			codigo.escribir("ASG",true);
+    			asig.add("; Direccion de la variable "+t.image+".\n");
+    			asig.add("\t"+"SRF  "+(s.getNivel()-nivel)+"  "+s.getDir()+"\n");
     		}catch(SimboloNoEncontradoException e) {
       			error_semantico(t.image, t.beginLine, t.beginColumn, e);
       			try {
@@ -362,19 +373,23 @@ void asignacion(Token t):
 		if(el1.getTipo()!= el.getTipo()) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
 		}else if(el1.getSimbolo()==Tipo_simbolo.VARIABLE || el1.getSimbolo()==Tipo_simbolo.PARAMETRO){
-		  
+		  System.out.println(t.image+" "+el1.getTipo());
 			switch(el1.getTipo()) {
-				case ENTERO:
-				
+				case ENTERO: 
+					System.out.println(t.image+" "+el1.getEntero());
+					asig.add("\t"+"STC  "+el1.getEntero()+"\n");
 					break;
 				case CHAR:
-				
+					asig.add("\t"+"STC  "+(int)el1.getCaracter()+"\n");
 					break;
 				case BOOLEANO:
-				
+					if(el1.getBool()==true) {
+						asig.add("\t"+"STC  1"+"\n");
+					}else {
+						asig.add("\t"+"STC  0"+"\n");
+					}
 					break;
 				case CADENA:
-				
 					break;
 				default:
 			}
@@ -386,11 +401,17 @@ void asignacion(Token t):
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de asignacion incorrecta");
 }
+{
+  
+  asig.add("; Asignacion.\n");
+  asig.add("\t"+"ASG"+"\n");
+  return asig;}
 }
 
-void invocacion_accion(Token t):
+ArrayList< String> invocacion_accion(Token t):
 {
   Simbolo accion=new Simbolo();
+  ArrayList< String> invocacion=new ArrayList< String>();
   ArrayList<Simbolo> paraList=null;
   boolean hayLista=false;
 }
@@ -419,6 +440,9 @@ void invocacion_accion(Token t):
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
 }
+{ invocacion.add("; Invocacion a "+t.image+".\n");
+  invocacion.add("\t"+"OSF  "+accion.getDir()+"  "+(accion.getNivel()-nivel)+"\n");
+  return invocacion;}
 }
 
 void declaracion_variables():
@@ -497,33 +521,57 @@ ArrayList<Token> identificadores():
 {return listaID;}
 }
 
-void declaracion_acciones():
+ArrayList<String> declaracion_acciones():
 {
+  ArrayList<String> declaraciones=new ArrayList<String>();
+  ArrayList<String> declaracion=new ArrayList< String>();
 }
 {
   try { 
-  	( declaracion_accion() )*
+  	( declaracion=declaracion_accion()
+  	{
+  	  
+  	  for(int n=0;n<declaracion.size();n++) {
+		declaraciones.add(declaracion.get(n));
+  	  }
+  	}
+  	)*
  }catch(ParseException e) {
 	error_sintactico(e,"Declaracion de acciones incorrecta");
 }
+{return declaraciones;}
 }
 
-void declaracion_accion():
+ArrayList<String> declaracion_accion():
 {
   int direccion_anterior=direccion;
   Token t=null;
+  ArrayList<String> declaracion=new ArrayList<String>();
+  ArrayList<String> declaracion2=new ArrayList<String>();
+  ArrayList< String> bloque=new ArrayList< String>();
 }
 {
   try {
      
-  	t=cabecera_accion() declaracion_variables() declaracion_acciones()
+  	t=cabecera_accion() declaracion_variables()
   	{
-  	  	codigo.escribir("; Comienzo de la accion "+t.image+".",false);
+  	  declaracion.add("; Accion "+t.image+".\n");
+	  declaracion.add(codigo.getEtiqueta()+":\n");
+	}
+	declaracion2=declaracion_acciones()
+  	{
+  	  	for(int n=0;n<declaracion2.size();n++) {
+			declaracion.add(declaracion2.get(n));
+  	  	}
+		declaracion.add("; Comienzo de la accion "+t.image+".\n");
   	}
-  	bloque_sentencias()
+  	bloque=bloque_sentencias()
   	{
-	  codigo.escribir("; Fin de la accion "+t.image+".",false);
-	  codigo.escribir("CSF",true);
+  	  for(int n=0;n<bloque.size();n++) {
+		declaracion.add(bloque.get(n));
+  	  }
+  	  declaracion.add("; Fin de la accion "+t.image+".\n");
+	  declaracion.add("\t"+"CSF"+"\n");
   	  tabla_simbolos.eliminar_variables(nivel);
   	  tabla_simbolos.eliminar_parametros(nivel);
   	  direccion=direccion_anterior;
@@ -532,6 +580,7 @@ void declaracion_accion():
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de accion incorrecta");
 }
+{return declaracion;}
 }
 
 Token cabecera_accion():
@@ -552,8 +601,6 @@ Token cabecera_accion():
 			}
 			direccion = direccion+1;
 			tabla_simbolos.imprimirTabla();
-			codigo.escribir("; Accion "+t.image,false);
-			codigo.escribir(codigo.getEtiqueta()+":",false);
   		  } catch(SimboloYaDeclaradoException e) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
@@ -655,31 +702,43 @@ Clase_parametro clase_parametros():
 {return clase;}
 }
 
-void bloque_sentencias():
+ArrayList<String> bloque_sentencias():
 {
+ ArrayList<String> bloque =new ArrayList<String>();
 }
 {
   try { 
-  	< tPRINCIPIO >lista_sentencias() < tFIN >
+  	< tPRINCIPIO >bloque=lista_sentencias() < tFIN >
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de bloque de sentencias incorrecta");
 }
+{return bloque;}
 }
 
-void lista_sentencias():
+ArrayList<String> lista_sentencias():
 {
+  ArrayList<String> sentencias =new ArrayList<String>();
+  ArrayList<String> s =new ArrayList<String>();
 }
 {
   try {
-  	(sentencia())*
+  	(s=sentencia()
+  	{
+  		for(int n=0;n<s.size();n++) {
+			sentencias.add(s.get(n));
+  	 	}
+  	}
+  	)*
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de sentencias incorrecta");
 }
+{return sentencias;}
 }
 
-void leer():
+ArrayList< String> leer():
 {
   ArrayList<Token> iden=new ArrayList<Token>();
+  ArrayList< String> l=new ArrayList< String>();
   Token t=null;
   Token t1=null;
   Simbolo s=null;
@@ -692,13 +751,17 @@ void leer():
 		  t=iden.get(n);
 		  try {
 			s=tabla_simbolos.buscar_simbolo(t.image);
-			codigo.escribir("; Leer.",false);
-			codigo.escribir("SRF  0 "+s.getDir(),true);
-			codigo.escribir("RD  1",true);
+			l.add("; Leer.\n");
+			l.add("\t"+"SRF  "+(s.getNivel()-nivel)+"  "+s.getDir()+"\n");
 			if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
 				if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
 				  	error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
 				}
+				if(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.BOOLEANO) {
+					l.add("\t"+"RD  1"+"\n");
+	  	 		}if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
+					l.add("\t"+"RD  0"+"\n");
+	  	 		}
 			}
 		  }catch(SimboloNoEncontradoException e) {
 		    error_semantico(t.image, t.beginLine, t.beginColumn, e);
@@ -713,17 +776,26 @@ void leer():
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de leer incorrecta");
 }
+{return l;}
 }
 
-void escribir():
+ArrayList< String> escribir():
 {
+  ArrayList< String> lista=new ArrayList< String>();
+  ArrayList< String> l=new ArrayList< String>();
 }
 {
   try { 
-  	< tESCRIBIR > < tPA > lista_escribibles() < tPC >
+  	< tESCRIBIR > < tPA > l=lista_escribibles() < tPC >
+  	{
+		for(int n=0;n<l.size();n++) {
+			lista.add(l.get(n));
+  	 	}
+  	}
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de escribir incorrecta");
 }
+{return lista;}
 }
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////RECORDATORIO////////////////////////////////////
@@ -786,9 +858,10 @@ void entacar():
 }
 }
 
-void lista_escribibles():
+ArrayList< String> lista_escribibles():
 {
   Token t=null;
+  ArrayList< String> lista=new ArrayList< String>();
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
@@ -797,35 +870,34 @@ void lista_escribibles():
   try { 
   	( el1=expresion() ) 
   	{
-  	  	
-		codigo.escribir("; Escribir.",false);
-		if(el1.getTipo()==Tipo_variable.CHAR) { 
-	  	 	codigo.escribir("; caracter '"+el1.getCaracter()+"'.",false);
-	  	 	codigo.escribir("STC  "+(int)el1.getCaracter(),true);
-	  	 	if(el1.getPara()==Clase_parametro.VAL) {
-				codigo.escribir("WRT  0",true);
-	  	 	}if(el1.getPara()==Clase_parametro.REF) {
-				codigo.escribir("WRT  1",true);
+  	  	lista.add("; Escribir.\n");
+		if(el1.getTipo()==Tipo_variable.CHAR) {
+		  lista.add("; caracter '"+el1.getCaracter()+"'.\n");
+		  lista.add("\t"+"STC  "+(int)el1.getCaracter()+"\n");
+	  	 	if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+	  	 	  	lista.add("\t"+"WRT  1"+"\n");
+	  	 	}if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+				lista.add("\t"+"WRT  0"+"\n");
 	  	 	}
 	  	 	
   		}else if(el1.getTipo()==Tipo_variable.CADENA){
   		  	String tmp=el1.getCadena().substring(1,el1.getCadena().length()-1);
-			codigo.escribir("; cadena '"+tmp+"'.",false);
+  		  	lista.add("; cadena '"+tmp+"'.\n");
 			for(int i=0;i<tmp.length();i++) {
-			  codigo.escribir("STC  "+(int)tmp.charAt(i),true);
-			  if(el1.getPara()==Clase_parametro.VAL) {
-				codigo.escribir("WRT  0",true);
-		  	 }if(el1.getPara()==Clase_parametro.REF) {
-				codigo.escribir("WRT  1",true);
-		  	 }
+			  lista.add("\t"+"STC  "+(int)tmp.charAt(i)+"\n");
+			if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+	  	 	  	lista.add("\t"+"WRT  1"+"\n");
+	  	 	}if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+				lista.add("\t"+"WRT  0"+"\n");
+	  	 	}
 			}
   		}else {
-			codigo.escribir("; entero '"+Integer.toString(el1.getEntero())+"'.",false);
-			codigo.escribir("STC  "+el1.getEntero(),true);
-	  	 	if(el1.getPara()==Clase_parametro.VAL) {
-				codigo.escribir("WRT  0",true);
-	  	 	}if(el1.getPara()==Clase_parametro.REF) {
-				codigo.escribir("WRT  1",true);
+  		  	lista.add("; entero '"+Integer.toString(el1.getEntero())+"'.\n");
+  		  	lista.add("\t"+"STC  "+el1.getEntero()+"\n");
+	  	 	if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+	  	 	  	lista.add("\t"+"WRT  1"+"\n");
+	  	 	}if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+				lista.add("\t"+"WRT  0"+"\n"); 
 	  	 	}
   		}
   	}
@@ -833,29 +905,29 @@ void lista_escribibles():
   	  
 	if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA ||el1.getTipo()==Tipo_variable.ENTERO) &&
 		(el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.ENTERO)) {
-		if(el2.getTipo()==Tipo_variable.CHAR) { 
-	  	 	codigo.escribir("; caracter '"+el2.getCaracter()+"'.",false);
-	  	 	codigo.escribir("STC  "+(int)el2.getCaracter(),true);
-	  	 	if(el2.getPara()==Clase_parametro.VAL) {
-				codigo.escribir("WRT  0",true);
-	  	 	}if(el2.getPara()==Clase_parametro.REF) {
-				codigo.escribir("WRT  1",true);
+		if(el2.getTipo()==Tipo_variable.CHAR) {
+		  	lista.add("; caracter '"+el2.getCaracter()+"'.\n");
+		  	lista.add("\t"+"STC  "+(int)el2.getCaracter()+"\n");
+	  	 	if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
+	  	 	  	lista.add("\t"+"WRT  1"+"\n");
+	  	 	}if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
+				lista.add("\t"+"WRT  0"+"\n");
 	  	 	}
   		}else if(el2.getTipo()==Tipo_variable.CADENA){
   		  	String tmp=el2.getCadena().substring(1,el2.getCadena().length()-1);
-			codigo.escribir("; cadena '"+tmp+"'.",false);
+  		  	lista.add("; cadena '"+tmp+"'.\n");
 			for(int i=0;i<tmp.length();i++) {
-			  codigo.escribir("STC  "+(int)tmp.charAt(i),true);
-			  if(el2.getPara()==Clase_parametro.VAL) {
-				codigo.escribir("WRT  0",true);
-		  	 }if(el2.getPara()==Clase_parametro.REF) {
-				codigo.escribir("WRT  1",true);
-		  	 }
+			  lista.add("\t"+"STC  "+(int)tmp.charAt(i)+"\n");
+			if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
+	  	 	  	lista.add("\t"+"WRT  1"+"\n");
+	  	 	}if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
+				lista.add("\t"+"WRT  0"+"\n");
+	  	 	}
 			}
   		}else {
-			codigo.escribir("; entero '"+Integer.toString(el2.getEntero())+"'.",false);
-			codigo.escribir("STC  "+el2.getEntero(),true);
-	  	 	codigo.escribir("WRT  0",true);
+  		  	lista.add("; entero '"+Integer.toString(el2.getEntero())+"'.\n");
+  		  	lista.add("\t"+"STC  "+el2.getEntero()+"\n");
+  		  	lista.add("\t"+"WRT  1"+"\n");
   		}
 	}else {
 		error_semantico(t.image, t.beginLine, t.beginColumn, new WrongTypeException());
@@ -864,56 +936,64 @@ void lista_escribibles():
 }catch(ParseException e) {
 	error_sintactico(e,"Estructura de escribir incorrecta ");
 }
+{return lista;}
 }
 
-void mientras_que():
+ArrayList< String> mientras_que():
 {
   Elemento el=null;
   Token t=null;
   String etiqueta1="";
   String etiqueta2="";
+  ArrayList< String> mq=new ArrayList<String >();
+  ArrayList< String>lista=new ArrayList< String>();
 }
 {
   try { 
   	t=< tMQ >
   	{
   	  	etiqueta1=codigo.getEtiqueta();
-  	  	codigo.escribir(etiqueta1+":",false);
-		codigo.escribir("; MQ",false);
+  	  	mq.add(etiqueta1+":\n");
+  	  	mq.add(etiqueta1+"; MQ\n");
 	} el=expresion()
 	{
 	  	etiqueta2=codigo.getEtiqueta();
-		codigo.escribir("; Salir del bucle si la guarda se evalua a falso",false);
-		codigo.escribir("JMF  "+etiqueta2,true);
+	  	mq.add("; Salir del bucle si la guarda se evalua a falso.\n");
+	  	mq.add("\t"+"JMF  "+etiqueta2+"\n");
 		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 	}
 		
-  	} lista_sentencias()
+  	} lista=lista_sentencias()
   	{
-		codigo.escribir("; Fin de la iteracion. Saltar a la cabecera del bucle. ",false);
-		codigo.escribir("JMP  "+etiqueta1,true);
-		codigo.escribir(etiqueta2+":",false);
-		codigo.escribir("; Fin MQ.",false);
+  	  	for(int n=0;n<lista.size();n++) {
+			mq.add(lista.get(n));
+  	  	}
+  	  	mq.add("; Fin de la iteracion. Saltar a la cabecera del bucle.\n");
+  	  	mq.add("\t"+"JMP  "+etiqueta1+"\n");
+  	  	mq.add(etiqueta2+":"+"\n");
+  	  	mq.add("; Fin MQ."+"\n");
   	}< tFMQ >
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de mientras que incorrecta");
 }
+{return mq;}
 }
 
-void si():
+ArrayList< String> si():
 {
   Elemento el=null;
   Token t=null;
+  ArrayList< String> s=new ArrayList< String>();
 }
 {
   try { 
   	t=< tSI >
   	{
-		codigo.escribir("; SI.",false);
+  	  	s.add("; SI.\n");
   	} el=expresion()
   	{
-		codigo.escribir("; ENT.",false);
+		s.add("; ENT.\n");
 		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 		}
@@ -923,6 +1003,7 @@ void si():
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de si incorrecta");
 }
+{return s;}
 }
 
 void argumentos(Simbolo accion):
@@ -1023,15 +1104,17 @@ void lista_expresiones(Simbolo accion):
 }
 }
 
-void seleccion():
+ArrayList< String> seleccion():
 {
+  ArrayList< String> s=new ArrayList < String>();
 }
 {
   try { 
-  	< tPRINCIPIO > < tIDENTIFICADOR > < tLLAVE_IZQ > (sentencia())* < tLLAVE_DCHA >
+  	< tPRINCIPIO > < tIDENTIFICADOR > < tLLAVE_IZQ > (s=lista_sentencias()) < tLLAVE_DCHA >
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de seleccion incorrecta");
 }
+{return s;}
 }
 
 Elemento expresion():
