@@ -2,5 +2,208 @@
 	ENP  L0
 ; Comienzo del programa noventa_y_nueve.
 L0:
+; Direccion de la variable n.
+	SRF  0  5
+	STC  0
+; Asignacion.
+	ASG
+L1:
+; MQ.
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  0
+	LTE
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  100
+	GTE
+	OR
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  10
+	DIV
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  10
+	MOD
+	EQ
+	OR
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L2
+; Escribir.
+; cadena 'n: '.
+	STC  110
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Leer.
+	SRF  0  5
+	RD  1
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L1
+L2:
+; Fin MQ.
+; Escribir.
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	WRT  1
+; cadena ' se convierte en '.
+	STC  32
+	WRT  0
+	STC  115
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  99
+	WRT  0
+	STC  111
+	WRT  0
+	STC  110
+	WRT  0
+	STC  118
+	WRT  0
+	STC  105
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  116
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+; Direccion de la variable x.
+	SRF  0  3
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  10
+	DIV
+; Asignacion.
+	ASG
+; Direccion de la variable y.
+	SRF  0  4
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  10
+	MOD
+; Asignacion.
+	ASG
+; Direccion de la variable m.
+	SRF  0  6
+	STC  10
+; Acceso a la variable y.
+	SRF  0  4
+	DRF
+	TMS
+; Acceso a la variable x.
+	SRF  0  3
+	DRF
+	PLUS
+; Asignacion.
+	ASG
+; SI.
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+; Acceso a la variable m.
+	SRF  0  6
+	DRF
+	GT
+	JMF  L3
+; ENT.
+; Direccion de la variable n.
+	SRF  0  5
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+; Acceso a la variable m.
+	SRF  0  6
+	DRF
+	SBT
+; Asignacion.
+	ASG
+; Direccion de la variable n.
+	SRF  0  5
+; Acceso a la variable m.
+	SRF  0  6
+	DRF
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	SBT
+; Asignacion.
+	ASG
+L3:
+;Fin SI:
+; Direccion de la variable x.
+	SRF  0  3
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  10
+	DIV
+; Asignacion.
+	ASG
+; Direccion de la variable y.
+	SRF  0  4
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	STC  10
+	MOD
+; Asignacion.
+	ASG
+; Direccion de la variable m.
+	SRF  0  6
+	STC  10
+; Acceso a la variable y.
+	SRF  0  4
+	DRF
+	TMS
+; Acceso a la variable x.
+	SRF  0  3
+	DRF
+	PLUS
+; Asignacion.
+	ASG
+; Direccion de la variable n.
+	SRF  0  5
+; Acceso a la variable m.
+	SRF  0  6
+	DRF
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	PLUS
+; Asignacion.
+	ASG
+; Escribir.
+; Acceso a la variable n.
+	SRF  0  5
+	DRF
+	WRT  1
+	STC  13
+	WRT  0
+	STC  10
+	WRT  0
 ; Fin de programa noventa_y_nueve.
 	LVP

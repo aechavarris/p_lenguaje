@@ -4,25 +4,53 @@
 L1:
 ; Comienzo de la accion es_primo.
 ; Direccion de la variable j.
-	SRF  0  6
+	SRF  0  3
+	STC  2
 ; Asignacion.
 	ASG
 ; Direccion de la variable divisible.
-	SRF  0  7
+	SRF  0  4
+	STC  0
 ; Asignacion.
 	ASG
 L2:
-L2; MQ
+; MQ.
+; Acceso a la variable j.
+	SRF  0  3
+	DRF
+; Acceso a la variable i.
+	SRF  1  4
+	DRF
+	STC  2
+	DIV
+	LT
+; Acceso a la variable divisible.
+	SRF  0  4
+	DRF
+	NGB
+	AND
 ; Salir del bucle si la guarda se evalua a falso.
 	JMF  L3
 ; Direccion de la variable divisible.
-	SRF  0  7
-	STC  1
+	SRF  0  4
+; Acceso a la variable i.
+	SRF  1  4
+	DRF
+; Acceso a la variable j.
+	SRF  0  3
+	DRF
+	MOD
+	STC  0
+	EQ
 ; Asignacion.
 	ASG
 ; Direccion de la variable j.
-	SRF  0  6
-	STC  2
+	SRF  0  3
+; Acceso a la variable j.
+	SRF  0  3
+	DRF
+	STC  1
+	PLUS
 ; Asignacion.
 	ASG
 ; Fin de la iteracion. Saltar a la cabecera del bucle.
@@ -30,10 +58,81 @@ L2; MQ
 L3:
 ; Fin MQ.
 ; SI.
+; Acceso a la variable divisible.
+	SRF  0  4
+	DRF
+	NGB
+	JMF  L4
 ; ENT.
-; Fin de la accion es_primo.
+; Escribir.
+; Acceso a la variable i.
+	SRF  1  4
+	DRF
+	WRT  1
+; cadena 'es primo.'.
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  32
+	WRT  0
+	STC  112
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  109
+	WRT  0
+	STC  111
+	WRT  0
+	STC  46
+	WRT  0
+	STC  13
+	WRT  0
+	STC  10
+	WRT  0
+L4:
+;Fin SI:
+; Fin de la accion / funcion es_primo.
 	CSF
 ; Comienzo del programa nprimos.
 L0:
+; Direccion de la variable n.
+	SRF  0  3
+	STC  100
+; Asignacion.
+	ASG
+; Direccion de la variable i.
+	SRF  0  4
+	STC  2
+; Asignacion.
+	ASG
+L5:
+; MQ.
+; Acceso a la variable i.
+	SRF  0  4
+	DRF
+; Acceso a la variable n.
+	SRF  0  3
+	DRF
+	LTE
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L6
+; Invocacion a es_primo.
+	OSF  4  0 L1
+; Direccion de la variable i.
+	SRF  0  4
+; Acceso a la variable i.
+	SRF  0  4
+	DRF
+	STC  1
+	PLUS
+; Asignacion.
+	ASG
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L5
+L6:
+; Fin MQ.
 ; Fin de programa nprimos.
 	LVP

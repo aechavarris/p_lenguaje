@@ -1,5 +1,7 @@
 package lib.semantico;
 
+import java.util.ArrayList;
+
 import lib.codigo.Codigo;
 import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_simbolo;
@@ -24,6 +26,13 @@ public class Elemento {
 	private Integer entero;
 	private Character caracter;
 	private String cadena;
+	private ArrayList<String> buff;
+	public ArrayList<String> getBuff() {
+		return buff;
+	}
+	public void setBuff(ArrayList<String> buff) {
+		this.buff = buff;
+	}
 	private boolean complex;
 	public boolean isComplex() {
 		return complex;
@@ -51,6 +60,7 @@ public class Elemento {
 		this.caracter=null;
 		this.bool=null;
 		this.complex=false;
+		this.buff=new ArrayList<String>();
 	}
 	public Tipo_variable getTipo() {
 		return tipo;

@@ -30,6 +30,7 @@ public class minilengcompiler {
   static int nivel = 0;
   static int direccion=3;
   static int ejecucion_correcta=1;
+  static int DIR_INICIAL=3;
   static Codigo codigo;
 	 public static void main(String args []) throws ParseException {
 	   tabla_simbolos.inicializar_tabla();
@@ -257,7 +258,7 @@ void programa():
   	< tPROGRAMA > p=< tIDENTIFICADOR >
   		{
   		  if(p!=null){
-  		    etiqueta=codigo.getEtiqueta();
+  		    etiqueta=codigo.getEtiqueta("PROGRAMA");
 			tabla_simbolos.introducir_programa(p.image,0);
 			tabla_simbolos.imprimirTabla(); 
   	 	  } 
@@ -274,6 +275,9 @@ void programa():
 			
   	   codigo.escribir("; Comienzo del programa "+p.image+".\n");
 	   codigo.escribir(etiqueta+":\n");
+	   for(int n=0; n<bloque.size();n++) {
+			codigo.escribir(bloque.get(n));
+	   }
  	   if(ejecucion_correcta==1) {
 			tabla_simbolos.eliminar_variables(nivel);
 			tabla_simbolos.eliminar_acciones(nivel);
@@ -312,9 +316,7 @@ try {
 	error_sintactico(e,"Sintaxis de sentencia incorrecta");
 }
 {
-  for(int n=0;n<s.size();n++) {
-	sentencia.add(s.get(n));
-  }
+  sentencia.addAll(s);
   return sentencia;}
 }
 
@@ -328,10 +330,7 @@ ArrayList<String> asignacion_invocacion_accion(Token t):
 }catch(ParseException e) {
 	error_sintactico(e,"No se encuentra asignacion o invocacion a accion");
 }
-{	for(int n=0;n<asig.size();n++) {
-		System.out.println(asig.get(n));
-	}
-  System.out.println(asig.get(asig.size()-2));
+{
   return asig;}
 }
 
@@ -348,11 +347,11 @@ ArrayList< String> asignacion(Token t):
     		try { 
     			s=tabla_simbolos.buscar_simbolo(t.image);
     			el.setTipo(s.getVariable());
+    			asig.add("; Direccion de la variable "+t.image+".\n");
+    			asig.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
     			if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
 					error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
     			}
-    			asig.add("; Direccion de la variable "+t.image+".\n");
-    			asig.add("\t"+"SRF  "+(s.getNivel()-nivel)+"  "+s.getDir()+"\n");
     		}catch(SimboloNoEncontradoException e) {
       			error_semantico(t.image, t.beginLine, t.beginColumn, e);
       			try {
@@ -372,27 +371,8 @@ ArrayList< String> asignacion(Token t):
 	  	
 		if(el1.getTipo()!= el.getTipo()) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
-		}else if(el1.getSimbolo()==Tipo_simbolo.VARIABLE || el1.getSimbolo()==Tipo_simbolo.PARAMETRO){
-		  System.out.println(t.image+" "+el1.getTipo());
-			switch(el1.getTipo()) {
-				case ENTERO: 
-					System.out.println(t.image+" "+el1.getEntero());
-					asig.add("\t"+"STC  "+el1.getEntero()+"\n");
-					break;
-				case CHAR:
-					asig.add("\t"+"STC  "+(int)el1.getCaracter()+"\n");
-					break;
-				case BOOLEANO:
-					if(el1.getBool()==true) {
-						asig.add("\t"+"STC  1"+"\n");
-					}else {
-						asig.add("\t"+"STC  0"+"\n");
-					}
-					break;
-				case CADENA:
-					break;
-				default:
-			}
+		}else {
+		  asig.addAll(el1.getBuff());			
 		}
 	}else {
 		error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
@@ -412,11 +392,13 @@ ArrayList< String> invocacion_accion(Token t):
 {
   Simbolo accion=new Simbolo();
   ArrayList< String> invocacion=new ArrayList< String>();
+  ArrayList< String> parametros=new ArrayList< String>();
   ArrayList<Simbolo> paraList=null;
   boolean hayLista=false;
 }
 {
   {
+    invocacion.add("; Invocacion a "+t.image+".\n");
     try { 
     	accion=tabla_simbolos.buscar_simbolo(t.image);
     	if(accion.getVariable()!=Tipo_variable.DESCONOCIDO && !accion.ES_ACCION()) {
@@ -427,8 +409,8 @@ ArrayList< String> invocacion_accion(Token t):
     }
   }
   try {
-    (argumentos(accion) {hayLista=true; })?
-    {{
+    (parametros=argumentos(accion) {hayLista=true; })?
+    {{invocacion.addAll(parametros);
   	  if(accion!=null && accion.ES_ACCION() && accion.getVariable()!=Tipo_variable.DESCONOCIDO){
       		paraList=accion.getListaParametros();
       
@@ -440,8 +422,15 @@ ArrayList< String> invocacion_accion(Token t):
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
 }
-{ invocacion.add("; Invocacion a "+t.image+".\n");
-  invocacion.add("\t"+"OSF  "+accion.getDir()+"  "+(accion.getNivel()-nivel)+"\n");
+{ 
+  
+  for(int n=0;n<codigo.getEtiquetas().size();n++) {
+    
+	if(codigo.getEtiquetas().get(n).equals(t.image)) {
+		invocacion.add("\t"+"OSF  "+Integer.toString(direccion-1)+"  "+(accion.getNivel()-nivel)+" "+"L"+n+"\n");
+	}
+  } 
+  
   return invocacion;}
 }
 
@@ -530,10 +519,7 @@ ArrayList<String> declaracion_acciones():
   try { 
   	( declaracion=declaracion_accion()
   	{
-  	  
-  	  for(int n=0;n<declaracion.size();n++) {
-		declaraciones.add(declaracion.get(n));
-  	  }
+  	    declaraciones.addAll(declaracion);
   	}
   	)*
  }catch(ParseException e) {
@@ -556,21 +542,17 @@ ArrayList<String> declaracion_accion():
   	t=cabecera_accion() declaracion_variables()
   	{
   	  declaracion.add("; Accion "+t.image+".\n");
-	  declaracion.add(codigo.getEtiqueta()+":\n");
+	  declaracion.add(codigo.getEtiqueta(t.image)+":\n");
 	}
 	declaracion2=declaracion_acciones()
   	{
-  	  	for(int n=0;n<declaracion2.size();n++) {
-			declaracion.add(declaracion2.get(n));
-  	  	}
+  	  	declaracion.addAll(declaracion2);
 		declaracion.add("; Comienzo de la accion "+t.image+".\n");
   	}
   	bloque=bloque_sentencias()
   	{
-  	  for(int n=0;n<bloque.size();n++) {
-		declaracion.add(bloque.get(n));
-  	  }
-  	  declaracion.add("; Fin de la accion "+t.image+".\n");
+  	  declaracion.addAll(bloque);
+  	  declaracion.add("; Fin de la accion / funcion "+t.image+".\n");
 	  declaracion.add("\t"+"CSF"+"\n");
   	  tabla_simbolos.eliminar_variables(nivel);
   	  tabla_simbolos.eliminar_parametros(nivel);
@@ -605,6 +587,7 @@ Token cabecera_accion():
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
   	 	}
+  	    direccion=DIR_INICIAL;
   	 	nivel=nivel+1;
   	}(parametros=parametros_formales())?< tFIN_SENTENCIA >
   	
@@ -724,9 +707,7 @@ ArrayList<String> lista_sentencias():
   try {
   	(s=sentencia()
   	{
-  		for(int n=0;n<s.size();n++) {
-			sentencias.add(s.get(n));
-  	 	}
+  		sentencias.addAll(s);
   	}
   	)*
  }catch(ParseException e) {
@@ -752,7 +733,7 @@ ArrayList< String> leer():
 		  try {
 			s=tabla_simbolos.buscar_simbolo(t.image);
 			l.add("; Leer.\n");
-			l.add("\t"+"SRF  "+(s.getNivel()-nivel)+"  "+s.getDir()+"\n");
+			l.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
 			if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
 				if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
 				  	error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
@@ -788,9 +769,7 @@ ArrayList< String> escribir():
   try { 
   	< tESCRIBIR > < tPA > l=lista_escribibles() < tPC >
   	{
-		for(int n=0;n<l.size();n++) {
-			lista.add(l.get(n));
-  	 	}
+		  lista.addAll(l);
   	}
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de escribir incorrecta");
@@ -872,8 +851,11 @@ ArrayList< String> lista_escribibles():
   	{
   	  	lista.add("; Escribir.\n");
 		if(el1.getTipo()==Tipo_variable.CHAR) {
-		  lista.add("; caracter '"+el1.getCaracter()+"'.\n");
-		  lista.add("\t"+"STC  "+(int)el1.getCaracter()+"\n");
+		  if((int)el1.getCaracter()>=32 && (int)el1.getCaracter() <=254 && el1.getPara()==Clase_parametro.VAL) {
+		     
+		  	lista.add("; caracter '"+el1.getCaracter()+"'.\n");
+		  }
+		  	lista.addAll(el1.getBuff());
 	  	 	if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
 	  	 	  	lista.add("\t"+"WRT  1"+"\n");
 	  	 	}if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
@@ -892,8 +874,10 @@ ArrayList< String> lista_escribibles():
 	  	 	}
 			}
   		}else {
+  		  if(el1.getPara()==Clase_parametro.VAL) { 
   		  	lista.add("; entero '"+Integer.toString(el1.getEntero())+"'.\n");
-  		  	lista.add("\t"+"STC  "+el1.getEntero()+"\n");
+  		  }
+  		  	lista.addAll(el1.getBuff());
 	  	 	if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
 	  	 	  	lista.add("\t"+"WRT  1"+"\n");
 	  	 	}if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
@@ -906,8 +890,10 @@ ArrayList< String> lista_escribibles():
 	if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA ||el1.getTipo()==Tipo_variable.ENTERO) &&
 		(el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.ENTERO)) {
 		if(el2.getTipo()==Tipo_variable.CHAR) {
+		  if((int)el2.getCaracter()>=32 && (int)el2.getCaracter() <=254 && el2.getPara()==Clase_parametro.VAL) { 
 		  	lista.add("; caracter '"+el2.getCaracter()+"'.\n");
-		  	lista.add("\t"+"STC  "+(int)el2.getCaracter()+"\n");
+		  }
+		  	lista.addAll(el2.getBuff());//lista.add("\t"+"STC  "+(int)el2.getCaracter()+"\n");
 	  	 	if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
 	  	 	  	lista.add("\t"+"WRT  1"+"\n");
 	  	 	}if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
@@ -925,8 +911,11 @@ ArrayList< String> lista_escribibles():
 	  	 	}
 			}
   		}else {
+  		  
+  		  if(el2.getPara()==Clase_parametro.VAL) {
   		  	lista.add("; entero '"+Integer.toString(el2.getEntero())+"'.\n");
-  		  	lista.add("\t"+"STC  "+el2.getEntero()+"\n");
+  		 }
+  		  	lista.addAll(el2.getBuff());
   		  	lista.add("\t"+"WRT  1"+"\n");
   		}
 	}else {
@@ -936,7 +925,8 @@ ArrayList< String> lista_escribibles():
 }catch(ParseException e) {
 	error_sintactico(e,"Estructura de escribir incorrecta ");
 }
-{return lista;}
+{
+  return lista;}
 }
 
 ArrayList< String> mientras_que():
@@ -952,12 +942,13 @@ ArrayList< String> mientras_que():
   try { 
   	t=< tMQ >
   	{
-  	  	etiqueta1=codigo.getEtiqueta();
+  	  	etiqueta1=codigo.getEtiqueta("MQ");
   	  	mq.add(etiqueta1+":\n");
-  	  	mq.add(etiqueta1+"; MQ\n");
+  	  	mq.add("; MQ.\n");
 	} el=expresion()
 	{
-	  	etiqueta2=codigo.getEtiqueta();
+	  	mq.addAll(el.getBuff());
+	  	etiqueta2=codigo.getEtiqueta("MQ");
 	  	mq.add("; Salir del bucle si la guarda se evalua a falso.\n");
 	  	mq.add("\t"+"JMF  "+etiqueta2+"\n");
 		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
@@ -966,9 +957,7 @@ ArrayList< String> mientras_que():
 		
   	} lista=lista_sentencias()
   	{
-  	  	for(int n=0;n<lista.size();n++) {
-			mq.add(lista.get(n));
-  	  	}
+  	  	mq.addAll(lista);
   	  	mq.add("; Fin de la iteracion. Saltar a la cabecera del bucle.\n");
   	  	mq.add("\t"+"JMP  "+etiqueta1+"\n");
   	  	mq.add(etiqueta2+":"+"\n");
@@ -985,39 +974,64 @@ ArrayList< String> si():
   Elemento el=null;
   Token t=null;
   ArrayList< String> s=new ArrayList< String>();
+  ArrayList< String>lista=new ArrayList< String>();
+  String etiqueta1="";
+  String etiqueta2="";
 }
 {
   try { 
   	t=< tSI >
   	{
+  	  	etiqueta1=codigo.getEtiqueta("SI");
   	  	s.add("; SI.\n");
   	} el=expresion()
   	{
+  	  	s.addAll(el.getBuff());
+  	  	s.add("\t"+"JMF  "+etiqueta1+"\n");
 		s.add("; ENT.\n");
 		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 		}
 
-  	} < tENT > lista_sentencias() (< tSI_NO > lista_sentencias())* < tFSI >
+  	} < tENT > lista=lista_sentencias() 
+  	{
+  	  s.addAll(lista);
+  	  etiqueta2=codigo.getEtiqueta("SI");
+  	  s.add("\t"+"JMP  "+etiqueta2+"\n");
+  	  s.add(etiqueta1+":\n");
+  	}
+  	(< tSI_NO > lista=lista_sentencias()
+
+  	{
+  	  
+  	  s.add("SI_NO.\n");
+  	  s.addAll(lista);
+  	  s.add(etiqueta2+":\n");
+  	}
+  	)* < tFSI >
 
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de si incorrecta");
 }
-{return s;}
+{ s.add(etiqueta1+":\n");
+  s.add(";Fin SI:\n");
+  return s;}
 }
 
-void argumentos(Simbolo accion):
+ArrayList< String> argumentos(Simbolo accion):
 {
+  ArrayList< String> lista=new ArrayList< String>();
 }
 {
   try { 
-  	< tPA > ( lista_expresiones(accion)  )? < tPC >
+  	< tPA > ( lista=lista_expresiones(accion)  )? < tPC >
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de lista de argumentos incorrecta");
 }
+{return lista;}
 }
 
-void lista_expresiones(Simbolo accion):
+ArrayList< String> lista_expresiones(Simbolo accion):
 {
   Token t=token;
   ArrayList<Simbolo> paraList=null;
@@ -1027,6 +1041,7 @@ void lista_expresiones(Simbolo accion):
   Simbolo parametro=null;
   boolean error=false;
   boolean noPara=false;
+  ArrayList< String> lista=new ArrayList< String>();
 }
 {
   {
@@ -1038,6 +1053,7 @@ void lista_expresiones(Simbolo accion):
   try { 
   	el1=expresion()
 	{
+	  	lista.addAll(el1.getBuff());
 		if(paraList!=null && paraList.size()>i){
 			parametro=paraList.get(i);
 			i++;
@@ -1065,7 +1081,8 @@ void lista_expresiones(Simbolo accion):
   	   
   	(t=< tCOMA >el2=expresion()
   	   
-	{	
+	{
+	  	lista.addAll(el2.getBuff());
 		if(paraList!=null && paraList.size()>i){
 			parametro=paraList.get(i);
 			i++;
@@ -1094,6 +1111,7 @@ void lista_expresiones(Simbolo accion):
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de lista de expresiones incorrecta");
 }
+{return lista;}
 {
   	
 	if(!error && paraList!=null) {
@@ -1123,12 +1141,14 @@ Elemento expresion():
   op o2=null;
   Token t=token;
   Elemento el=new Elemento();
+  ArrayList< String> buff=null;
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
 }
 {
   try {
    el1=expresion2(){
+    buff=el1.getBuff();
 	el.setTipo(el1.getTipo());
 	el.setPara(el1.getPara());
 	el.setSimbolo(el1.getSimbolo());
@@ -1149,6 +1169,7 @@ Elemento expresion():
 		}
 	}
    } (o1=operador_relacional() el2=expresion2(){
+     buff.addAll(el2.getBuff());
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
        	
      	if(o1!=null) {
@@ -1160,65 +1181,70 @@ Elemento expresion():
          		  	
 					switch (o1) {
 						case MAYOR:
-							
+							buff.add("\t"+"GT"+"\n");
 							el.setBool(el1.getEntero()>el2.getEntero());
 							break;
 						case MENOR:
+							buff.add("\t"+"LT"+"\n");
 							el.setBool(el1.getEntero()<el2.getEntero());
 							break;
 						case IGUAL:
+							buff.add("\t"+"EQ"+"\n");
 							el.setBool(el1.getEntero()==el2.getEntero());
 							break;
 						case MAI:
+							buff.add("\t"+"GTE"+"\n");
 							el.setBool(el1.getEntero()>=el2.getEntero());
 							break;
-						case MEI: 
+						case MEI:
+							buff.add("\t"+"LTE"+"\n");
 							el.setBool(el1.getEntero()<=el2.getEntero());
 							break;
 						case NI:
+							buff.add("\t"+"NEQ"+"\n");
 							el.setBool(el1.getEntero()!=el2.getEntero());
 					}
          		}else if(el1.getBool()!=null && el2.getBool()!=null) {
 					switch (o1) {
 						case IGUAL:
+							buff.add("\t"+"EQ"+"\n");
 							el.setBool(el1.getBool()==el2.getBool());
 							break;
 						case NI:
+							buff.add("\t"+"NEQ"+"\n");
 							el.setBool(el1.getBool()!=el2.getBool());
 							break;
 						default:
 							error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 					}
          		}else if(el1.getCadena()!=null && el2.getCadena()!=null) {
-					switch (o1) {
-						case IGUAL:
-							el.setBool(el1.getCadena()==el2.getCadena());
-							break;
-						case NI:
-							el.setBool(el1.getCadena()!=el2.getCadena());
-							break;
-						default:
-							error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
-					}  
+					
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+					 
          		}else if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
 					switch (o1) {
 						case MAYOR:
-							
+							buff.add("\t"+"GT"+"\n");
 							el.setBool(el1.getCaracter()>el2.getCaracter());
 							break;
 						case MENOR:
+							buff.add("\t"+"LT"+"\n");
 							el.setBool(el1.getCaracter()<el2.getCaracter());
 							break;
 						case IGUAL:
+							buff.add("\t"+"EQ"+"\n");
 							el.setBool(el1.getCaracter()==el2.getCaracter());
 							break;
 						case MAI:
+							buff.add("\t"+"GTE"+"\n");
 							el.setBool(el1.getCaracter()>=el2.getCaracter());
 							break;
-						case MEI: 
+						case MEI:
+							buff.add("\t"+"LTE"+"\n");
 							el.setBool(el1.getCaracter()<=el2.getCaracter());
 							break;
 						case NI:
+							buff.add("\t"+"NEQ"+"\n");
 							el.setBool(el1.getCaracter()!=el2.getCaracter());
 					}
          		}
@@ -1246,7 +1272,9 @@ Elemento expresion():
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
-	{return el;}
+	{ 
+	  el.setBuff(buff);
+	  return el;}
 }
 
 Elemento expresion2():
@@ -1254,13 +1282,19 @@ Elemento expresion2():
   op o1=null;
   op o2=null;
   Token t=null;
+  ArrayList< String> buff=new ArrayList< String>();
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
 }
 {
   try {
-    (o1=operador_aditivo() {el.setComplex(true);})? el1=expresion3() {
+    (o1=operador_aditivo()
+    {
+      el.setComplex(true);
+    }
+    )? el1=expresion3() {
+    buff.addAll(el1.getBuff());
 	el.setTipo(el1.getTipo());
 	el.setPara(el1.getPara());
 	el.setSimbolo(el1.getSimbolo());
@@ -1269,6 +1303,7 @@ Elemento expresion2():
 		switch(el1.getTipo()) {
 			case ENTERO:
 				if(o1==op.RESTA) {
+				  	buff.add("\t"+"NGI"+"\n");
 					el.setEntero(-el1.getEntero());
 	 			 }else { 
 					el.setEntero(el1.getEntero());
@@ -1294,6 +1329,7 @@ Elemento expresion2():
 		}
 	}
    } ((o2=operador_aditivo()|t=< tOR >) el2=expresion3(){
+     buff.addAll(el2.getBuff());
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
      	if(o2!=null) {
      	  t=token;
@@ -1303,9 +1339,11 @@ Elemento expresion2():
 					el.setTipo(Tipo_variable.ENTERO);
 					switch (o2) {
 						case SUMA:
+							buff.add("\t"+"PLUS"+"\n");
 							el.setEntero(el1.getEntero()+el2.getEntero());
 							break;
 						case RESTA:
+							buff.add("\t"+"SBT"+"\n");
 							el.setEntero(el1.getEntero()-el2.getEntero());
 					}
          		}
@@ -1317,6 +1355,7 @@ Elemento expresion2():
 			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
 				el.setTipo(Tipo_variable.BOOLEANO);
 				if(el1.getBool()!=null && el2.getBool()!=null) {
+				  	buff.add("\t"+"OR"+"\n");
 					el.setBool(el1.getBool() || el2.getBool());
 				}
 			}else {
@@ -1336,6 +1375,7 @@ Elemento expresion2():
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
 	{
+	el.setBuff(buff);
 	return el;
 	}
 }
@@ -1344,6 +1384,7 @@ Elemento expresion3():
 {
   op o=null;
   Token t=null;
+  ArrayList< String>buff=null;
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
   Elemento el2=new Elemento();
@@ -1351,6 +1392,7 @@ Elemento expresion3():
 {
   try {
    el1=factor() {
+     buff=el1.getBuff();
 	el.setTipo(el1.getTipo());
 	el.setPara(el1.getPara());
 	el.setSimbolo(el1.getSimbolo());
@@ -1370,7 +1412,7 @@ Elemento expresion3():
 		}
 	}
    }( (o=operador_multiplicativo()|t=< tAND >) el2=factor() {
-     
+     buff.addAll(el2.getBuff());
      if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
      	if(o!=null) {
      	  t=token;
@@ -1381,11 +1423,11 @@ Elemento expresion3():
 					el.setTipo(Tipo_variable.ENTERO);
 					switch (o) {
 						case MULL:
-				
+							buff.add("\t"+"TMS"+"\n");
 							el.setEntero(el1.getEntero()*el2.getEntero());
 							break;
 						case DIV:
-							
+							buff.add("\t"+"DIV"+"\n");
 							if(el2.getEntero()==0) {
 								error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
 							}else { 
@@ -1393,7 +1435,7 @@ Elemento expresion3():
 							}
 							break;
 						case DIV1:
-							
+							buff.add("\t"+"DIV"+"\n");
 							if(el2.getEntero()==0) {
 								error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
 							}else { 
@@ -1401,6 +1443,7 @@ Elemento expresion3():
 							}
 							break;
 						case MOD:
+							buff.add("\t"+"MOD"+"\n");
 							if(el2.getEntero()==0) {
 								error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
 							}else {
@@ -1417,6 +1460,7 @@ Elemento expresion3():
 				el.setTipo(Tipo_variable.BOOLEANO);
 				if(el1.getBool()!=null && el2.getBool()!=null) {
 					el.setBool(el1.getBool() && el2.getBool());
+					buff.add("\t"+"AND"+"\n");
 				}
 			}else {
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -1434,7 +1478,8 @@ Elemento expresion3():
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de expresion incorrecta");
 }
-	{return el;}
+	{ el.setBuff(buff);
+	  return el;}
 }
 
 op operador_relacional():
@@ -1485,10 +1530,12 @@ Elemento factor():
 {
   Token t=null;
   Elemento el=new Elemento();
+  ArrayList< String> buff=new ArrayList< String>();
 }
 {
   try { 
   (t=< tNOT >)? el=factor2() {
+    buff.addAll(el.getBuff());
 	if(t!=null ) {
 		if(el.getTipo()==Tipo_variable.DESCONOCIDO || el.getTipo()==Tipo_variable.BOOLEANO) {
 			if(el.getBool()!=null) {
@@ -1496,13 +1543,18 @@ Elemento factor():
 			}
 		}else {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
-		} 
+		}
+		
+		buff.add("\t"+"NGB"+"\n");
+		
 	}
   }
 }catch(ParseException e) {
 	error_sintactico(e,"Factor no encontrado");
 }
-	{return el;}
+	{ 
+	  el.setBuff(buff);
+	  return el;}
 }
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////RECORDATORIO////////////////////////////////////
@@ -1512,12 +1564,13 @@ Elemento factor2():
 {
   Token t=null;
   Simbolo s=null;
+  ArrayList< String> buff=new ArrayList< String>();
   Elemento e=new Elemento();
 }
 {
   try {
      
-   < tPA > e=expresion() < tPC >
+   < tPA > e=expresion() < tPC > { e.setBuff(e.getBuff());}
 	| t=< tENTACAR > < tPA > e=expresion() { 
 	  	Character c=null;
 		if(e.getTipo()==Tipo_variable.ENTERO ) { 
@@ -1525,7 +1578,11 @@ Elemento factor2():
 			if(e.getEntero() <0 || e.getEntero() >255 ) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, new OutOfBoundsIntExcepction());
 			}else {
+			  
 			  c=(char)e.getEntero().intValue();
+			  
+			  buff.add("\t"+"STC  "+e.getEntero()+"\n");
+			  
 			}
 			}
 		}else {
@@ -1534,9 +1591,11 @@ Elemento factor2():
 		e=new Elemento();
 		e.setTipo(Tipo_variable.CHAR);
 		e.setCaracter(c);
+		e.setBuff(buff);
 
 	} < tPC >
 	| t=< tCARAENT > < tPA > e=expresion(){
+	  	buff.add("\t"+"STC  "+Integer.parseInt(e.getCaracter().toString())+"\n"); 
 	  	Integer en=null;
 		if(e.getTipo()==Tipo_variable.CHAR ) {
 		  if(e.getCaracter()!=null) { 
@@ -1548,11 +1607,15 @@ Elemento factor2():
 		e=new Elemento();
 		e.setTipo(Tipo_variable.ENTERO);
 		e.setEntero(en);
+		e.setBuff(buff);
 
 	} < tPC >
 	| t=< tIDENTIFICADOR > {
 	   try {
 	     	s=tabla_simbolos.buscar_simbolo(t.image);
+	     	buff.add("; Acceso a la variable "+t.image+".\n");
+	     	buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
+	     	buff.add("\t"+"DRF"+"\n");
 	     	e.setSimbolo(s.getTipo());
 	     	if(s.ES_PARAMETRO()) {
 				e.setPara(s.getParametro());
@@ -1596,47 +1659,58 @@ Elemento factor2():
 			}catch(SimboloYaDeclaradoException ex) {}
 			
 		}
+		e.setBuff(buff);
 	} 
 	| t=< tVALOR_CARACTER >{
+	  	buff.add("\t"+"STC  "+(int)t.image.charAt(0)+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CHAR);
 		e.setCaracter(t.image.charAt(1));
+		e.setBuff(buff);
 		
 	} 
 	| t=< tVALOR_CADENA >{
-	  	e.setPara(Clase_parametro.VAL);
+	  	e.setPara(Clase_parametro.VAL); 
 		e.setTipo(Tipo_variable.CADENA);
 		e.setCadena(t.image);
 		
 	}
 	| t=< tVALOR_CADENA_VACIA >{
+	  	buff.add("\t"+"STC  "+(int)t.image.charAt(0)+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CADENA);
 		e.setCadena(t.image);
+		e.setBuff(buff);
 		
 	}
 	| t=< tVALOR_ENTERO >{
+	  	buff.add("\t"+"STC  "+Integer.parseInt(t.image)+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.ENTERO);
 		e.setEntero(Integer.parseInt(t.image));
+		e.setBuff(buff);
 		
 	}
 	| t=< tTRUE >{
+	  	buff.add("\t"+"STC  1"+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.BOOLEANO);
 		e.setBool(true);
+		e.setBuff(buff);
 		
 	}
 	| t=< tFALSE >{
+	  	buff.add("\t"+"STC  0"+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.BOOLEANO);
 		e.setBool(false);
-		
+		e.setBuff(buff);
 	}
 
 	
 }catch(ParseException esc) {
 	error_sintactico(esc,"Sintaxis de factor incorrecta");
 }
-{return e;}
+{ 
+  return e;}
 }
