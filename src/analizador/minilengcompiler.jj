@@ -977,6 +977,7 @@ ArrayList< String> si():
   ArrayList< String>lista=new ArrayList< String>();
   String etiqueta1="";
   String etiqueta2="";
+  boolean sino=false;
 }
 {
   try { 
@@ -988,7 +989,7 @@ ArrayList< String> si():
   	{
   	  	s.addAll(el.getBuff());
   	  	s.add("\t"+"JMF  "+etiqueta1+"\n");
-		s.add("; ENT.\n");
+  	  	s.add("; ENT.\n");
 		if(el.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.BOOLEANO){
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 		}
@@ -996,17 +997,15 @@ ArrayList< String> si():
   	} < tENT > lista=lista_sentencias() 
   	{
   	  s.addAll(lista);
-  	  etiqueta2=codigo.getEtiqueta("SI");
-  	  s.add("\t"+"JMP  "+etiqueta2+"\n");
-  	  s.add(etiqueta1+":\n");
+  	  
+  	  
   	}
   	(< tSI_NO > lista=lista_sentencias()
 
   	{
-  	  
-  	  s.add("SI_NO.\n");
-  	  s.addAll(lista);
-  	  s.add(etiqueta2+":\n");
+  	  sino=true;
+  	  etiqueta2=codigo.getEtiqueta("SI");
+  	  s.add("\t"+"JMP  "+etiqueta2+"\n");
   	}
   	)* < tFSI >
 
@@ -1014,7 +1013,12 @@ ArrayList< String> si():
 	error_sintactico(e,"Estructura de si incorrecta");
 }
 { s.add(etiqueta1+":\n");
-  s.add(";Fin SI:\n");
+  if(sino) {
+		s.add(" SI_NO.\n");
+		s.addAll(lista);
+  	  	s.add(etiqueta2+":\n");
+	}
+  s.add("; Fin SI:\n");
   return s;}
 }
 

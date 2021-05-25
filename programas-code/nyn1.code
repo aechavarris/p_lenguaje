@@ -2,10 +2,10 @@
      ENP  L0
 ; Comienzo del programa NOVENTA_Y_NUEVE.
 L0:
-; Dirección de la variable N.
+; Direcciï¿½n de la variable N.
      SRF   0  5
      STC   0
-; Asignación.
+; Asignaciï¿½n.
      ASG  
 L1:
 ; MQ.
@@ -32,7 +32,7 @@ L1:
      MOD  
      EQ  
      OR  
-; Salir del bucle si la guarda se evalúa a falso.
+; Salir del bucle si la guarda se evalï¿½a a falso.
      JMF  L2
 ; Escribir.
 ; cadena 'n: '.
@@ -45,7 +45,7 @@ L1:
 ; Leer.
      SRF   0  5
      RD   1
-; Fin de la iteración. Saltar a la cabecera del bucle.
+; Fin de la iteraciï¿½n. Saltar a la cabecera del bucle.
      JMP  L1
 L2:
 ; Fin MQ.
@@ -89,25 +89,25 @@ L2:
      WRT   0
      STC  32
      WRT   0
-; Dirección de la variable X.
+; Direcciï¿½n de la variable X.
      SRF   0  3
 ; Acceso a la variable N.
      SRF   0  5
      DRF  
      STC  10
      DIV  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable Y.
+; Direcciï¿½n de la variable Y.
      SRF   0  4
 ; Acceso a la variable N.
      SRF   0  5
      DRF  
      STC  10
      MOD  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable M.
+; Direcciï¿½n de la variable M.
      SRF   0  6
      STC  10
 ; Acceso a la variable Y.
@@ -118,7 +118,7 @@ L2:
      SRF   0  3
      DRF  
      PLUS  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
 ; SI.
 ; Acceso a la variable N.
@@ -130,7 +130,7 @@ L2:
      GT  
      JMF  L3
 ; ENT.
-; Dirección de la variable N.
+; Direcciï¿½n de la variable N.
      SRF   0  5
 ; Acceso a la variable N.
      SRF   0  5
@@ -139,12 +139,12 @@ L2:
      SRF   0  6
      DRF  
      SBT  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
      JMP  L4
 L3:
 ; SI_NO.
-; Dirección de la variable N.
+; Direcciï¿½n de la variable N.
      SRF   0  5
 ; Acceso a la variable M.
      SRF   0  6
@@ -153,29 +153,29 @@ L3:
      SRF   0  5
      DRF  
      SBT  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
 L4:
 ; Fin SI.
-; Dirección de la variable X.
+; Direcciï¿½n de la variable X.
      SRF   0  3
 ; Acceso a la variable N.
      SRF   0  5
      DRF  
      STC  10
      DIV  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable Y.
+; Direcciï¿½n de la variable Y.
      SRF   0  4
 ; Acceso a la variable N.
      SRF   0  5
      DRF  
      STC  10
      MOD  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable M.
+; Direcciï¿½n de la variable M.
      SRF   0  6
      STC  10
 ; Acceso a la variable Y.
@@ -186,9 +186,9 @@ L4:
      SRF   0  3
      DRF  
      PLUS  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
-; Dirección de la variable N.
+; Direcciï¿½n de la variable N.
      SRF   0  5
 ; Acceso a la variable M.
      SRF   0  6
@@ -197,7 +197,7 @@ L4:
      SRF   0  5
      DRF  
      PLUS  
-; Asignación.
+; Asignaciï¿½n.
      ASG  
 ; Escribir.
 ; Acceso a la variable N.

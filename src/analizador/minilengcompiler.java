@@ -925,6 +925,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   ArrayList< String>lista=new ArrayList< String>();
   String etiqueta1="";
   String etiqueta2="";
+  boolean sino=false;
     try {
       t = jj_consume_token(tSI);
                 etiqueta1=codigo.getEtiqueta("SI");
@@ -939,9 +940,6 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_consume_token(tENT);
       lista = lista_sentencias();
           s.addAll(lista);
-          etiqueta2=codigo.getEtiqueta("SI");
-          s.add("\u005ct"+"JMP  "+etiqueta2+"\u005cn");
-          s.add(etiqueta1+":\u005cn");
       label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -954,16 +952,21 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         jj_consume_token(tSI_NO);
         lista = lista_sentencias();
-          s.add("SI_NO.\u005cn");
-          s.addAll(lista);
-          s.add(etiqueta2+":\u005cn");
+          sino=true;
+          etiqueta2=codigo.getEtiqueta("SI");
+          s.add("\u005ct"+"JMP  "+etiqueta2+"\u005cn");
       }
       jj_consume_token(tFSI);
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de si incorrecta");
     }
   s.add(etiqueta1+":\u005cn");
-  s.add(";Fin SI:\u005cn");
+  if(sino) {
+                s.add(" SI_NO.\u005cn");
+                s.addAll(lista);
+                s.add(etiqueta2+":\u005cn");
+        }
+  s.add("; Fin SI:\u005cn");
   {if (true) return s;}
     throw new Error("Missing return statement in function");
   }

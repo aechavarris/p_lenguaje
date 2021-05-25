@@ -93,7 +93,7 @@ L3:
 	STC  10
 	WRT  0
 L4:
-;Fin SI:
+; Fin SI:
 ; Fin de la accion / funcion es_primo.
 	CSF
 ; Comienzo del programa nprimos.
