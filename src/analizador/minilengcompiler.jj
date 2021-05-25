@@ -1014,7 +1014,7 @@ ArrayList< String> si():
 }
 { s.add(etiqueta1+":\n");
   if(sino) {
-		s.add(" SI_NO.\n");
+		s.add("; SI_NO.\n");
 		s.addAll(lista);
   	  	s.add(etiqueta2+":\n");
 	}
@@ -1599,11 +1599,12 @@ Elemento factor2():
 
 	} < tPC >
 	| t=< tCARAENT > < tPA > e=expresion(){
-	  	buff.add("\t"+"STC  "+Integer.parseInt(e.getCaracter().toString())+"\n"); 
+	  	
 	  	Integer en=null;
 		if(e.getTipo()==Tipo_variable.CHAR ) {
 		  if(e.getCaracter()!=null) { 
 			en=(int)e.getCaracter().charValue();
+			buff.add("\t"+"STC  "+en+"\n"); 
 			}
 		}else {
 		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -1666,7 +1667,7 @@ Elemento factor2():
 		e.setBuff(buff);
 	} 
 	| t=< tVALOR_CARACTER >{
-	  	buff.add("\t"+"STC  "+(int)t.image.charAt(0)+"\n");
+	  	buff.add("\t"+"STC  "+(int)t.image.charAt(1)+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CHAR);
 		e.setCaracter(t.image.charAt(1));
@@ -1680,7 +1681,7 @@ Elemento factor2():
 		
 	}
 	| t=< tVALOR_CADENA_VACIA >{
-	  	buff.add("\t"+"STC  "+(int)t.image.charAt(0)+"\n");
+	  	buff.add("\t"+"STC  "+0+"\n");
 	  	e.setPara(Clase_parametro.VAL);
 		e.setTipo(Tipo_variable.CADENA);
 		e.setCadena(t.image);

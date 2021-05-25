@@ -1,0 +1,508 @@
+; Programa adivinar.
+	ENP  L0
+; Accion siono.
+L1:
+; Comienzo de la accion siono.
+; Direccion de la variable c.
+	SRF  0  3
+	STC  32
+; Asignacion.
+	ASG
+L2:
+; MQ.
+; Acceso a la variable c.
+	SRF  0  3
+	DRF
+	STC  83
+	NEQ
+; Acceso a la variable c.
+	SRF  0  3
+	DRF
+	STC  78
+	NEQ
+	AND
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L3
+; Escribir.
+; cadena '(S/N)?'.
+	STC  40
+	WRT  0
+	STC  83
+	WRT  0
+	STC  47
+	WRT  0
+	STC  78
+	WRT  0
+	STC  41
+	WRT  0
+	STC  63
+	WRT  0
+; Leer.
+	SRF  0  3
+	RD  0
+; Leer.
+	SRF  0  4
+	RD  0
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L2
+L3:
+; Fin MQ.
+; Direccion de la variable respuesta.
+	SRF  1  3
+; Acceso a la variable c.
+	SRF  0  3
+	DRF
+; Asignacion.
+	ASG
+; Fin de la accion / funcion siono.
+	CSF
+; Accion pedirletra.
+L4:
+; Comienzo de la accion pedirletra.
+; Direccion de la variable c.
+	SRF  0  3
+	STC  32
+; Asignacion.
+	ASG
+L5:
+; MQ.
+; Acceso a la variable c.
+	SRF  0  3
+	DRF
+	STC  65
+	LT
+; Acceso a la variable c.
+	SRF  0  3
+	DRF
+	STC  90
+	GT
+	OR
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L6
+; Escribir.
+; cadena 'letra:'.
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  97
+	WRT  0
+	STC  58
+	WRT  0
+; Leer.
+	SRF  0  3
+	RD  0
+; Leer.
+	SRF  0  4
+	RD  0
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L5
+L6:
+; Fin MQ.
+; Direccion de la variable respuesta.
+	SRF  1  3
+; Acceso a la variable c.
+	SRF  0  3
+	DRF
+; Asignacion.
+	ASG
+; Fin de la accion / funcion pedirletra.
+	CSF
+; Comienzo del programa adivinar.
+L0:
+; Escribir.
+; cadena 'Piensa en una letra e intentare adivinarla.'.
+	STC  80
+	WRT  0
+	STC  105
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  115
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  105
+	WRT  0
+	STC  118
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  108
+	WRT  0
+	STC  97
+	WRT  0
+	STC  46
+	WRT  0
+	STC  13
+	WRT  0
+	STC  10
+	WRT  0
+; Escribir.
+; cadena 'Listo?'.
+	STC  76
+	WRT  0
+	STC  105
+	WRT  0
+	STC  115
+	WRT  0
+	STC  116
+	WRT  0
+	STC  111
+	WRT  0
+	STC  63
+	WRT  0
+; Invocacion a siono.
+	OSF  9  0 L1
+; Direccion de la variable min.
+	SRF  0  5
+	STC  65
+; Asignacion.
+	ASG
+; Direccion de la variable max.
+	SRF  0  6
+	STC  90
+; Asignacion.
+	ASG
+; Direccion de la variable headivinado.
+	SRF  0  7
+	STC  0
+; Asignacion.
+	ASG
+L7:
+; MQ.
+; Acceso a la variable min.
+	SRF  0  5
+	DRF
+; Acceso a la variable max.
+	SRF  0  6
+	DRF
+	NEQ
+; Acceso a la variable headivinado.
+	SRF  0  7
+	DRF
+	NGB
+	AND
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L8
+; Direccion de la variable letra.
+	SRF  0  4
+	STC  65
+; Asignacion.
+	ASG
+; Escribir.
+; caracter '('.
+	STC  40
+	WRT  0
+; Acceso a la variable min.
+	SRF  0  5
+	DRF
+	WRT  0
+; caracter ','.
+	STC  44
+	WRT  0
+; Acceso a la variable max.
+	SRF  0  6
+	DRF
+	WRT  0
+; caracter ')'.
+	STC  41
+	WRT  0
+; cadena ': has pensado en la letra '.
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  104
+	WRT  0
+	STC  97
+	WRT  0
+	STC  115
+	WRT  0
+	STC  32
+	WRT  0
+	STC  112
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  115
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+; Acceso a la variable letra.
+	SRF  0  4
+	DRF
+	WRT  0
+; caracter '?'.
+	STC  63
+	WRT  0
+; Invocacion a siono.
+	OSF  9  0 L1
+; SI.
+; Acceso a la variable respuesta.
+	SRF  0  3
+	DRF
+	STC  78
+	EQ
+	JMF  L9
+; ENT.
+; Escribir.
+; cadena 'La letra que has pensado es mayor?'.
+	STC  76
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  113
+	WRT  0
+	STC  117
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  104
+	WRT  0
+	STC  97
+	WRT  0
+	STC  115
+	WRT  0
+	STC  32
+	WRT  0
+	STC  112
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  115
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  32
+	WRT  0
+	STC  109
+	WRT  0
+	STC  97
+	WRT  0
+	STC  121
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  63
+	WRT  0
+; Invocacion a siono.
+	OSF  9  0 L1
+; SI.
+; Acceso a la variable respuesta.
+	SRF  0  3
+	DRF
+	STC  83
+	EQ
+	JMF  L10
+; ENT.
+; Direccion de la variable min.
+	SRF  0  5
+	STC  66
+; Asignacion.
+	ASG
+	JMP  L11
+L10:
+; SI_NO.
+; Direccion de la variable max.
+	SRF  0  6
+	STC  64
+; Asignacion.
+	ASG
+L11:
+; Fin SI:
+	JMP  L12
+L9:
+; SI_NO.
+; Direccion de la variable headivinado.
+	SRF  0  7
+	STC  1
+; Asignacion.
+	ASG
+L12:
+; Fin SI:
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L7
+L8:
+; Fin MQ.
+; SI.
+; Acceso a la variable headivinado.
+	SRF  0  7
+	DRF
+	NGB
+	JMF  L13
+; ENT.
+; Escribir.
+; cadena 'La letra es la '.
+	STC  76
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+; Acceso a la variable min.
+	SRF  0  5
+	DRF
+	WRT  0
+	STC  13
+	WRT  0
+	STC  10
+	WRT  0
+L13:
+; Fin SI:
+; Fin de programa adivinar.
+	LVP

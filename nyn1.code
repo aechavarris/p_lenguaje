@@ -129,7 +129,7 @@ L2:
 	DRF
 	GT
 	JMF  L3
-;ENT.
+; ENT.
 ; Direccion de la variable n.
 	SRF  0  5
 ; Acceso a la variable n.
@@ -143,7 +143,7 @@ L2:
 	ASG
 	JMP  L4
 L3:
-SI_NO.
+; SI_NO.
 ; Direccion de la variable n.
 	SRF  0  5
 ; Acceso a la variable m.
@@ -156,7 +156,7 @@ SI_NO.
 ; Asignacion.
 	ASG
 L4:
-;Fin SI:
+; Fin SI:
 ; Direccion de la variable x.
 	SRF  0  3
 ; Acceso a la variable n.

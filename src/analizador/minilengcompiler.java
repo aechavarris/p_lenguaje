@@ -962,7 +962,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     }
   s.add(etiqueta1+":\u005cn");
   if(sino) {
-                s.add(" SI_NO.\u005cn");
+                s.add("; SI_NO.\u005cn");
                 s.addAll(lista);
                 s.add(etiqueta2+":\u005cn");
         }
@@ -1692,11 +1692,11 @@ public class minilengcompiler implements minilengcompilerConstants {
         t = jj_consume_token(tCARAENT);
         jj_consume_token(tPA);
         e = expresion();
-                buff.add("\u005ct"+"STC  "+Integer.parseInt(e.getCaracter().toString())+"\u005cn");
                 Integer en=null;
                 if(e.getTipo()==Tipo_variable.CHAR ) {
                   if(e.getCaracter()!=null) {
                         en=(int)e.getCaracter().charValue();
+                        buff.add("\u005ct"+"STC  "+en+"\u005cn");
                         }
                 }else {
                   error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -1761,7 +1761,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         break;
       case tVALOR_CARACTER:
         t = jj_consume_token(tVALOR_CARACTER);
-                buff.add("\u005ct"+"STC  "+(int)t.image.charAt(0)+"\u005cn");
+                buff.add("\u005ct"+"STC  "+(int)t.image.charAt(1)+"\u005cn");
                 e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.CHAR);
                 e.setCaracter(t.image.charAt(1));
@@ -1775,7 +1775,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         break;
       case tVALOR_CADENA_VACIA:
         t = jj_consume_token(tVALOR_CADENA_VACIA);
-                buff.add("\u005ct"+"STC  "+(int)t.image.charAt(0)+"\u005cn");
+                buff.add("\u005ct"+"STC  "+0+"\u005cn");
                 e.setPara(Clase_parametro.VAL);
                 e.setTipo(Tipo_variable.CADENA);
                 e.setCadena(t.image);
