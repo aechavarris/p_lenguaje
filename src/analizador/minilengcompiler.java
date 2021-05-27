@@ -105,6 +105,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                         System.out.println("ERROR SEM\u00c1NTICO: <Accion incorrecta encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
                 }else if (except instanceof SimboloNoAsignableException) {
                         System.out.println("ERROR SEM\u00c1NTICO: <Simbolo no asignable encontrado en: " + name + "> en (<" + f  + ", " + col + ">)");
+                }else if (except instanceof VectorIndexException) {
+                        System.out.println("ERROR SEM\u00c1NTICO: <Acceso a elemento de vector incorrecto: " + name + "> en (<" + f  + ", " + col + ">)");
                 }
 
 
@@ -236,6 +238,10 @@ public class minilengcompiler implements minilengcompilerConstants {
                 try {
                         s=tabla_simbolos.buscar_simbolo(t.image);
                         el.setTipo(s.getVariable());
+                        el.setVector(s.ES_VECTOR());
+                        if(s.ES_VECTOR()) {
+                                        el.setLongitud(s.getLongitud());
+                        }
                         asig.add("; Direccion de la variable "+t.image+".\u005cn");
                         asig.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
                         if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
@@ -247,7 +253,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         s=tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
                                         direccion++;
                                         el.setTipo(Tipo_variable.DESCONOCIDO);
-
                                         if(s.ES_PARAMETRO()) {
                                                 el.setPara(s.getParametro());
                                 }
@@ -257,10 +262,14 @@ public class minilengcompiler implements minilengcompilerConstants {
       el1 = expresion();
         if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
 
-                if(el1.getTipo()!= el.getTipo()) {
+                if(el1.getTipo()!= el.getTipo() || (el.isVector() && !el1.isVector()) || (el1.isVector() && !el.isVector())) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
                 }else {
-                  asig.addAll(el1.getBuff());
+                  if(!(el.isVector() && el.getLongitud()!=el1.getLongitud())) {
+                        asig.addAll(el1.getBuff());
+                  }else {
+                        error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
+                  }
                 }
         }else {
                 error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
@@ -348,14 +357,36 @@ public class minilengcompiler implements minilengcompilerConstants {
   Tipo_variable tipo = null;
   ArrayList<Token > listaID = null;
   Token t=null;
+  boolean vector=false;
+  int v=0;
     try {
       tipo = tipo_variables();
       listaID = identificadores();
+                int corcheteA=0;
+                int corcheteB=0;
                 for(int i=0;i<listaID.size();i++) {
                   try {
+                    for(int j=0;j<listaID.get(i).image.length();j++) {
+                        if(listaID.get(i).image.charAt(j)=='[') {
+                                vector=true;
+                                corcheteA=j;
+                        }
+                        if(listaID.get(i).image.charAt(j)==']') {
+                                corcheteB=j;
+                        }
+              }
+              if(vector) {
+                        String e=listaID.get(i).image.substring(corcheteA+1,corcheteB);
+                        listaID.get(i).image=listaID.get(i).image.substring(0,corcheteA);
+                        v=Integer.parseInt(e);
+                        tabla_simbolos.introducir_variable_vector(listaID.get(i).image,tipo,v,nivel,direccion);
+                        direccion = direccion+v;
+                        tabla_simbolos.imprimirTabla();
+              }else {
                         tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
                         direccion=direccion+1;
                         tabla_simbolos.imprimirTabla();
+                  }
                   } catch(SimboloYaDeclaradoException e) {
                       t = listaID.get(i);
                           error_semantico(t.image, t.beginLine, t.beginColumn, e);
@@ -396,12 +427,38 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public ArrayList<Token> identificadores() throws ParseException {
   Token t=null;
+  Token r=null;
+  Elemento E=new Elemento();
   ArrayList<Token> listaID = new ArrayList<Token>();
+  boolean hayExpresion=false;
     try {
       t = jj_consume_token(tIDENTIFICADOR);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case tCORCH_I:
+                               hayExpresion=true;
+        jj_consume_token(tCORCH_I);
+        E = expresion();
+        jj_consume_token(tCORCH_D);
+        break;
+      default:
+        jj_la1[6] = jj_gen;
+        ;
+      }
                   if(t!=null){
-                                listaID.add(t);
-                        }
+                    if(hayExpresion) {
+                      if(E.getEntero()< 0) {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                      }else if(E.getTipo()!=Tipo_variable.ENTERO) {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                      }else {
+
+                                t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
+                          }
+                          hayExpresion=false;
+                    }
+                        listaID.add(t);
+                        E=null;
+                  }
       label_3:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -409,12 +466,34 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[6] = jj_gen;
+          jj_la1[7] = jj_gen;
           break label_3;
         }
         jj_consume_token(tCOMA);
         t = jj_consume_token(tIDENTIFICADOR);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case tCORCH_I:
+                                              hayExpresion=true;
+          jj_consume_token(tCORCH_I);
+          E = expresion();
+          jj_consume_token(tCORCH_D);
+          break;
+        default:
+          jj_la1[8] = jj_gen;
+          ;
+        }
                   if(t!=null){
+                    if(hayExpresion) {
+                      if(E.getEntero()< 0) {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                      }else if(E.getTipo()!=Tipo_variable.ENTERO) {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                      }else {
+
+                                t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
+                          }
+                          hayExpresion=false;
+                    }
                         listaID.add(t);
                         }
       }
@@ -436,7 +515,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[7] = jj_gen;
+          jj_la1[9] = jj_gen;
           break label_4;
         }
         declaracion = declaracion_accion();
@@ -506,7 +585,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         parametros = parametros_formales();
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[10] = jj_gen;
         ;
       }
       jj_consume_token(tFIN_SENTENCIA);
@@ -541,7 +620,7 @@ public class minilengcompiler implements minilengcompilerConstants {
             ;
             break;
           default:
-            jj_la1[9] = jj_gen;
+            jj_la1[11] = jj_gen;
             break label_5;
           }
           jj_consume_token(tFIN_SENTENCIA);
@@ -552,7 +631,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[12] = jj_gen;
         ;
       }
       jj_consume_token(tPC);
@@ -569,29 +648,60 @@ public class minilengcompiler implements minilengcompilerConstants {
   Clase_parametro clase=null;
   Simbolo s=null;
   Token t=null;
+  boolean vector=false;
+  int v=0;
   ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
     try {
       clase = clase_parametros();
       tipo = tipo_variables();
       tokens = identificadores();
+          int corcheteA=0;
+          int corcheteB=0;
           for(int i = 0; i < tokens.size(); i++) {
             try {
-                  s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
-                  parametros.add(s);
-                  direccion = direccion+1;
-                  tabla_simbolos.imprimirTabla();
+
+              for(int j=0;j<tokens.get(i).image.length();j++) {
+                        if(tokens.get(i).image.charAt(j)=='[') {
+                                vector=true;
+                                corcheteA=j;
+                        }
+                        if(tokens.get(i).image.charAt(j)==']') {
+                                corcheteB=j;
+                        }
+              }
+              if(vector) {
+                        String e=tokens.get(i).image.substring(corcheteA+1,corcheteB);
+                        tokens.get(i).image=tokens.get(i).image.substring(0,corcheteA);
+                        v=Integer.parseInt(e);
+                        s=tabla_simbolos.introducir_parametro_vector(tokens.get(i).image,tipo,clase,v,nivel,direccion);
+                        parametros.add(s);
+                        direccion = direccion+v;
+                        tabla_simbolos.imprimirTabla();
+              }else {
+                        s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+                        parametros.add(s);
+                        direccion = direccion+1;
+                        tabla_simbolos.imprimirTabla();
+                  }
                 } catch(SimboloYaDeclaradoException e) {
-                        //System.out.println("SIMBOLO YA EXISTE");
                         boolean end=false;
                         Integer n=1;
                         t = tokens.get(i);
                         while(!end) {
                          try {
-                                        s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
-                                        end=true;
-                                        parametros.add(s);
-                                        direccion = direccion+1;
-                                        tabla_simbolos.imprimirTabla();
+                                        if(vector) {
+                                                s=tabla_simbolos.introducir_parametro_vector(t.image+"_"+Integer.toString(n),tipo,clase,v,nivel,direccion);
+                                                end=true;
+                                                parametros.add(s);
+                                                direccion = direccion+v;
+                                                tabla_simbolos.imprimirTabla();
+                                        }else {
+                                                s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
+                                                end=true;
+                                                parametros.add(s);
+                                                direccion = direccion+1;
+                                                tabla_simbolos.imprimirTabla();
+                                        }
                                 } catch(SimboloYaDeclaradoException es) {n=n+1;}
                         }
                         error_semantico(t.image, t.beginLine, t.beginColumn, e);
@@ -617,7 +727,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                    clase=Clase_parametro.REF;
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[13] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -657,7 +767,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[12] = jj_gen;
+          jj_la1[14] = jj_gen;
           break label_6;
         }
         s = sentencia();
@@ -676,15 +786,51 @@ public class minilengcompiler implements minilengcompilerConstants {
   Token t=null;
   Token t1=null;
   Simbolo s=null;
+  boolean vector=false;
+  int v=0;
     try {
       t1 = jj_consume_token(tLEER);
       jj_consume_token(tPA);
       iden = identificadores();
       jj_consume_token(tPC);
+                int corcheteA=0;
+                int corcheteB=0;
                 for(int n=0;n<iden.size();n++) {
                   t=iden.get(n);
                   try {
+                    for(int j=0;j<iden.get(n).image.length();j++) {
+                        if(iden.get(n).image.charAt(j)=='[') {
+                                vector=true;
+                                corcheteA=j;
+                        }
+                        if(iden.get(n).image.charAt(j)==']') {
+                                corcheteB=j;
+                        }
+              }
+              if(vector) {
+                        String e=iden.get(n).image.substring(corcheteA+1,corcheteB);
+                        iden.get(n).image=iden.get(n).image.substring(0,corcheteA);
+                        v=Integer.parseInt(e);
                         s=tabla_simbolos.buscar_simbolo(t.image);
+                        if(s.getLongitud()< v+1 || v<0) {
+                                        error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                        }else {
+                                l.add("; Leer.\u005cn");
+                                l.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+v)+"\u005cn");
+                        }
+                        if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
+                                if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
+                                        error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
+                                }
+                                if(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.BOOLEANO) {
+                                        l.add("\u005ct"+"RD  1"+"\u005cn");
+                                }if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
+                                        l.add("\u005ct"+"RD  0"+"\u005cn");
+                                }
+                        }
+              }else {
+                        s=tabla_simbolos.buscar_simbolo(t.image);
+
                         l.add("; Leer.\u005cn");
                         l.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
                         if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
@@ -697,11 +843,17 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         l.add("\u005ct"+"RD  0"+"\u005cn");
                                 }
                         }
+                  }
                   }catch(SimboloNoEncontradoException e) {
                     error_semantico(t.image, t.beginLine, t.beginColumn, e);
                     try {
+                      if(vector) {
+                        s=tabla_simbolos.introducir_variable_vector(t.image,Tipo_variable.DESCONOCIDO,v,nivel,direccion);
+                        direccion=direccion +v;
+                      }else {
                         s=tabla_simbolos.introducir_variable(t.image,Tipo_variable.DESCONOCIDO,nivel,direccion);
                         direccion=direccion +1;
+                         }
                    }catch(SimboloYaDeclaradoException es) { }
 
                    }
@@ -801,11 +953,33 @@ public class minilengcompiler implements minilengcompilerConstants {
 
                         lista.add("; caracter '"+el1.getCaracter()+"'.\u005cn");
                   }
-                        lista.addAll(el1.getBuff());
+                        System.out.println(el1.getBuff().get(0));
+
                         if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
-                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                          if(el1.isVector()) {
+                            for(int n=0;n<el1.getLongitud();n++) {
+                                lista.add(el1.getBuff().get(n*3));
+                                    lista.add(el1.getBuff().get(n*3+1));
+                                    lista.add(el1.getBuff().get(n*3+2));
+                                        lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                                  }
+                          }else {
+                            lista.addAll(el1.getBuff());
+                            lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                          }
+
                         }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
-                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
+                                if(el1.isVector()) {
+                                  for(int n=0;n<el1.getLongitud();n++) {
+                                    lista.add(el1.getBuff().get(n*3));
+                                    lista.add(el1.getBuff().get(n*3+1));
+                                    lista.add(el1.getBuff().get(n*3+2));
+                                        lista.add("\u005ct"+"WRT  0"+"\u005cn");
+                                  }
+                          }else {
+                            lista.addAll(el1.getBuff());
+                            lista.add("\u005ct"+"WRT  0"+"\u005cn");
+                          }
                         }
 
                 }else if(el1.getTipo()==Tipo_variable.CADENA){
@@ -837,7 +1011,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[15] = jj_gen;
           break label_7;
         }
         t = jj_consume_token(tCOMA);
@@ -947,7 +1121,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[16] = jj_gen;
           break label_8;
         }
         jj_consume_token(tSI_NO);
@@ -992,7 +1166,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         lista = lista_expresiones(accion);
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[17] = jj_gen;
         ;
       }
       jj_consume_token(tPC);
@@ -1050,7 +1224,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[16] = jj_gen;
+          jj_la1[18] = jj_gen;
           break label_9;
         }
         t = jj_consume_token(tCOMA);
@@ -1123,6 +1297,8 @@ public class minilengcompiler implements minilengcompilerConstants {
         el.setPara(el1.getPara());
         el.setSimbolo(el1.getSimbolo());
         el.setComplex(el1.isComplex());
+        el.setVector(el1.isVector());
+        el.setLongitud(el1.getLongitud());
         if(el1.getTipo()!=null) {
                 switch(el1.getTipo()) {
                 case ENTERO:
@@ -1150,7 +1326,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[17] = jj_gen;
+          jj_la1[19] = jj_gen;
           break label_10;
         }
         o1 = operador_relacional();
@@ -1160,7 +1336,7 @@ public class minilengcompiler implements minilengcompilerConstants {
 
         if(o1!=null) {
                 el.setComplex(true);
-                if(el1.getTipo()==el2.getTipo()) {
+                if(el1.getTipo()==el2.getTipo() && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
 
                         el.setTipo(Tipo_variable.BOOLEANO);
                         if((el1.getEntero()!=null && el2.getEntero()!=null)) {
@@ -1235,6 +1411,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         }
                         }
                 }else {
+
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
         }else if(t!=null) {
@@ -1279,7 +1456,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       el.setComplex(true);
         break;
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[20] = jj_gen;
         ;
       }
       el1 = expresion3();
@@ -1288,6 +1465,8 @@ public class minilengcompiler implements minilengcompilerConstants {
         el.setPara(el1.getPara());
         el.setSimbolo(el1.getSimbolo());
         el.setComplex(el1.isComplex());
+        el.setVector(el1.isVector());
+        el.setLongitud(el1.getLongitud());
         if(el1.getTipo()!=null) {
                 switch(el1.getTipo()) {
                         case ENTERO:
@@ -1326,7 +1505,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[19] = jj_gen;
+          jj_la1[21] = jj_gen;
           break label_11;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1338,7 +1517,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           t = jj_consume_token(tOR);
           break;
         default:
-          jj_la1[20] = jj_gen;
+          jj_la1[22] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1348,8 +1527,8 @@ public class minilengcompiler implements minilengcompilerConstants {
         if(o2!=null) {
           t=token;
                 el.setComplex(true);
-                if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
-                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO ) {
+                        if(el1.getEntero()!=null && el2.getEntero()!=null && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
                                         el.setTipo(Tipo_variable.ENTERO);
                                         switch (o2) {
                                                 case SUMA:
@@ -1360,13 +1539,17 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         buff.add("\u005ct"+"SBT"+"\u005cn");
                                                         el.setEntero(el1.getEntero()-el2.getEntero());
                                         }
+                        }if(el1.isVector() || el2.isVector()) {
+
+                                        error_semantico(token.image, token.beginLine, token.beginColumn, new WrongExpresionException());
                         }
                 }else if(t!=null){
+
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
         }else if(t!=null) {
                 el.setComplex(true);
-                        if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
+                        if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO && !el1.isVector() && !el2.isVector()) {
                                 el.setTipo(Tipo_variable.BOOLEANO);
                                 if(el1.getBool()!=null && el2.getBool()!=null) {
                                         buff.add("\u005ct"+"OR"+"\u005cn");
@@ -1405,6 +1588,8 @@ public class minilengcompiler implements minilengcompilerConstants {
         el.setTipo(el1.getTipo());
         el.setPara(el1.getPara());
         el.setSimbolo(el1.getSimbolo());
+        el.setVector(el1.isVector());
+        el.setLongitud(el1.getLongitud());
         if(el1.getTipo()!=null) {
                 switch(el1.getTipo()) {
                         case ENTERO:
@@ -1431,7 +1616,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[23] = jj_gen;
           break label_12;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1445,19 +1630,19 @@ public class minilengcompiler implements minilengcompilerConstants {
           t = jj_consume_token(tAND);
           break;
         default:
-          jj_la1[22] = jj_gen;
+          jj_la1[24] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         el2 = factor();
      buff.addAll(el2.getBuff());
-     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) {
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO ) {
         if(o!=null) {
           t=token;
           el.setComplex(true);
 
-                if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
-                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
+                        if(el1.getEntero()!=null && el2.getEntero()!=null ) {
                                         el.setTipo(Tipo_variable.ENTERO);
                                         switch (o) {
                                                 case MULL:
@@ -1488,6 +1673,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         el.setEntero(el1.getEntero()%el2.getEntero());
                                                         }
                                         }
+                        }if(el1.isVector() || el2.isVector()) {
+                                        error_semantico(token.image, token.beginLine, token.beginColumn, new WrongExpresionException());
                         }
                 }else if(t!=null){
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -1548,7 +1735,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.NI;}
         break;
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[25] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1570,7 +1757,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.SUMA;}
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1600,7 +1787,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.MOD;}
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[27] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1620,7 +1807,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         t = jj_consume_token(tNOT);
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[28] = jj_gen;
         ;
       }
       el = factor2();
@@ -1651,9 +1838,11 @@ public class minilengcompiler implements minilengcompilerConstants {
 ///////////////////////////////EN CARAENT Y ENTACAR/////////////////////////////////
   static final public Elemento factor2() throws ParseException {
   Token t=null;
+  Elemento E=new Elemento();
   Simbolo s=null;
   ArrayList< String> buff=new ArrayList< String>();
   Elemento e=new Elemento();
+  boolean hayExpresion=false;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
@@ -1709,20 +1898,60 @@ public class minilengcompiler implements minilengcompilerConstants {
         break;
       case tIDENTIFICADOR:
         t = jj_consume_token(tIDENTIFICADOR);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case tCORCH_I:
+                                  hayExpresion=true;
+          jj_consume_token(tCORCH_I);
+          E = expresion();
+          jj_consume_token(tCORCH_D);
+          break;
+        default:
+          jj_la1[29] = jj_gen;
+          ;
+        }
            try {
+                int v=0;
                 s=tabla_simbolos.buscar_simbolo(t.image);
-                buff.add("; Acceso a la variable "+t.image+".\u005cn");
-                buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
-                buff.add("\u005ct"+"DRF"+"\u005cn");
+                if(hayExpresion) {
+                                if(E.getTipo()!=Tipo_variable.ENTERO) {
+                                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                                }else {
+                                        if(s.getLongitud()< E.getEntero() || E.getEntero()<0 ) {
+                                                error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                                        }else {
+                                                s=tabla_simbolos.buscar_simbolo(t.image);
+                                        buff.add("; Acceso a la variable "+t.image+".\u005cn");
+                                        buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\u005cn");
+                                        buff.add("\u005ct"+"DRF"+"\u005cn");
+                                        e.setPara(Clase_parametro.VAL);
+                                }
+                        }
+                    }else {
+                        if(s.ES_VECTOR() && !hayExpresion) {
+                                        for(int n=0;n<s.getLongitud();n++) {
+                                                buff.add("; Acceso a la variable "+t.image+"["+Integer.toString(n)+"]"+".\u005cn");
+                                        buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+n)+"\u005cn");
+                                        buff.add("\u005ct"+"DRF"+"\u005cn");
+                                        }
+                        }else {
+                                buff.add("; Acceso a la variable "+t.image+".\u005cn");
+                                buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
+                                buff.add("\u005ct"+"DRF"+"\u005cn");
+                        }
+                }
                 e.setSimbolo(s.getTipo());
                 if(s.ES_PARAMETRO()) {
                                 e.setPara(s.getParametro());
-                }if(s.ES_VARIABLE()) {
+                }if(s.ES_VARIABLE()&& !s.ES_VECTOR()) {
                                 e.setPara(Clase_parametro.REF);
                 }if(s.ES_PROGRAMA()) {
-                                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }if(s.ES_ACCION()) {
-                                        error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+                }if(s.ES_VECTOR()&& !hayExpresion) {
+                                e.setVector(true);
+                                e.setLongitud(s.getLongitud());
+                                e.setPara(s.getParametro());
                 }
                 e.setTipo(s.getVariable());
                 //Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
@@ -1806,7 +2035,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 e.setBuff(buff);
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[30] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1827,7 +2056,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[28];
+  static final private int[] jj_la1 = new int[31];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -1837,13 +2066,13 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xf000000,0x0,0x80000000,0xc000000,0xc000000,0xc000000,0x70200000,0x70200000,0x80000000,0xc000000,0x70200000,0x0,0x3000000,};
+      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xf000000,0x0,0x80000000,0xc000000,0xc000000,0xc000000,0x70200000,0x70200000,0x80000000,0xc000000,0x70200000,0x0,0x0,0x3000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x0,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xf004c100,0x0,0x3b,0x0,0x80,0x80,0x40,0x40,0x3b,0x0,0x0,0x100,0xf004c000,};
+      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x100000,0x0,0x100000,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xc004c100,0x0,0x3b,0x0,0x80,0x80,0x40,0x40,0x3b,0x0,0x0,0x100,0x100000,0xc004c000,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x2,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x4,0x0,0x0,0x2,0x8,0x0,0x2,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,};
+      jj_la1_2 = new int[] {0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x10,0x0,0x0,0x8,0x20,0x0,0xb,0x20,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xb,};
    }
 
   /** Constructor with InputStream. */
@@ -1864,7 +2093,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1878,7 +2107,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1895,7 +2124,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1905,7 +2134,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1921,7 +2150,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1930,7 +2159,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1981,12 +2210,12 @@ public class minilengcompiler implements minilengcompilerConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[68];
+    boolean[] la1tokens = new boolean[70];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 31; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -2001,7 +2230,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
       }
     }
-    for (int i = 0; i < 68; i++) {
+    for (int i = 0; i < 70; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

@@ -27,6 +27,20 @@ public class Elemento {
 	private Character caracter;
 	private String cadena;
 	private ArrayList<String> buff;
+	private boolean vector;
+	private int longitud;
+	public boolean isVector() {
+		return vector;
+	}
+	public void setVector(boolean vector) {
+		this.vector = vector;
+	}
+	public int getLongitud() {
+		return longitud;
+	}
+	public void setLongitud(int longitud) {
+		this.longitud = longitud;
+	}
 	public ArrayList<String> getBuff() {
 		return buff;
 	}

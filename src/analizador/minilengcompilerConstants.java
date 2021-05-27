@@ -93,37 +93,41 @@ public interface minilengcompilerConstants {
   /** RegularExpression Id. */
   int tPC = 51;
   /** RegularExpression Id. */
-  int DIGITO = 52;
+  int tCORCH_I = 52;
   /** RegularExpression Id. */
-  int LETRA = 53;
+  int tCORCH_D = 53;
   /** RegularExpression Id. */
-  int BOOLEAN = 54;
+  int DIGITO = 54;
   /** RegularExpression Id. */
-  int LETRAID_INICIAL = 55;
+  int LETRA = 55;
   /** RegularExpression Id. */
-  int LETRAID_FINAL = 56;
+  int BOOLEAN = 56;
   /** RegularExpression Id. */
-  int CARACTER = 57;
+  int LETRAID_INICIAL = 57;
   /** RegularExpression Id. */
-  int CADENA = 58;
+  int LETRAID_FINAL = 58;
   /** RegularExpression Id. */
-  int CADENA_VACIA = 59;
+  int CARACTER = 59;
   /** RegularExpression Id. */
-  int tVALOR_ENTERO = 60;
+  int CADENA = 60;
   /** RegularExpression Id. */
-  int tVALOR_CARACTER = 61;
+  int CADENA_VACIA = 61;
   /** RegularExpression Id. */
-  int tVALOR_CADENA = 62;
+  int tVALOR_ENTERO = 62;
   /** RegularExpression Id. */
-  int tVALOR_CADENA_VACIA = 63;
+  int tVALOR_CARACTER = 63;
   /** RegularExpression Id. */
-  int tVALOR_BOOLEANO = 64;
+  int tVALOR_CADENA = 64;
   /** RegularExpression Id. */
-  int tIDENTIFICADOR = 65;
+  int tVALOR_CADENA_VACIA = 65;
   /** RegularExpression Id. */
-  int tFIN_SENTENCIA = 66;
+  int tVALOR_BOOLEANO = 66;
   /** RegularExpression Id. */
-  int tCOMA = 67;
+  int tIDENTIFICADOR = 67;
+  /** RegularExpression Id. */
+  int tFIN_SENTENCIA = 68;
+  /** RegularExpression Id. */
+  int tCOMA = 69;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -186,6 +190,8 @@ public interface minilengcompilerConstants {
     "\"}\"",
     "\"(\"",
     "\")\"",
+    "\"[\"",
+    "\"]\"",
     "<DIGITO>",
     "<LETRA>",
     "<BOOLEAN>",

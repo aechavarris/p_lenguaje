@@ -119,6 +119,8 @@ public class minilengcompiler {
 			System.out.println("ERROR SEMÁNTICO: <Accion incorrecta encontrada en: " + name + "> en (<" + f  + ", " + col + ">)");
 		}else if (except instanceof SimboloNoAsignableException) {
 			System.out.println("ERROR SEMÁNTICO: <Simbolo no asignable encontrado en: " + name + "> en (<" + f  + ", " + col + ">)");
+		}else if (except instanceof VectorIndexException) {
+			System.out.println("ERROR SEMÁNTICO: <Acceso a elemento de vector incorrecto: " + name + "> en (<" + f  + ", " + col + ">)");
 		}
 		
 		
@@ -217,7 +219,9 @@ TOKEN : /* AGRUPACIONES */
   <  tLLAVE_IZQ : "{" >
 | <  tLLAVE_DCHA : "}" >
 | <  tPA : "(" >
-| <  tPC : ")" >   
+| <  tPC : ")" >
+| <  tCORCH_I : "[" >
+| <  tCORCH_D : "]" > 
 }
 
 TOKEN : /* VALORES */
@@ -232,7 +236,7 @@ TOKEN : /* VALORES */
 | < #CADENA_VACIA : "\"""\"" >
 
 | < tVALOR_ENTERO : (< DIGITO >)+ >
-| < tVALOR_CARACTER : ("-")?(< CARACTER >) >
+| < tVALOR_CARACTER : ("-")?(< CARACTER >) > 
 | < tVALOR_CADENA : ("-")?(< CADENA >) >
 | < tVALOR_CADENA_VACIA : ("-")?(< CADENA_VACIA >) >
 | < tVALOR_BOOLEANO : ("-")?(< BOOLEAN >) >
@@ -241,7 +245,7 @@ TOKEN : /* VALORES */
 
 TOKEN : /* FINES DE SENTENCIA */
 {
-  <  tFIN_SENTENCIA : ";" >
+  <  tFIN_SENTENCIA : ";" > 
 | <  tCOMA : "," >
 }
 
@@ -347,6 +351,10 @@ ArrayList< String> asignacion(Token t):
     		try { 
     			s=tabla_simbolos.buscar_simbolo(t.image);
     			el.setTipo(s.getVariable());
+    			el.setVector(s.ES_VECTOR());
+    			if(s.ES_VECTOR()) {
+					el.setLongitud(s.getLongitud());
+    			}
     			asig.add("; Direccion de la variable "+t.image+".\n");
     			asig.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
     			if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
@@ -358,7 +366,6 @@ ArrayList< String> asignacion(Token t):
 					s=tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO,nivel, direccion);
 					direccion++;
 					el.setTipo(Tipo_variable.DESCONOCIDO);
-				
 					if(s.ES_PARAMETRO()) {
 						el.setPara(s.getParametro());
 	     			}
@@ -369,10 +376,14 @@ ArrayList< String> asignacion(Token t):
   {
 	if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
 	  	
-		if(el1.getTipo()!= el.getTipo()) {
+		if(el1.getTipo()!= el.getTipo() || (el.isVector() && !el1.isVector()) || (el1.isVector() && !el.isVector())) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
 		}else {
-		  asig.addAll(el1.getBuff());			
+		  if(!(el.isVector() && el.getLongitud()!=el1.getLongitud())) {
+		  	asig.addAll(el1.getBuff());
+		  }else {
+			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
+		  }		
 		}
 	}else {
 		error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
@@ -450,16 +461,38 @@ void declaracion():
   Tipo_variable tipo = null;
   ArrayList<Token > listaID = null;
   Token t=null;
+  boolean vector=false;
+  int v=0;
 }
 {
   try { 
   	tipo=tipo_variables() listaID=identificadores()
   	{
+  	  	int corcheteA=0;
+  	  	int corcheteB=0;
 		for(int i=0;i<listaID.size();i++) {
-		  try { 
+		  try {
+		    for(int j=0;j<listaID.get(i).image.length();j++) {
+			if(listaID.get(i).image.charAt(j)=='[') {
+				vector=true;
+				corcheteA=j;
+			}
+			if(listaID.get(i).image.charAt(j)==']') {
+				corcheteB=j;
+			}
+  	      }
+  	      if(vector) {
+			String e=listaID.get(i).image.substring(corcheteA+1,corcheteB);
+			listaID.get(i).image=listaID.get(i).image.substring(0,corcheteA);
+			v=Integer.parseInt(e);
+			tabla_simbolos.introducir_variable_vector(listaID.get(i).image,tipo,v,nivel,direccion);
+		  	direccion = direccion+v;
+		  	tabla_simbolos.imprimirTabla();
+  	      }else { 
 			tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
 			direccion=direccion+1;
 			tabla_simbolos.imprimirTabla();
+		  }
 		  } catch(SimboloYaDeclaradoException e) {
 		      t = listaID.get(i);
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
@@ -489,18 +522,44 @@ Tipo_variable tipo_variables():
 ArrayList<Token> identificadores():
 {
   Token t=null;
+  Token r=null;
+  Elemento E=new Elemento();
   ArrayList<Token> listaID = new ArrayList<Token>();
+  boolean hayExpresion=false;
 }
 {
   try { 
-  	t=< tIDENTIFICADOR >
+  	t=< tIDENTIFICADOR >( {hayExpresion=true; }< tCORCH_I >E=expresion()< tCORCH_D >)?
   		{
   		  if(t!=null){
-				listaID.add(t);
-  	 		}
-  	  	} ( "," t=< tIDENTIFICADOR >
+  		    if(hayExpresion) {
+  		      if(E.getEntero()< 0) {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+  		      }else if(E.getTipo()!=Tipo_variable.ENTERO) {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+  		      }else { 
+  		      
+				t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
+			  }
+			  hayExpresion=false;
+  		    }
+			listaID.add(t);
+			E=null;
+  	 	  }
+  	  	} ( "," t=< tIDENTIFICADOR >({hayExpresion=true; }< tCORCH_I >E=expresion()< tCORCH_D >)?
   		{
   		  if(t!=null){
+  		    if(hayExpresion) {
+  		      if(E.getEntero()< 0) {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+  		      }else if(E.getTipo()!=Tipo_variable.ENTERO) {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+  		      }else { 
+  		      
+				t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
+			  }
+			  hayExpresion=false;
+  		    }
 			listaID.add(t);
   	 		}
   	  	} )*
@@ -633,31 +692,61 @@ ArrayList<Simbolo > parametros():
   Clase_parametro clase=null;
   Simbolo s=null;
   Token t=null;
+  boolean vector=false;
+  int v=0;
   ArrayList<Simbolo> parametros=new ArrayList<Simbolo>();
 }
 {
   try { 
   	clase=clase_parametros() tipo=tipo_variables() tokens=identificadores()
   	{
-  	  
+  	  int corcheteA=0;
+  	  int corcheteB=0;
   	  for(int i = 0; i < tokens.size(); i++) {
   	    try {
-		  s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
-		  parametros.add(s);
-		  direccion = direccion+1;
-		  tabla_simbolos.imprimirTabla();
+  	      
+  	      for(int j=0;j<tokens.get(i).image.length();j++) {
+			if(tokens.get(i).image.charAt(j)=='[') {
+				vector=true;
+				corcheteA=j;
+			}
+			if(tokens.get(i).image.charAt(j)==']') {
+				corcheteB=j;
+			}
+  	      }
+  	      if(vector) {
+			String e=tokens.get(i).image.substring(corcheteA+1,corcheteB);
+			tokens.get(i).image=tokens.get(i).image.substring(0,corcheteA);
+			v=Integer.parseInt(e);
+			s=tabla_simbolos.introducir_parametro_vector(tokens.get(i).image,tipo,clase,v,nivel,direccion);
+			parametros.add(s);
+		  	direccion = direccion+v;
+		  	tabla_simbolos.imprimirTabla();
+  	      }else { 
+		  	s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
+		  	parametros.add(s);
+		  	direccion = direccion+1;
+		  	tabla_simbolos.imprimirTabla();
+		  }
 		} catch(SimboloYaDeclaradoException e) {
-		  	//System.out.println("SIMBOLO YA EXISTE");
 		  	boolean end=false;
 		  	Integer n=1;
 		  	t = tokens.get(i);
 		  	while(!end) {
 		   	 try {
-					s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
-					end=true;
-		  			parametros.add(s);
-		  			direccion = direccion+1;
-		  			tabla_simbolos.imprimirTabla();
+		   	   		if(vector) {
+						s=tabla_simbolos.introducir_parametro_vector(t.image+"_"+Integer.toString(n),tipo,clase,v,nivel,direccion);
+						end=true;
+		  				parametros.add(s);
+		  				direccion = direccion+v;
+		  				tabla_simbolos.imprimirTabla();
+		   	   		}else { 
+						s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
+						end=true;
+		  				parametros.add(s);
+		  				direccion = direccion+1;
+		  				tabla_simbolos.imprimirTabla();
+		  			}
 				} catch(SimboloYaDeclaradoException es) {n=n+1;}
 		  	}
 		  	error_semantico(t.image, t.beginLine, t.beginColumn, e);
@@ -723,15 +812,51 @@ ArrayList< String> leer():
   Token t=null;
   Token t1=null;
   Simbolo s=null;
+  boolean vector=false;
+  int v=0;
 }
 {
   try { 
   	t1=< tLEER > < tPA > iden=identificadores() < tPC >
   	{
+  	  	int corcheteA=0;
+  	  	int corcheteB=0;
 		for(int n=0;n<iden.size();n++) {
 		  t=iden.get(n);
 		  try {
+		    for(int j=0;j<iden.get(n).image.length();j++) {
+			if(iden.get(n).image.charAt(j)=='[') {
+				vector=true;
+				corcheteA=j;
+			}
+			if(iden.get(n).image.charAt(j)==']') {
+				corcheteB=j;
+			}
+  	      }
+  	      if(vector) {
+			String e=iden.get(n).image.substring(corcheteA+1,corcheteB);
+			iden.get(n).image=iden.get(n).image.substring(0,corcheteA);
+			v=Integer.parseInt(e);
 			s=tabla_simbolos.buscar_simbolo(t.image);
+			if(s.getLongitud()< v+1 || v<0) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+			}else { 
+				l.add("; Leer.\n");
+				l.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+v)+"\n");
+			}
+			if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
+				if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
+				  	error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
+				}
+				if(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.BOOLEANO) {
+					l.add("\t"+"RD  1"+"\n");
+	  	 		}if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
+					l.add("\t"+"RD  0"+"\n");
+	  	 		}
+			}
+  	      }else {
+			s=tabla_simbolos.buscar_simbolo(t.image);
+			
 			l.add("; Leer.\n");
 			l.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
 			if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
@@ -744,11 +869,17 @@ ArrayList< String> leer():
 					l.add("\t"+"RD  0"+"\n");
 	  	 		}
 			}
+		  }
 		  }catch(SimboloNoEncontradoException e) {
 		    error_semantico(t.image, t.beginLine, t.beginColumn, e);
-		    try { 
+		    try {
+		      if(vector) {
+		        s=tabla_simbolos.introducir_variable_vector(t.image,Tipo_variable.DESCONOCIDO,v,nivel,direccion);
+		    	direccion=direccion +v;
+		      }else { 
 		    	s=tabla_simbolos.introducir_variable(t.image,Tipo_variable.DESCONOCIDO,nivel,direccion);
 		    	direccion=direccion +1;
+		  	 }
 		   }catch(SimboloYaDeclaradoException es) { }
 		    
 		   }
@@ -855,11 +986,33 @@ ArrayList< String> lista_escribibles():
 		     
 		  	lista.add("; caracter '"+el1.getCaracter()+"'.\n");
 		  }
-		  	lista.addAll(el1.getBuff());
+		  	System.out.println(el1.getBuff().get(0));
+		  	
 	  	 	if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
-	  	 	  	lista.add("\t"+"WRT  1"+"\n");
+	  	 	  if(el1.isVector()) {
+	  	 	    for(int n=0;n<el1.getLongitud();n++) {
+	  	 	        lista.add(el1.getBuff().get(n*3));
+				    lista.add(el1.getBuff().get(n*3+1));
+				    lista.add(el1.getBuff().get(n*3+2));  
+					lista.add("\t"+"WRT  1"+"\n");
+				  }
+	  	 	  }else {
+	  	 	    lista.addAll(el1.getBuff());
+	  	 	    lista.add("\t"+"WRT  1"+"\n");
+	  	 	  }
+	  	 	  
 	  	 	}if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
-				lista.add("\t"+"WRT  0"+"\n");
+				if(el1.isVector()) {
+				  for(int n=0;n<el1.getLongitud();n++) {
+				    lista.add(el1.getBuff().get(n*3));
+				    lista.add(el1.getBuff().get(n*3+1));
+				    lista.add(el1.getBuff().get(n*3+2));  
+					lista.add("\t"+"WRT  0"+"\n");
+				  }
+	  	 	  }else {
+	  	 	    lista.addAll(el1.getBuff());
+	  	 	    lista.add("\t"+"WRT  0"+"\n");
+	  	 	  }
 	  	 	}
 	  	 	
   		}else if(el1.getTipo()==Tipo_variable.CADENA){
@@ -1157,6 +1310,8 @@ Elemento expresion():
 	el.setPara(el1.getPara());
 	el.setSimbolo(el1.getSimbolo());
 	el.setComplex(el1.isComplex());
+	el.setVector(el1.isVector());
+	el.setLongitud(el1.getLongitud());
 	if(el1.getTipo()!=null) {
 		switch(el1.getTipo()) {
 		case ENTERO:
@@ -1178,7 +1333,7 @@ Elemento expresion():
        	
      	if(o1!=null) {
      	  	el.setComplex(true);
-       		if(el1.getTipo()==el2.getTipo()) {
+       		if(el1.getTipo()==el2.getTipo() && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
        		  
        		  	el.setTipo(Tipo_variable.BOOLEANO);
          		if((el1.getEntero()!=null && el2.getEntero()!=null)) {
@@ -1253,6 +1408,7 @@ Elemento expresion():
 					}
          		}
         	}else {
+        	    
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
         	}
      	}else if(t!=null) {
@@ -1303,6 +1459,8 @@ Elemento expresion2():
 	el.setPara(el1.getPara());
 	el.setSimbolo(el1.getSimbolo());
 	el.setComplex(el1.isComplex());
+	el.setVector(el1.isVector());
+	el.setLongitud(el1.getLongitud());
 	if(el1.getTipo()!=null) {
 		switch(el1.getTipo()) {
 			case ENTERO:
@@ -1338,8 +1496,8 @@ Elemento expresion2():
      	if(o2!=null) {
      	  t=token;
      	  	el.setComplex(true);
-       		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
-         		if(el1.getEntero()!=null && el2.getEntero()!=null) {
+       		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO ) {
+         		if(el1.getEntero()!=null && el2.getEntero()!=null && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
 					el.setTipo(Tipo_variable.ENTERO);
 					switch (o2) {
 						case SUMA:
@@ -1350,13 +1508,17 @@ Elemento expresion2():
 							buff.add("\t"+"SBT"+"\n");
 							el.setEntero(el1.getEntero()-el2.getEntero());
 					}
+         		}if(el1.isVector() || el2.isVector()) {
+         		  
+					error_semantico(token.image, token.beginLine, token.beginColumn, new WrongExpresionException());
          		}
         	}else if(t!=null){
+        	    
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
         	}
      	}else if(t!=null) {
      	  	el.setComplex(true);
-			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
+			if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO && !el1.isVector() && !el2.isVector()) {
 				el.setTipo(Tipo_variable.BOOLEANO);
 				if(el1.getBool()!=null && el2.getBool()!=null) {
 				  	buff.add("\t"+"OR"+"\n");
@@ -1400,6 +1562,8 @@ Elemento expresion3():
 	el.setTipo(el1.getTipo());
 	el.setPara(el1.getPara());
 	el.setSimbolo(el1.getSimbolo());
+	el.setVector(el1.isVector());
+	el.setLongitud(el1.getLongitud());
 	if(el1.getTipo()!=null) {
 		switch(el1.getTipo()) {
 			case ENTERO:
@@ -1417,13 +1581,13 @@ Elemento expresion3():
 	}
    }( (o=operador_multiplicativo()|t=< tAND >) el2=factor() {
      buff.addAll(el2.getBuff());
-     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO) { 
+     if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el2.getTipo()!=Tipo_variable.DESCONOCIDO ) { 
      	if(o!=null) {
      	  t=token;
      	  el.setComplex(true);
      	  	
-       		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO) {
-         		if(el1.getEntero()!=null && el2.getEntero()!=null) {
+       		if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
+         		if(el1.getEntero()!=null && el2.getEntero()!=null ) {
 					el.setTipo(Tipo_variable.ENTERO);
 					switch (o) {
 						case MULL:
@@ -1454,6 +1618,8 @@ Elemento expresion3():
 							el.setEntero(el1.getEntero()%el2.getEntero());
 							}
 					}
+         		}if(el1.isVector() || el2.isVector()) {
+					error_semantico(token.image, token.beginLine, token.beginColumn, new WrongExpresionException());
          		}
         	}else if(t!=null){
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -1567,9 +1733,11 @@ Elemento factor():
 Elemento factor2():
 {
   Token t=null;
+  Elemento E=new Elemento();
   Simbolo s=null;
   ArrayList< String> buff=new ArrayList< String>();
   Elemento e=new Elemento();
+  boolean hayExpresion=false;
 }
 {
   try {
@@ -1615,21 +1783,50 @@ Elemento factor2():
 		e.setBuff(buff);
 
 	} < tPC >
-	| t=< tIDENTIFICADOR > {
+	| t=< tIDENTIFICADOR >( { hayExpresion=true; }< tCORCH_I >E=expresion()< tCORCH_D >)? {
 	   try {
+	     	int v=0;
 	     	s=tabla_simbolos.buscar_simbolo(t.image);
-	     	buff.add("; Acceso a la variable "+t.image+".\n");
-	     	buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
-	     	buff.add("\t"+"DRF"+"\n");
+	     	if(hayExpresion) {
+				if(E.getTipo()!=Tipo_variable.ENTERO) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+				}else { 
+					if(s.getLongitud()< E.getEntero() || E.getEntero()<0 ) {
+						error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+					}else {
+					  	s=tabla_simbolos.buscar_simbolo(t.image);  
+		     			buff.add("; Acceso a la variable "+t.image+".\n");
+		     			buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\n");
+		     			buff.add("\t"+"DRF"+"\n");
+		     			e.setPara(Clase_parametro.VAL);
+		     		}
+	     		}		
+  		    }else { 
+	     		if(s.ES_VECTOR() && !hayExpresion) {
+					for(int n=0;n<s.getLongitud();n++) {
+						buff.add("; Acceso a la variable "+t.image+"["+Integer.toString(n)+"]"+".\n");
+	     				buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+n)+"\n");
+	     				buff.add("\t"+"DRF"+"\n");
+					}
+	     		}else { 
+		     		buff.add("; Acceso a la variable "+t.image+".\n");
+		     		buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
+		     		buff.add("\t"+"DRF"+"\n");
+	     		}
+	    	}
 	     	e.setSimbolo(s.getTipo());
 	     	if(s.ES_PARAMETRO()) {
-				e.setPara(s.getParametro());
-	     	}if(s.ES_VARIABLE()) {
+				e.setPara(s.getParametro()); 
+	     	}if(s.ES_VARIABLE()&& !s.ES_VECTOR()) {
 				e.setPara(Clase_parametro.REF);
 	     	}if(s.ES_PROGRAMA()) {
-					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 	     	}if(s.ES_ACCION()) {
-					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
+	     	}if(s.ES_VECTOR()&& !hayExpresion) {
+				e.setVector(true);
+				e.setLongitud(s.getLongitud());
+				e.setPara(s.getParametro());
 	     	}
 	     	e.setTipo(s.getVariable());
 	     	//Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
