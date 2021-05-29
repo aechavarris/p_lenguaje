@@ -8,32 +8,29 @@ L1:
 	STC  2
 ; Asignacion.
 	ASG
-; Escribir.
-; Acceso a la variable car[0].
+; Direccion de la variable car.
 	SRF  1  5
+; Acceso a la variable j.
+	SRF  0  3
 	DRF
-	WRT  0
-; Acceso a la variable car[1].
-	SRF  1  6
-	DRF
-	WRT  0
-; Acceso a la variable car[2].
-	SRF  1  7
-	DRF
-	WRT  0
-; Acceso a la variable car[3].
-	SRF  1  8
-	DRF
-	WRT  0
-; Acceso a la variable car[4].
-	SRF  1  9
-	DRF
-	WRT  0
-; Direccion de la variable a.
-	SRF  1  13
 	STC  1
+	PLUS
+	PLUS
+	STC  97
 ; Asignacion.
 	ASG
+; Escribir.
+; Acceso a la variable car.
+	SRF  1  5
+; Acceso a la variable j.
+	SRF  0  3
+	DRF
+; Acceso a la variable a.
+	SRF  1  14
+	DRF
+	PLUS
+	PLUS
+	WRT  0
 ; Direccion de la variable divisible.
 	SRF  0  4
 	STC  0
@@ -146,7 +143,7 @@ L5:
 ; Salir del bucle si la guarda se evalua a falso.
 	JMF  L6
 ; Invocacion a es_primo.
-	OSF  13  0 L1
+	OSF  14  0 L1
 ; Direccion de la variable i.
 	SRF  0  4
 ; Acceso a la variable i.

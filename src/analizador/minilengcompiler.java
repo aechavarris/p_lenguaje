@@ -174,6 +174,8 @@ public class minilengcompiler implements minilengcompilerConstants {
   Token t=null;
   ArrayList<String> sentencia=new ArrayList<String>();
   ArrayList<String> s=new ArrayList<String>();
+  boolean hayExpresion=false;
+  Elemento E=new Elemento();
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tLEER:
@@ -216,6 +218,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tOAS:
+      case tCORCH_I:
         asig = asignacion(t);
         break;
       default:
@@ -231,22 +234,18 @@ public class minilengcompiler implements minilengcompilerConstants {
 
   static final public ArrayList< String> asignacion(Token t) throws ParseException {
   Simbolo s=null;
+  Elemento E=new Elemento();
   Elemento el=new Elemento();
   Elemento el1=new Elemento();
   ArrayList< String> asig=new ArrayList< String>();
+  boolean hayExpresion=false;
     try {
-                try {
-                        s=tabla_simbolos.buscar_simbolo(t.image);
-                        el.setTipo(s.getVariable());
-                        el.setVector(s.ES_VECTOR());
-                        if(s.ES_VECTOR()) {
-                                        el.setLongitud(s.getLongitud());
-                        }
-                        asig.add("; Direccion de la variable "+t.image+".\u005cn");
-                        asig.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
-                        if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
-                                        error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
-                        }
+        try {
+                s=tabla_simbolos.buscar_simbolo(t.image);
+                el.setTipo(s.getVariable());
+                if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
+                }
                 }catch(SimboloNoEncontradoException e) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, e);
                         try {
@@ -258,8 +257,25 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 }
                                 }catch(SimboloYaDeclaradoException ex) {}
                 }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case tCORCH_I:
+        jj_consume_token(tCORCH_I);
+               hayExpresion=true;
+        E = expresion();
+        jj_consume_token(tCORCH_D);
+        break;
+      default:
+        jj_la1[3] = jj_gen;
+        ;
+      }
       jj_consume_token(tOAS);
       el1 = expresion();
+     asig.add("; Direccion de la variable "+t.image+".\u005cn");
+     asig.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
+     if(hayExpresion) {
+        asig.addAll(E.getBuff());
+                asig.add("\u005ct"+"PLUS"+"\u005cn");
+     }
         if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
 
                 if(el1.getTipo()!= el.getTipo() || (el.isVector() && !el1.isVector()) || (el1.isVector() && !el.isVector())) {
@@ -277,7 +293,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis de asignacion incorrecta");
     }
-  asig.add("; Asignacion.\u005cn");
+ asig.add("; Asignacion.\u005cn");
   asig.add("\u005ct"+"ASG"+"\u005cn");
   {if (true) return asig;}
     throw new Error("Missing return statement in function");
@@ -305,7 +321,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                     hayLista=true;
         break;
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[4] = jj_gen;
         ;
       }
      {invocacion.addAll(parametros);
@@ -342,7 +358,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[4] = jj_gen;
+          jj_la1[5] = jj_gen;
           break label_2;
         }
         declaracion();
@@ -414,7 +430,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          tipo=Tipo_variable.BOOLEANO;
         break;
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -441,7 +457,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         jj_consume_token(tCORCH_D);
         break;
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[7] = jj_gen;
         ;
       }
                   if(t!=null){
@@ -466,7 +482,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[7] = jj_gen;
+          jj_la1[8] = jj_gen;
           break label_3;
         }
         jj_consume_token(tCOMA);
@@ -479,7 +495,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_consume_token(tCORCH_D);
           break;
         default:
-          jj_la1[8] = jj_gen;
+          jj_la1[9] = jj_gen;
           ;
         }
                   if(t!=null){
@@ -515,7 +531,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[9] = jj_gen;
+          jj_la1[10] = jj_gen;
           break label_4;
         }
         declaracion = declaracion_accion();
@@ -585,7 +601,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         parametros = parametros_formales();
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[11] = jj_gen;
         ;
       }
       jj_consume_token(tFIN_SENTENCIA);
@@ -620,7 +636,7 @@ public class minilengcompiler implements minilengcompilerConstants {
             ;
             break;
           default:
-            jj_la1[11] = jj_gen;
+            jj_la1[12] = jj_gen;
             break label_5;
           }
           jj_consume_token(tFIN_SENTENCIA);
@@ -631,7 +647,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         break;
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[13] = jj_gen;
         ;
       }
       jj_consume_token(tPC);
@@ -727,7 +743,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                    clase=Clase_parametro.REF;
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[14] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -767,7 +783,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[15] = jj_gen;
           break label_6;
         }
         s = sentencia();
@@ -948,12 +964,13 @@ public class minilengcompiler implements minilengcompilerConstants {
     try {
       el1 = expresion();
                 lista.add("; Escribir.\u005cn");
-                if(el1.getTipo()==Tipo_variable.CHAR) {
-                  if((int)el1.getCaracter()>=32 && (int)el1.getCaracter() <=254 && el1.getPara()==Clase_parametro.VAL) {
 
-                        lista.add("; caracter '"+el1.getCaracter()+"'.\u005cn");
+                if(el1.getTipo()==Tipo_variable.CHAR) {
+                  if(el1.getCaracter()!=null) {
+                          if((int)el1.getCaracter()>=32 && (int)el1.getCaracter() <=254 && el1.getPara()==Clase_parametro.VAL) {
+                                lista.add("; caracter '"+el1.getCaracter()+"'.\u005cn");
+                          }
                   }
-                        System.out.println(el1.getBuff().get(0));
 
                         if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
                           if(el1.isVector()) {
@@ -1011,7 +1028,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[15] = jj_gen;
+          jj_la1[16] = jj_gen;
           break label_7;
         }
         t = jj_consume_token(tCOMA);
@@ -1121,7 +1138,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[16] = jj_gen;
+          jj_la1[17] = jj_gen;
           break label_8;
         }
         jj_consume_token(tSI_NO);
@@ -1166,7 +1183,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         lista = lista_expresiones(accion);
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         ;
       }
       jj_consume_token(tPC);
@@ -1224,7 +1241,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[18] = jj_gen;
+          jj_la1[19] = jj_gen;
           break label_9;
         }
         t = jj_consume_token(tCOMA);
@@ -1326,7 +1343,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[19] = jj_gen;
+          jj_la1[20] = jj_gen;
           break label_10;
         }
         o1 = operador_relacional();
@@ -1339,75 +1356,104 @@ public class minilengcompiler implements minilengcompilerConstants {
                 if(el1.getTipo()==el2.getTipo() && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
 
                         el.setTipo(Tipo_variable.BOOLEANO);
-                        if((el1.getEntero()!=null && el2.getEntero()!=null)) {
+                        if(el1.getTipo()==Tipo_variable.ENTERO) {
 
                                         switch (o1) {
                                                 case MAYOR:
                                                         buff.add("\u005ct"+"GT"+"\u005cn");
-                                                        el.setBool(el1.getEntero()>el2.getEntero());
+                                                        if((el1.getEntero()!=null && el2.getEntero()!=null)) {
+                                                                el.setBool(el1.getEntero()>el2.getEntero());
+                                                        }
                                                         break;
                                                 case MENOR:
                                                         buff.add("\u005ct"+"LT"+"\u005cn");
-                                                        el.setBool(el1.getEntero()<el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setBool(el1.getEntero()<el2.getEntero());
+                                                        }
                                                         break;
                                                 case IGUAL:
                                                         buff.add("\u005ct"+"EQ"+"\u005cn");
-                                                        el.setBool(el1.getEntero()==el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setBool(el1.getEntero()==el2.getEntero());
+                                                        }
                                                         break;
                                                 case MAI:
                                                         buff.add("\u005ct"+"GTE"+"\u005cn");
-                                                        el.setBool(el1.getEntero()>=el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setBool(el1.getEntero()>=el2.getEntero());
+                                                        }
                                                         break;
                                                 case MEI:
                                                         buff.add("\u005ct"+"LTE"+"\u005cn");
-                                                        el.setBool(el1.getEntero()<=el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setBool(el1.getEntero()<=el2.getEntero());
+                                                        }
                                                         break;
                                                 case NI:
                                                         buff.add("\u005ct"+"NEQ"+"\u005cn");
-                                                        el.setBool(el1.getEntero()!=el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setBool(el1.getEntero()!=el2.getEntero());
+                                                        }
                                         }
-                        }else if(el1.getBool()!=null && el2.getBool()!=null) {
+                        }else if(el1.getTipo()==Tipo_variable.BOOLEANO) {
                                         switch (o1) {
                                                 case IGUAL:
                                                         buff.add("\u005ct"+"EQ"+"\u005cn");
-                                                        el.setBool(el1.getBool()==el2.getBool());
+                                                        if(el1.getBool()!=null && el2.getBool()!=null) {
+                                                                el.setBool(el1.getBool()==el2.getBool());
+                                                        }
                                                         break;
                                                 case NI:
                                                         buff.add("\u005ct"+"NEQ"+"\u005cn");
-                                                        el.setBool(el1.getBool()!=el2.getBool());
+                                                        if(el1.getBool()!=null && el2.getBool()!=null) {
+                                                                el.setBool(el1.getBool()!=el2.getBool());
+                                                        }
                                                         break;
                                                 default:
+                                                System.out.println(buff);
                                                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                                         }
-                        }else if(el1.getCadena()!=null && el2.getCadena()!=null) {
+                        }else if(el.getTipo()==Tipo_variable.CADENA) {
 
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 
-                        }else if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                        }else if(el.getTipo()==Tipo_variable.CHAR) {
                                         switch (o1) {
                                                 case MAYOR:
                                                         buff.add("\u005ct"+"GT"+"\u005cn");
-                                                        el.setBool(el1.getCaracter()>el2.getCaracter());
+                                                        if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                                                el.setBool(el1.getCaracter()>el2.getCaracter());
+                                                        }
                                                         break;
                                                 case MENOR:
                                                         buff.add("\u005ct"+"LT"+"\u005cn");
-                                                        el.setBool(el1.getCaracter()<el2.getCaracter());
+                                                        if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                                                el.setBool(el1.getCaracter()<el2.getCaracter());
+                                                        }
                                                         break;
                                                 case IGUAL:
                                                         buff.add("\u005ct"+"EQ"+"\u005cn");
-                                                        el.setBool(el1.getCaracter()==el2.getCaracter());
+                                                        if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                                                el.setBool(el1.getCaracter()==el2.getCaracter());
+                                                        }
                                                         break;
                                                 case MAI:
                                                         buff.add("\u005ct"+"GTE"+"\u005cn");
-                                                        el.setBool(el1.getCaracter()>=el2.getCaracter());
+                                                        if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                                                el.setBool(el1.getCaracter()>=el2.getCaracter());
+                                                        }
                                                         break;
                                                 case MEI:
                                                         buff.add("\u005ct"+"LTE"+"\u005cn");
-                                                        el.setBool(el1.getCaracter()<=el2.getCaracter());
+                                                        if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                                                el.setBool(el1.getCaracter()<=el2.getCaracter());
+                                                        }
                                                         break;
                                                 case NI:
                                                         buff.add("\u005ct"+"NEQ"+"\u005cn");
-                                                        el.setBool(el1.getCaracter()!=el2.getCaracter());
+                                                        if(el1.getCaracter()!=null && el2.getCaracter()!=null) {
+                                                                el.setBool(el1.getCaracter()!=el2.getCaracter());
+                                                        }
                                         }
                         }
                 }else {
@@ -1456,7 +1502,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       el.setComplex(true);
         break;
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[21] = jj_gen;
         ;
       }
       el1 = expresion3();
@@ -1505,7 +1551,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[22] = jj_gen;
           break label_11;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1517,7 +1563,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           t = jj_consume_token(tOR);
           break;
         default:
-          jj_la1[22] = jj_gen;
+          jj_la1[23] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1528,16 +1574,20 @@ public class minilengcompiler implements minilengcompilerConstants {
           t=token;
                 el.setComplex(true);
                 if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO ) {
-                        if(el1.getEntero()!=null && el2.getEntero()!=null && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
+                        if(!(el1.isVector() && el.isComplex()) && !el2.isVector()) {
                                         el.setTipo(Tipo_variable.ENTERO);
                                         switch (o2) {
                                                 case SUMA:
                                                         buff.add("\u005ct"+"PLUS"+"\u005cn");
-                                                        el.setEntero(el1.getEntero()+el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setEntero(el1.getEntero()+el2.getEntero());
+                                                        }
                                                         break;
                                                 case RESTA:
                                                         buff.add("\u005ct"+"SBT"+"\u005cn");
-                                                        el.setEntero(el1.getEntero()-el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null) {
+                                                                el.setEntero(el1.getEntero()-el2.getEntero());
+                                                        }
                                         }
                         }if(el1.isVector() || el2.isVector()) {
 
@@ -1551,8 +1601,8 @@ public class minilengcompiler implements minilengcompilerConstants {
                 el.setComplex(true);
                         if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO && !el1.isVector() && !el2.isVector()) {
                                 el.setTipo(Tipo_variable.BOOLEANO);
+                                buff.add("\u005ct"+"OR"+"\u005cn");
                                 if(el1.getBool()!=null && el2.getBool()!=null) {
-                                        buff.add("\u005ct"+"OR"+"\u005cn");
                                         el.setBool(el1.getBool() || el2.getBool());
                                 }
                         }else {
@@ -1616,7 +1666,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[24] = jj_gen;
           break label_12;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1630,7 +1680,7 @@ public class minilengcompiler implements minilengcompilerConstants {
           t = jj_consume_token(tAND);
           break;
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[25] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1642,38 +1692,49 @@ public class minilengcompiler implements minilengcompilerConstants {
           el.setComplex(true);
 
                 if(el1.getTipo()==Tipo_variable.ENTERO && el2.getTipo()==Tipo_variable.ENTERO && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
-                        if(el1.getEntero()!=null && el2.getEntero()!=null ) {
                                         el.setTipo(Tipo_variable.ENTERO);
                                         switch (o) {
                                                 case MULL:
                                                         buff.add("\u005ct"+"TMS"+"\u005cn");
-                                                        el.setEntero(el1.getEntero()*el2.getEntero());
+                                                        if(el1.getEntero()!=null && el2.getEntero()!=null ) {
+                                                                el.setEntero(el1.getEntero()*el2.getEntero());
+                                                        }
                                                         break;
                                                 case DIV:
                                                         buff.add("\u005ct"+"DIV"+"\u005cn");
                                                         if(el2.getEntero()==0) {
                                                                 error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
                                                         }else {
+                                                          if(el1.getEntero()!=null && el2.getEntero()!=null ) {
                                                                 el.setEntero(el1.getEntero()/el2.getEntero());
+                                                          }
                                                         }
                                                         break;
                                                 case DIV1:
                                                         buff.add("\u005ct"+"DIV"+"\u005cn");
-                                                        if(el2.getEntero()==0) {
-                                                                error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
-                                                        }else {
-                                                                el.setEntero(el1.getEntero()/el2.getEntero());
-                                                        }
+
+                                                          if(el1.getEntero()!=null && el2.getEntero()!=null ) {
+                                                            if(el2.getEntero()==0) {
+                                                                        error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
+                                                                }else {
+                                                                        el.setEntero(el1.getEntero()/el2.getEntero());
+                                                                }
+                                                          }
+
                                                         break;
                                                 case MOD:
                                                         buff.add("\u005ct"+"MOD"+"\u005cn");
-                                                        if(el2.getEntero()==0) {
-                                                                error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
-                                                        }else {
-                                                        el.setEntero(el1.getEntero()%el2.getEntero());
+
+                                                          if(el1.getEntero()!=null && el2.getEntero()!=null ) {
+                                                            if(el2.getEntero()==0) {
+                                                                        error_semantico(t.image, t.beginLine, t.beginColumn, new DivZeroException());
+                                                                }else {
+                                                                        el.setEntero(el1.getEntero()%el2.getEntero());
+                                                                }
                                                         }
+
                                         }
-                        }if(el1.isVector() || el2.isVector()) {
+                        if(el1.isVector() || el2.isVector()) {
                                         error_semantico(token.image, token.beginLine, token.beginColumn, new WrongExpresionException());
                         }
                 }else if(t!=null){
@@ -1683,11 +1744,12 @@ public class minilengcompiler implements minilengcompilerConstants {
                 el.setComplex(true);
                         if(el1.getTipo()==Tipo_variable.BOOLEANO && el2.getTipo()==Tipo_variable.BOOLEANO) {
                                 el.setTipo(Tipo_variable.BOOLEANO);
+                                buff.add("\u005ct"+"AND"+"\u005cn");
                                 if(el1.getBool()!=null && el2.getBool()!=null) {
                                         el.setBool(el1.getBool() && el2.getBool());
-                                        buff.add("\u005ct"+"AND"+"\u005cn");
                                 }
                         }else {
+
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                         }
         }
@@ -1735,7 +1797,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.NI;}
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1757,7 +1819,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.SUMA;}
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[27] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1787,7 +1849,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                          {if (true) return op.MOD;}
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[28] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1807,7 +1869,7 @@ public class minilengcompiler implements minilengcompilerConstants {
         t = jj_consume_token(tNOT);
         break;
       default:
-        jj_la1[28] = jj_gen;
+        jj_la1[29] = jj_gen;
         ;
       }
       el = factor2();
@@ -1818,6 +1880,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 el.setBool(!el.getBool());
                         }
                 }else {
+
                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
 
@@ -1869,6 +1932,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
                         }
                 }else {
+
                   error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                 }
                 e=new Elemento();
@@ -1906,24 +1970,33 @@ public class minilengcompiler implements minilengcompilerConstants {
           jj_consume_token(tCORCH_D);
           break;
         default:
-          jj_la1[29] = jj_gen;
+          jj_la1[30] = jj_gen;
           ;
         }
            try {
                 int v=0;
+
                 s=tabla_simbolos.buscar_simbolo(t.image);
                 if(hayExpresion) {
                                 if(E.getTipo()!=Tipo_variable.ENTERO) {
+
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                                 }else {
-                                        if(s.getLongitud()< E.getEntero() || E.getEntero()<0 ) {
-                                                error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
-                                        }else {
-                                                s=tabla_simbolos.buscar_simbolo(t.image);
-                                        buff.add("; Acceso a la variable "+t.image+".\u005cn");
-                                        buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\u005cn");
-                                        buff.add("\u005ct"+"DRF"+"\u005cn");
-                                        e.setPara(Clase_parametro.VAL);
+                                        if(E.getEntero()!=null) {
+                                                if(s.getLongitud()< E.getEntero() || E.getEntero()<0 ) {
+                                                        error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                                                }else {
+
+                                                buff.add("; Acceso a la variable "+t.image+".\u005cn");
+                                                buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\u005cn");
+                                                buff.add("\u005ct"+"DRF"+"\u005cn");
+                                                e.setPara(Clase_parametro.VAL);
+                                        }
+                                }else {
+                                                buff.add("; Acceso a la variable "+t.image+".\u005cn");
+                                        buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
+                                        buff.addAll(E.getBuff());
+                                        buff.add("\u005ct"+"PLUS"+"\u005cn");
                                 }
                         }
                     }else {
@@ -1956,23 +2029,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                 e.setTipo(s.getVariable());
                 //Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
                 //con un valor por defecto, mas adelante se le dara el valor correspondiente
-                if(e.getSimbolo()==Tipo_simbolo.VARIABLE || e.getSimbolo()==Tipo_simbolo.PARAMETRO) {
-                        switch (e.getTipo()) {
-                                        case ENTERO:
-                                        e.setEntero(1);
-                                        break;
-                                        case BOOLEANO:
-                                        e.setBool(true);
-                                        break;
-                                        case CHAR:
-                                        e.setCaracter('A');
-                                        break;
-                                        case CADENA:
-                                        e.setCadena("A");
-                                        break;
-                                        default:
-                        }
-                }
              }catch(SimboloNoEncontradoException es) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, es);
                         try {
@@ -2035,7 +2091,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 e.setBuff(buff);
         break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[31] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -2056,7 +2112,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[31];
+  static final private int[] jj_la1 = new int[32];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -2066,13 +2122,13 @@ public class minilengcompiler implements minilengcompilerConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xf000000,0x0,0x80000000,0xc000000,0xc000000,0xc000000,0x70200000,0x70200000,0x80000000,0xc000000,0x70200000,0x0,0x0,0x3000000,};
+      jj_la1_0 = new int[] {0x8000,0xca8000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1000,0x0,0x0,0x0,0x0,0xca8000,0x0,0x4000,0xf000000,0x0,0x80000000,0xc000000,0xc000000,0xc000000,0x70200000,0x70200000,0x80000000,0xc000000,0x70200000,0x0,0x0,0x3000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x4,0x40000,0xe00,0xe00,0x100000,0x0,0x100000,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xc004c100,0x0,0x3b,0x0,0x80,0x80,0x40,0x40,0x3b,0x0,0x0,0x100,0x100000,0xc004c000,};
+      jj_la1_1 = new int[] {0x0,0x0,0x100004,0x100000,0x40000,0xe00,0xe00,0x100000,0x0,0x100000,0x0,0x40000,0x0,0x3000,0x3000,0x0,0x0,0x0,0xc004c100,0x0,0x3b,0x0,0x80,0x80,0x40,0x40,0x3b,0x0,0x0,0x100,0x100000,0xc004c000,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x10,0x0,0x0,0x8,0x20,0x0,0xb,0x20,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xb,};
+      jj_la1_2 = new int[] {0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x10,0x0,0x0,0x8,0x20,0x0,0xb,0x20,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xb,};
    }
 
   /** Constructor with InputStream. */
@@ -2093,7 +2149,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 32; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2107,7 +2163,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 32; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -2124,7 +2180,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 32; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2134,7 +2190,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 32; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -2150,7 +2206,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 32; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2159,7 +2215,7 @@ public class minilengcompiler implements minilengcompilerConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 32; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -2215,7 +2271,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 31; i++) {
+    for (int i = 0; i < 32; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

@@ -4,6 +4,7 @@ programa nprimos;
 
     entero n, i;
 	caracter car[5],car2[3];
+	caracter t;
 	entero a;
 
     %------------------------------------------------------
@@ -14,8 +15,8 @@ programa nprimos;
 
     principio
       j := 2;
-	  escribir(car);
-	  a:=1;
+	  car[j+1]:="a";
+	  escribir(car[j+a]);
       divisible := false;
       mq (j < (i div 2)) and not divisible
 	     divisible := i mod j = 0;
