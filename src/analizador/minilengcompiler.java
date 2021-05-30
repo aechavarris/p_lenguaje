@@ -121,6 +121,7 @@ public class minilengcompiler implements minilengcompilerConstants {
   ArrayList<String> declaraciones=new ArrayList<String>();
   ArrayList<String> variables=new ArrayList<String>();
   ArrayList<String> bloque=new ArrayList<String>();
+  String etiqueta1="";
     try {
       jj_consume_token(tPROGRAMA);
       p = jj_consume_token(tIDENTIFICADOR);
@@ -146,6 +147,17 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
            codigo.escribir("; Programa "+p.image+".\u005cn");
            codigo.escribir("\u005ct"+"ENP  "+etiqueta+"\u005cn");
+           etiqueta1=codigo.getEtiqueta("PROGRAMA");
+           codigo.escribir("\u005ct"+"JMP  "+etiqueta1+"\u005cn");
+           codigo.escribir("error_inicializada:\u005cn");
+           codigo.escribir(";Escribir error en runtime.\u005cn");
+           String tmp="Error en runtime: variable no inicializada.\u005cn";
+           for(int n=0;n<tmp.length();n++) {
+                        codigo.escribir("\u005ct"+"STC  "+(int)tmp.charAt(n)+"\u005cn");
+                        codigo.escribir("\u005ct"+"WRT  0"+"\u005cn");
+                }
+           codigo.escribir("\u005ct"+"JMP  FIN_PROGRAMA"+"\u005cn");
+           codigo.escribir(etiqueta1+":\u005cn");
            for(int n=0; n<variables.size();n++) {
                         codigo.escribir(variables.get(n));
            }
@@ -164,6 +176,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         tabla_simbolos.eliminar_programa();
                         tabla_simbolos.imprimirTabla();
                         try {
+                            codigo.escribir("FIN_PROGRAMA:\u005cn");
                                 codigo.escribir("; Fin de programa "+p.image+".\u005cn");
                                 codigo.escribir("\u005ct"+"LVP"+"\u005cn");
                                 codigo.finCodigo(ejecucion_correcta);
@@ -397,11 +410,13 @@ public class minilengcompiler implements minilengcompilerConstants {
   boolean vector=false;
   int v=0;
   Simbolo s=new Simbolo();
+  String es="";
     try {
       tipo = tipo_variables();
       listaID = identificadores();
                 int corcheteA=0;
                 int corcheteB=0;
+                System.out.println(listaID);
                 for(int i=0;i<listaID.size();i++) {
                   try {
                     for(int j=0;j<listaID.get(i).image.length();j++) {
@@ -414,9 +429,11 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
               }
               if(vector) {
-                        String e=listaID.get(i).image.substring(corcheteA+1,corcheteB);
+
+                        es=listaID.get(i).image.substring(corcheteA+1,corcheteB);
                         listaID.get(i).image=listaID.get(i).image.substring(0,corcheteA);
-                        v=Integer.parseInt(e);
+                        v=Integer.parseInt(es);
+
                         s=tabla_simbolos.introducir_variable_vector(listaID.get(i).image,tipo,v,nivel,direccion);
                         for(int n=0;n<s.getLongitud();n++) {
                                 declaracion.add("; Reservamos direccion.\u005cn");
@@ -497,15 +514,18 @@ public class minilengcompiler implements minilengcompilerConstants {
         ;
       }
                   if(t!=null){
+
                     if(hayExpresion) {
+
+                      if(E.getEntero()!=null) {
                       if(E.getEntero()< 0) {
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                                }else {
+                                        t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
+                                }
                       }else if(E.getTipo()!=Tipo_variable.ENTERO) {
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
-                      }else {
-
-                                t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
-                          }
+                      }
                           hayExpresion=false;
                     }
                         listaID.add(t);
@@ -535,20 +555,23 @@ public class minilengcompiler implements minilengcompilerConstants {
           ;
         }
                   if(t!=null){
+
                     if(hayExpresion) {
+
                       if(E.getEntero()!=null) {
-                        if(E.getEntero()< 0) {
-                                        error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                      if(E.getEntero()< 0) {
+                                error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+                                }else {
+                                        t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
                                 }
                       }else if(E.getTipo()!=Tipo_variable.ENTERO) {
                                 error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
-                      }else {
-                                t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
-                          }
+                      }
                           hayExpresion=false;
                     }
                         listaID.add(t);
-                        }
+                        E=null;
+                  }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Sintaxis en definicion de identificadores incorrecta");
@@ -1947,7 +1970,6 @@ public class minilengcompiler implements minilengcompilerConstants {
   ArrayList< String> buff=new ArrayList< String>();
   Elemento e=new Elemento();
   boolean hayExpresion=false;
-  String etiqueta="";
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case tPA:
@@ -2025,10 +2047,10 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
                                 }else {
                                         if(E.getEntero()!=null) {
+                                            System.out.println(s.getNombre()+" "+s.getLongitud());
                                                 if(s.getLongitud()< E.getEntero() || E.getEntero()<0 ) {
                                                         error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
                                                 }else {
-                                                        etiqueta=codigo.getEtiqueta(t.image);
                                                 buff.add("; Acceso a la variable "+t.image+".\u005cn");
                                                 buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\u005cn");
                                                 buff.add("\u005ct"+"DRF"+"\u005cn");
@@ -2036,20 +2058,11 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                 buff.add("\u005ct"+"DUP"+"\u005cn");
                                                 buff.add("\u005ct"+"STC  32768"+"\u005cn");
                                                 buff.add("\u005ct"+"EQ"+"\u005cn");
-                                                buff.add("\u005ct"+"JMF  "+etiqueta+"\u005cn");
-                                                buff.add(";Escribir error en runtime.\u005cn");
-                                                        String p="Error en runtime: acceso a variable "+s.getNombre()+" no inicializada en la fila "
-                                                        +t.beginLine+", columna "+t.beginColumn+" en el fichero "+fichero;
-                                                        for(int n=0;n<p.length();n++) {
-                                                                buff.add("\u005ct"+"STC  "+(int)p.charAt(n)+"\u005cn");
-                                                                buff.add("\u005ct"+"WRT  0"+"\u005cn");
-                                                        }
+                                                buff.add("\u005ct"+"JMT  error_inicializada\u005cn");
                                                 buff.add(";sino, seguimos ejecucion.\u005cn");
-                                                buff.add(etiqueta+":\u005cn");
                                                 e.setPara(Clase_parametro.VAL);
                                         }
                                 }else {
-                                    etiqueta=codigo.getEtiqueta(t.image);
                                                 buff.add("; Acceso a la variable "+t.image+".\u005cn");
                                         buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
                                         buff.addAll(E.getBuff());
@@ -2059,38 +2072,21 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         buff.add("\u005ct"+"DUP"+"\u005cn");
                                         buff.add("\u005ct"+"STC  32768"+"\u005cn");
                                         buff.add("\u005ct"+"EQ"+"\u005cn");
-                                        buff.add("\u005ct"+"JMF  "+etiqueta+"\u005cn");
-                                        buff.add(";Escribir error en runtime.\u005cn");
-                                                String p="Error en runtime: acceso a variable "+s.getNombre()+" no inicializada en la fila "
-                                                +t.beginLine+", columna "+t.beginColumn+" en el fichero "+fichero;
-                                                for(int n=0;n<p.length();n++) {
-                                                        buff.add("\u005ct"+"STC  "+(int)p.charAt(n)+"\u005cn");
-                                                        buff.add("\u005ct"+"WRT  0"+"\u005cn");
-                                                }
+                                        buff.add("\u005ct"+"JMT  error_inicializada\u005cn");
                                         buff.add(";sino, seguimos ejecucion.\u005cn");
-                                        buff.add(etiqueta+":\u005cn");
                                 }
                         }
                     }else {
                         buff.add("; Acceso a la variable "+t.image+".\u005cn");
                         buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
                         if(!s.ES_VECTOR()) {
-                            etiqueta=codigo.getEtiqueta(t.image);
                                 buff.add("\u005ct"+"DRF"+"\u005cn");
                                 buff.add(";Comprobamos si i esta inicializada.\u005cn");
                                 buff.add("\u005ct"+"DUP"+"\u005cn");
                                 buff.add("\u005ct"+"STC  32768"+"\u005cn");
                                 buff.add("\u005ct"+"EQ"+"\u005cn");
-                                buff.add("\u005ct"+"JMF  "+etiqueta+"\u005cn");
-                                buff.add(";Escribir error en runtime.\u005cn");
-                                        String p="Error en runtime: acceso a variable "+s.getNombre()+" no inicializada en la fila "
-                                        +t.beginLine+", columna "+t.beginColumn+" en el fichero "+fichero;
-                                        for(int n=0;n<p.length();n++) {
-                                                buff.add("\u005ct"+"STC  "+(int)p.charAt(n)+"\u005cn");
-                                                buff.add("\u005ct"+"WRT  0"+"\u005cn");
-                                        }
+                                buff.add("\u005ct"+"JMT  error_inicializada\u005cn");
                                 buff.add(";sino, seguimos ejecucion.\u005cn");
-                                buff.add(etiqueta+":\u005cn");
                         }
                     }
                 e.setSimbolo(s.getTipo());

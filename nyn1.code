@@ -1,5 +1,123 @@
 ; Programa noventa_y_nueve.
 	ENP  L0
+	JMP  L5
+error_inicializada:
+;Escribir error en runtime.
+	STC  69
+	WRT  0
+	STC  114
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  114
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  105
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  98
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  105
+	WRT  0
+	STC  99
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  105
+	WRT  0
+	STC  122
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  97
+	WRT  0
+	STC  46
+	WRT  0
+	STC  10
+	WRT  0
+	JMP  FIN_PROGRAMA
+L5:
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  3
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  5
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  6
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  7
+	STC  32768
+	ASG 
 ; Comienzo del programa noventa_y_nueve.
 L0:
 ; Direccion de la variable n.
@@ -7,27 +125,66 @@ L0:
 	STC  0
 ; Asignacion.
 	ASG
+; Direccion de la variable w.
+	SRF  0  7
+; Acceso a la variable w.
+	SRF  0  7
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+; Asignacion.
+	ASG
 L1:
 ; MQ.
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  0
 	LTE
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  100
 	GTE
 	OR
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  10
 	DIV
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  10
 	MOD
 	EQ
@@ -53,6 +210,12 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	WRT  1
 ; cadena ' se convierte en '.
 	STC  32
@@ -94,6 +257,12 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  10
 	DIV
 ; Asignacion.
@@ -103,6 +272,12 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  10
 	MOD
 ; Asignacion.
@@ -113,10 +288,22 @@ L2:
 ; Acceso a la variable y.
 	SRF  0  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	TMS
 ; Acceso a la variable x.
 	SRF  0  3
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	PLUS
 ; Asignacion.
 	ASG
@@ -124,9 +311,21 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	GT
 	JMF  L3
 ; ENT.
@@ -135,9 +334,21 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	SBT
 ; Asignacion.
 	ASG
@@ -149,9 +360,21 @@ L3:
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	SBT
 ; Asignacion.
 	ASG
@@ -162,6 +385,12 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  10
 	DIV
 ; Asignacion.
@@ -171,6 +400,12 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  10
 	MOD
 ; Asignacion.
@@ -181,10 +416,22 @@ L4:
 ; Acceso a la variable y.
 	SRF  0  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	TMS
 ; Acceso a la variable x.
 	SRF  0  3
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	PLUS
 ; Asignacion.
 	ASG
@@ -193,9 +440,21 @@ L4:
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	PLUS
 ; Asignacion.
 	ASG
@@ -203,10 +462,17 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	WRT  1
 	STC  13
 	WRT  0
 	STC  10
 	WRT  0
+FIN_PROGRAMA:
 ; Fin de programa noventa_y_nueve.
 	LVP
