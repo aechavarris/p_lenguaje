@@ -3,7 +3,7 @@ programa nprimos;
 %------------------------------------------------------
 
     entero n, i;
-	caracter car[5],car2[3];
+	caracter car[5],car2[5];
 	caracter t;
 	entero a;
 
@@ -15,8 +15,12 @@ programa nprimos;
 
     principio
       j := 2;
-	  car[j+1]:="a";
-	  escribir(car[j+a]);
+	  a:=1;
+	  car:=car2;
+	  car[0]:=car[2];
+	  car2[0]:=car2[2];
+	  escribir(car[j+a],car2,car[2]);
+	  leer(car[j+a],car[0]);
       divisible := false;
       mq (j < (i div 2)) and not divisible
 	     divisible := i mod j = 0;

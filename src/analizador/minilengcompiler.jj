@@ -32,11 +32,13 @@ public class minilengcompiler {
   static int ejecucion_correcta=1;
   static int DIR_INICIAL=3;
   static Codigo codigo;
+  static String fichero;
 	 public static void main(String args []) throws ParseException {
 	   tabla_simbolos.inicializar_tabla();
 	    if (args.length != 0 ) {
 			File tmp = new File(args[0]);
 			String file = tmp.getAbsolutePath()+".ml";
+			fichero=file;
 			try {
 				minilengcompiler parser = new minilengcompiler(new FileInputStream(file));
 				codigo=new Codigo(file);
@@ -255,6 +257,7 @@ void programa():
   Token p=null;
   String etiqueta="";
   ArrayList<String> declaraciones=new ArrayList<String>();
+  ArrayList<String> variables=new ArrayList<String>();
   ArrayList<String> bloque=new ArrayList<String>();
 }
 {
@@ -267,12 +270,15 @@ void programa():
 			tabla_simbolos.imprimirTabla(); 
   	 	  } 
   	  	}
-  	   < tFIN_SENTENCIA > (declaracion_variables()) (declaraciones=declaracion_acciones())
+  	   < tFIN_SENTENCIA > (variables=declaracion_variables()) (declaraciones=declaracion_acciones())
 
  	 (bloque=bloque_sentencias())*
  	 {
  	   codigo.escribir("; Programa "+p.image+".\n");
 	   codigo.escribir("\t"+"ENP  "+etiqueta+"\n");
+	   for(int n=0; n<variables.size();n++) {
+			codigo.escribir(variables.get(n));
+	   }
 	   for(int n=0; n<declaraciones.size();n++) {
 			codigo.escribir(declaraciones.get(n));
 	   }
@@ -355,7 +361,12 @@ ArrayList< String> asignacion(Token t):
     	try { 
     		s=tabla_simbolos.buscar_simbolo(t.image);
     		el.setTipo(s.getVariable());
+    		el.setVector(s.ES_VECTOR());
+    		if(el.isVector()) { 
+    			el.setLongitud(s.getLongitud());
+    		}
     		if(s.ES_ACCION() ||s.ES_PROGRAMA() || s.ES_VALOR()) {
+    		  
 				error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
     		}
     		}catch(SimboloNoEncontradoException e) {
@@ -380,16 +391,20 @@ ArrayList< String> asignacion(Token t):
      }
 	if(el1.getTipo()!=Tipo_variable.DESCONOCIDO && el.getTipo()!=Tipo_variable.DESCONOCIDO) {
 	  	
-		if(el1.getTipo()!= el.getTipo() || (el.isVector() && !el1.isVector()) || (el1.isVector() && !el.isVector())) {
+		if(el1.getTipo()!= el.getTipo() || (el.isVector() && (!el1.isVector()&&!hayExpresion)) || (el1.isVector() && (!el.isVector()&&!hayExpresion))) {
+			
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
 		}else {
-		  if(!(el.isVector() && el.getLongitud()!=el1.getLongitud())) {
+		  if(!(el.isVector() && el.getLongitud()!=el1.getLongitud()&&!hayExpresion)) {
+		    
 		  	asig.addAll(el1.getBuff());
 		  }else {
+		    System.out.println("DEBUG");
 			error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
 		  }		
 		}
 	}else {
+	  	
 		error_semantico(t.image, t.beginLine, t.beginColumn, new SimboloNoAsignableException());
 	}
 	}
@@ -448,24 +463,33 @@ ArrayList< String> invocacion_accion(Token t):
   return invocacion;}
 }
 
-void declaracion_variables():
+ArrayList< String> declaracion_variables():
 {
+  ArrayList< String> variables=new ArrayList< String>();
+  ArrayList< String> v=new ArrayList< String>();
 }
 {
   try { 
-  	( declaracion() ";" )*
+  	( v=declaracion() ";"
+  	{
+  	  variables.addAll(v);
+  	}
+  	)*
  }catch(ParseException e) {
 	error_sintactico(e,"Declaracion de variables incorrecta");
 }
+{return variables;}
 }
 
-void declaracion():
+ArrayList < String> declaracion():
 {
   Tipo_variable tipo = null;
   ArrayList<Token > listaID = null;
+  ArrayList< String> declaracion=new ArrayList< String>();
   Token t=null;
   boolean vector=false;
   int v=0;
+  Simbolo s=new Simbolo();
 }
 {
   try { 
@@ -488,11 +512,23 @@ void declaracion():
 			String e=listaID.get(i).image.substring(corcheteA+1,corcheteB);
 			listaID.get(i).image=listaID.get(i).image.substring(0,corcheteA);
 			v=Integer.parseInt(e);
-			tabla_simbolos.introducir_variable_vector(listaID.get(i).image,tipo,v,nivel,direccion);
+			s=tabla_simbolos.introducir_variable_vector(listaID.get(i).image,tipo,v,nivel,direccion);
+			for(int n=0;n<s.getLongitud();n++) {
+				declaracion.add("; Reservamos direccion.\n");
+				declaracion.add("; Inicializamos con valor centinela.\n");
+	 			declaracion.add("\t"+"SRF  "+s.getNivel()+"  "+(s.getDir()+n)+"\n");
+	 			declaracion.add("\t"+"STC  "+"32768"+"\n");
+	 			declaracion.add("\t"+"ASG \n");
+			}
 		  	direccion = direccion+v;
 		  	tabla_simbolos.imprimirTabla();
   	      }else { 
-			tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
+			s=tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
+			declaracion.add("; Reservamos direccion.\n");
+			declaracion.add("; Inicializamos con valor centinela.\n");
+	 		declaracion.add("\t"+"SRF  "+s.getNivel()+"  "+s.getDir()+"\n");
+	 		declaracion.add("\t"+"STC  "+"32768"+"\n");
+	 		declaracion.add("\t"+"ASG \n");
 			direccion=direccion+1;
 			tabla_simbolos.imprimirTabla();
 		  }
@@ -505,6 +541,7 @@ void declaracion():
  }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis incorrecta");
 }
+{return declaracion;}
 }
 
 Tipo_variable tipo_variables():
@@ -553,12 +590,13 @@ ArrayList<Token> identificadores():
   		{
   		  if(t!=null){
   		    if(hayExpresion) {
-  		      if(E.getEntero()< 0) {
-				error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+  		      if(E.getEntero()!=null) {
+  		        if(E.getEntero()< 0) {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
+				}
   		      }else if(E.getTipo()!=Tipo_variable.ENTERO) {
 				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
   		      }else { 
-  		      
 				t.image=t.image+"["+Integer.toString(E.getEntero())+"]";
 			  }
 			  hayExpresion=false;
@@ -596,15 +634,17 @@ ArrayList<String> declaracion_accion():
   Token t=null;
   ArrayList<String> declaracion=new ArrayList<String>();
   ArrayList<String> declaracion2=new ArrayList<String>();
+  ArrayList<String> variables=new ArrayList<String>();
   ArrayList< String> bloque=new ArrayList< String>();
 }
 {
   try {
      
-  	t=cabecera_accion() declaracion_variables()
+  	t=cabecera_accion() variables=declaracion_variables()
   	{
   	  declaracion.add("; Accion "+t.image+".\n");
 	  declaracion.add(codigo.getEtiqueta(t.image)+":\n");
+	  declaracion.addAll(variables);
 	}
 	declaracion2=declaracion_acciones()
   	{
@@ -1047,9 +1087,11 @@ ArrayList< String> lista_escribibles():
 	if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA ||el1.getTipo()==Tipo_variable.ENTERO) &&
 		(el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.ENTERO)) {
 		if(el2.getTipo()==Tipo_variable.CHAR) {
+		  if(el2.getCaracter()!=null) { 
 		  if((int)el2.getCaracter()>=32 && (int)el2.getCaracter() <=254 && el2.getPara()==Clase_parametro.VAL) { 
 		  	lista.add("; caracter '"+el2.getCaracter()+"'.\n");
 		  }
+		}
 		  	lista.addAll(el2.getBuff());//lista.add("\t"+"STC  "+(int)el2.getCaracter()+"\n");
 	  	 	if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
 	  	 	  	lista.add("\t"+"WRT  1"+"\n");
@@ -1789,6 +1831,7 @@ Elemento factor2():
   ArrayList< String> buff=new ArrayList< String>();
   Elemento e=new Elemento();
   boolean hayExpresion=false;
+  String etiqueta="";
 }
 {
   try {
@@ -1849,32 +1892,71 @@ Elemento factor2():
 						if(s.getLongitud()< E.getEntero() || E.getEntero()<0 ) {
 							error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
 						}else {
-						  	  
+						  	etiqueta=codigo.getEtiqueta(t.image);
 		     				buff.add("; Acceso a la variable "+t.image+".\n");
 		     				buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\n");
 		     				buff.add("\t"+"DRF"+"\n");
+		     				buff.add(";Comprobamos si i esta inicializada.\n");
+		     				buff.add("\t"+"DUP"+"\n");
+		     				buff.add("\t"+"STC  32768"+"\n");
+		     				buff.add("\t"+"EQ"+"\n");
+		     				buff.add("\t"+"JMF  "+etiqueta+"\n");
+		     				buff.add(";Escribir error en runtime.\n");
+							String p="Error en runtime: acceso a variable "+s.getNombre()+" no inicializada en la fila "
+							+t.beginLine+", columna "+t.beginColumn+" en el fichero "+fichero;
+							for(int n=0;n<p.length();n++) {
+								buff.add("\t"+"STC  "+(int)p.charAt(n)+"\n");
+								buff.add("\t"+"WRT  0"+"\n");
+							}
+		     				buff.add(";sino, seguimos ejecucion.\n");
+		     				buff.add(etiqueta+":\n");
 		     				e.setPara(Clase_parametro.VAL);
 			     		}
-		     		}else { 
+		     		}else {
+		     		    etiqueta=codigo.getEtiqueta(t.image);
 						buff.add("; Acceso a la variable "+t.image+".\n");
 		     			buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");     		
 		     			buff.addAll(E.getBuff());
 		     			buff.add("\t"+"PLUS"+"\n");
+		     			buff.add("\t"+"DRF"+"\n");
+		     			buff.add(";Comprobamos si i esta inicializada.\n");
+		     			buff.add("\t"+"DUP"+"\n");
+		     			buff.add("\t"+"STC  32768"+"\n");
+		     			buff.add("\t"+"EQ"+"\n");
+		     			buff.add("\t"+"JMF  "+etiqueta+"\n");
+		     			buff.add(";Escribir error en runtime.\n");
+						String p="Error en runtime: acceso a variable "+s.getNombre()+" no inicializada en la fila "
+						+t.beginLine+", columna "+t.beginColumn+" en el fichero "+fichero;
+						for(int n=0;n<p.length();n++) {
+							buff.add("\t"+"STC  "+(int)p.charAt(n)+"\n");
+							buff.add("\t"+"WRT  0"+"\n");
+						}
+		     			buff.add(";sino, seguimos ejecucion.\n");
+		     			buff.add(etiqueta+":\n");
 		     		}
 	     		}		
   		    }else { 
-	     		if(s.ES_VECTOR() && !hayExpresion) {
-					for(int n=0;n<s.getLongitud();n++) {
-						buff.add("; Acceso a la variable "+t.image+"["+Integer.toString(n)+"]"+".\n");
-	     				buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+n)+"\n");
-	     				buff.add("\t"+"DRF"+"\n");
-					}
-	     		}else {
-		     		buff.add("; Acceso a la variable "+t.image+".\n");
-		     		buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
+		     	buff.add("; Acceso a la variable "+t.image+".\n");
+		     	buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
+		     	if(!s.ES_VECTOR()) {
+		     	    etiqueta=codigo.getEtiqueta(t.image);
 		     		buff.add("\t"+"DRF"+"\n");
-	     		}
-	    	}
+		     		buff.add(";Comprobamos si i esta inicializada.\n");
+		     		buff.add("\t"+"DUP"+"\n");
+		     		buff.add("\t"+"STC  32768"+"\n");
+		     		buff.add("\t"+"EQ"+"\n");
+		     		buff.add("\t"+"JMF  "+etiqueta+"\n");
+		     		buff.add(";Escribir error en runtime.\n");
+					String p="Error en runtime: acceso a variable "+s.getNombre()+" no inicializada en la fila "
+					+t.beginLine+", columna "+t.beginColumn+" en el fichero "+fichero;
+					for(int n=0;n<p.length();n++) {
+						buff.add("\t"+"STC  "+(int)p.charAt(n)+"\n");
+						buff.add("\t"+"WRT  0"+"\n");
+					}
+		     		buff.add(";sino, seguimos ejecucion.\n");
+		     		buff.add(etiqueta+":\n");
+		    	}
+		    }
 	     	e.setSimbolo(s.getTipo());
 	     	if(s.ES_PARAMETRO()) {
 				e.setPara(s.getParametro()); 
