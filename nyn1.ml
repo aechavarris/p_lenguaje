@@ -8,7 +8,6 @@ entero x,y,n,m,w;
 Principio
 %--------------------------------------------------------
         n := 0;
-		w:=w+1;
         Mq (n <= 0) or (n >=100) or (n div 10 = n mod 10)
            escribir("n: ");
            leer(n);

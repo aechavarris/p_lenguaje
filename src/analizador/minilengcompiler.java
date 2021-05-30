@@ -121,7 +121,6 @@ public class minilengcompiler implements minilengcompilerConstants {
   ArrayList<String> declaraciones=new ArrayList<String>();
   ArrayList<String> variables=new ArrayList<String>();
   ArrayList<String> bloque=new ArrayList<String>();
-  String etiqueta1="";
     try {
       jj_consume_token(tPROGRAMA);
       p = jj_consume_token(tIDENTIFICADOR);
@@ -147,8 +146,7 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
            codigo.escribir("; Programa "+p.image+".\u005cn");
            codigo.escribir("\u005ct"+"ENP  "+etiqueta+"\u005cn");
-           etiqueta1=codigo.getEtiqueta("PROGRAMA");
-           codigo.escribir("\u005ct"+"JMP  "+etiqueta1+"\u005cn");
+           codigo.escribir("\u005ct"+"JMP  "+etiqueta+"\u005cn");
            codigo.escribir("error_inicializada:\u005cn");
            codigo.escribir(";Escribir error en runtime.\u005cn");
            String tmp="Error en runtime: variable no inicializada.\u005cn";
@@ -157,7 +155,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                         codigo.escribir("\u005ct"+"WRT  0"+"\u005cn");
                 }
            codigo.escribir("\u005ct"+"JMP  FIN_PROGRAMA"+"\u005cn");
-           codigo.escribir(etiqueta1+":\u005cn");
            for(int n=0; n<variables.size();n++) {
                         codigo.escribir(variables.get(n));
            }

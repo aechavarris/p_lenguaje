@@ -259,7 +259,6 @@ void programa():
   ArrayList<String> declaraciones=new ArrayList<String>();
   ArrayList<String> variables=new ArrayList<String>();
   ArrayList<String> bloque=new ArrayList<String>();
-  String etiqueta1="";
 }
 {
   try { 
@@ -277,8 +276,7 @@ void programa():
  	 {
  	   codigo.escribir("; Programa "+p.image+".\n");
 	   codigo.escribir("\t"+"ENP  "+etiqueta+"\n");
-	   etiqueta1=codigo.getEtiqueta("PROGRAMA");
-	   codigo.escribir("\t"+"JMP  "+etiqueta1+"\n");
+	   codigo.escribir("\t"+"JMP  "+etiqueta+"\n");
 	   codigo.escribir("error_inicializada:\n");
 	   codigo.escribir(";Escribir error en runtime.\n");
 	   String tmp="Error en runtime: variable no inicializada.\n";
@@ -287,7 +285,6 @@ void programa():
 			codigo.escribir("\t"+"WRT  0"+"\n");
 		}
 	   codigo.escribir("\t"+"JMP  FIN_PROGRAMA"+"\n");
-	   codigo.escribir(etiqueta1+":\n");
 	   for(int n=0; n<variables.size();n++) {
 			codigo.escribir(variables.get(n));
 	   }

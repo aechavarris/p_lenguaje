@@ -1,6 +1,6 @@
 ; Programa noventa_y_nueve.
 	ENP  L0
-	JMP  L5
+	JMP  L0
 error_inicializada:
 ;Escribir error en runtime.
 	STC  69
@@ -92,7 +92,6 @@ error_inicializada:
 	STC  10
 	WRT  0
 	JMP  FIN_PROGRAMA
-L5:
 ; Reservamos direccion.
 ; Inicializamos con valor centinela.
 	SRF  0  3
@@ -122,11 +121,6 @@ L5:
 L0:
 ; Direccion de la variable n.
 	SRF  0  5
-	STC  0
-; Asignacion.
-	ASG
-; Direccion de la variable w.
-	SRF  0  7
 ; Acceso a la variable w.
 	SRF  0  7
 	DRF
@@ -136,14 +130,12 @@ L0:
 	EQ
 	JMT  error_inicializada
 ;sino, seguimos ejecucion.
-	STC  1
-	PLUS
 ; Asignacion.
 	ASG
 L1:
 ; MQ.
-; Acceso a la variable n.
-	SRF  0  5
+; Acceso a la variable w.
+	SRF  0  7
 	DRF
 ;Comprobamos si i esta inicializada.
 	DUP
