@@ -905,7 +905,7 @@ ArrayList< String> leer():
 					error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
 			}else { 
 				l.add("; Leer.\n");
-				l.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+v)+"\n");
+				l.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+v+1)+"\n");
 			}
 			if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
 				if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
@@ -1913,7 +1913,7 @@ Elemento factor2():
 							error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
 						}else {
 		     				buff.add("; Acceso a la variable "+t.image+".\n");
-		     				buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\n");
+		     				buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero()+1)+"\n");
 		     				buff.add("\t"+"DRF"+"\n");
 		     				buff.add(";Comprobamos si i esta inicializada.\n");
 		     				buff.add("\t"+"DUP"+"\n");

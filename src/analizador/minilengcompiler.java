@@ -891,7 +891,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                         error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
                         }else {
                                 l.add("; Leer.\u005cn");
-                                l.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+v)+"\u005cn");
+                                l.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+v+1)+"\u005cn");
                         }
                         if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
                                 if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
@@ -2049,7 +2049,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                         error_semantico(t.image, t.beginLine, t.beginColumn, new VectorIndexException());
                                                 }else {
                                                 buff.add("; Acceso a la variable "+t.image+".\u005cn");
-                                                buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero())+"\u005cn");
+                                                buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+E.getEntero()+1)+"\u005cn");
                                                 buff.add("\u005ct"+"DRF"+"\u005cn");
                                                 buff.add(";Comprobamos si i esta inicializada.\u005cn");
                                                 buff.add("\u005ct"+"DUP"+"\u005cn");
