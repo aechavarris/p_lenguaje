@@ -2,6 +2,7 @@ package lib.semantico;
 
 import java.util.ArrayList;
 
+import analizador.Token;
 import lib.codigo.Codigo;
 import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_simbolo;
@@ -29,8 +30,15 @@ public class Elemento {
 	private ArrayList<String> buff;
 	private boolean vector;
 	private int longitud;
+	private ArrayList<Token> tokens=new ArrayList<Token>();
 	public boolean isVector() {
 		return vector;
+	}
+	public ArrayList<Token> getTokens() {
+		return tokens;
+	}
+	public void setTokens(ArrayList<Token> tokens) {
+		this.tokens = tokens;
 	}
 	public void setVector(boolean vector) {
 		this.vector = vector;

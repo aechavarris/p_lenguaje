@@ -3,8 +3,6 @@ programa nprimos;
 %------------------------------------------------------
 
     entero n, i;
-	caracter car[5],car2[5];
-	caracter t;
 
     %------------------------------------------------------
     accion es_primo;
@@ -13,16 +11,16 @@ programa nprimos;
     booleano divisible;
 
     principio
-      j := 2;
-	  i:=1;
       divisible := false;
       mq (j < (i div 2)) and not divisible
 	     divisible := i mod j = 0;
 	     j := j + 1;
       fmq
+	  
       si not divisible ent
 	     escribir (i, "es primo.", entacar(13), entacar(10));
       fsi
+	
     fin
 
 %------------------------------------------------------
