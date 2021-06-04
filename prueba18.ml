@@ -2,18 +2,18 @@
 programa nprimos;
 %------------------------------------------------------
 
-    entero n, i,m;
+    entero n, i;
 
     %------------------------------------------------------
-    accion es_primo;
+    accion es_primo(val entero e,x;ref entero r,y);
     %------------------------------------------------------
-    entero j,m; 
+    entero j; 
     booleano divisible;
 
     principio
+	  escribir(r," ",e," ",x," ",y," ");
       divisible := false; 
 	  j:=2;
-	  escribir(m);
       mq (j < (i div 2)) and not divisible
 	     divisible := i mod j = 0;
 	     j := j + 1;
@@ -29,10 +29,9 @@ programa nprimos;
 principio
 %------------------------------------------------------
   n := 100;
-  escribir(m);
   i := 2;
   mq i <= n
-	 es_primo;
+	 es_primo(5,3,n,i);
 	 i := i + 1;
   fmq
 fin

@@ -103,54 +103,93 @@ L1:
 	SRF  0  4
 	STC  32768
 	ASG 
-; Reservamos direccion.
-; Inicializamos con valor centinela.
-	SRF  0  5
-	STC  32768
-	ASG 
 ; Accion es_primo.
 L2:
-; Reservamos direccion.
-; Inicializamos con valor centinela.
-	SRF  0  3
-	STC  32768
-	ASG 
-; Reservamos direccion.
-; Inicializamos con valor centinela.
-	SRF  0  4
-	STC  32768
-	ASG 
-; Reservamos direccion.
-; Inicializamos con valor centinela.
+	SRF  0  6
+	ASGI
 	SRF  0  5
+	ASGI
+	SRF  0  4
+	ASGI
+	SRF  0  3
+	ASGI
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  11
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  12
 	STC  32768
 	ASG 
 ; Comienzo de la accion es_primo.
-; Direccion de la variable divisible.
-	SRF  0  5
-	STC  0
-; Asignacion.
-	ASG
-; Direccion de la variable j.
-	SRF  0  3
-	STC  2
-; Asignacion.
-	ASG
 ; Escribir.
-; Acceso a la variable m.
-	SRF  0  4
+; Acceso a la variable r.
+	SRF  0  5
 	DRF
-;Comprobamos si m esta inicializada.
+;Comprobamos si r esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	DRF
+	WRT  1
+; caracter ' '.
+	STC  32
+	WRT  0
+; Acceso a la variable e.
+	SRF  0  3
+	DRF
+;Comprobamos si e esta inicializada.
 	DUP
 	STC  32768
 	EQ
 	JMT  error_inicializada
 ;sino, seguimos ejecucion.
 	WRT  1
+; caracter ' '.
+	STC  32
+	WRT  0
+; Acceso a la variable x.
+	SRF  0  4
+	DRF
+;Comprobamos si x esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	WRT  1
+; caracter ' '.
+	STC  32
+	WRT  0
+; Acceso a la variable y.
+	SRF  0  6
+	DRF
+;Comprobamos si y esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	DRF
+	WRT  1
+; Direccion de la variable divisible.
+	SRF  0  12
+	STC  0
+; Asignacion.
+	ASG
+; Direccion de la variable j.
+	SRF  0  11
+	STC  2
+; Asignacion.
+	ASG
 L3:
 ; MQ.
 ; Acceso a la variable j.
-	SRF  0  3
+	SRF  0  11
 	DRF
 ;Comprobamos si j esta inicializada.
 	DUP
@@ -171,7 +210,7 @@ L3:
 	DIV
 	LT
 ; Acceso a la variable divisible.
-	SRF  0  5
+	SRF  0  12
 	DRF
 ;Comprobamos si divisible esta inicializada.
 	DUP
@@ -184,7 +223,7 @@ L3:
 ; Salir del bucle si la guarda se evalua a falso.
 	JMF  L4
 ; Direccion de la variable divisible.
-	SRF  0  5
+	SRF  0  12
 ; Acceso a la variable i.
 	SRF  1  4
 	DRF
@@ -195,7 +234,7 @@ L3:
 	JMT  error_inicializada
 ;sino, seguimos ejecucion.
 ; Acceso a la variable j.
-	SRF  0  3
+	SRF  0  11
 	DRF
 ;Comprobamos si j esta inicializada.
 	DUP
@@ -209,9 +248,9 @@ L3:
 ; Asignacion.
 	ASG
 ; Direccion de la variable j.
-	SRF  0  3
+	SRF  0  11
 ; Acceso a la variable j.
-	SRF  0  3
+	SRF  0  11
 	DRF
 ;Comprobamos si j esta inicializada.
 	DUP
@@ -229,7 +268,7 @@ L4:
 ; Fin MQ.
 ; SI.
 ; Acceso a la variable divisible.
-	SRF  0  5
+	SRF  0  12
 	DRF
 ;Comprobamos si divisible esta inicializada.
 	DUP
@@ -285,17 +324,6 @@ L0:
 	STC  100
 ; Asignacion.
 	ASG
-; Escribir.
-; Acceso a la variable m.
-	SRF  0  5
-	DRF
-;Comprobamos si m esta inicializada.
-	DUP
-	STC  32768
-	EQ
-	JMT  error_inicializada
-;sino, seguimos ejecucion.
-	WRT  1
 ; Direccion de la variable i.
 	SRF  0  4
 	STC  2
@@ -325,7 +353,13 @@ L6:
 ; Salir del bucle si la guarda se evalua a falso.
 	JMF  L7
 ; Invocacion a es_primo.
-	OSF  5  0 L2
+	STC  5
+	STC  3
+; Acceso a la variable n.
+	SRF  0  3
+; Acceso a la variable i.
+	SRF  0  4
+	OSF  4  0 L2
 ; Direccion de la variable i.
 	SRF  0  4
 ; Acceso a la variable i.

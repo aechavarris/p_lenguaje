@@ -1,7 +1,110 @@
 ; Programa fibbonaci.
 	ENP  L0
-; Accion cambiar_de_linea.
+	JMP  L1
+error_inicializada:
+;Escribir error en runtime.
+	STC  69
+	WRT  0
+	STC  114
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  114
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  105
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  98
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  105
+	WRT  0
+	STC  99
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  105
+	WRT  0
+	STC  122
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  97
+	WRT  0
+	STC  46
+	WRT  0
+	STC  10
+	WRT  0
+	JMP  FIN_PROGRAMA
 L1:
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  3
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
+; Accion cambiar_de_linea.
+L2:
 ; Comienzo de la accion cambiar_de_linea.
 ; Escribir.
 	STC  13
@@ -11,9 +114,14 @@ L1:
 ; Fin de la accion / funcion cambiar_de_linea.
 	CSF
 ; Accion dato.
-L2:
-; Accion pedir_dato.
 L3:
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
+; Accion pedir_dato.
+L4:
 ; Comienzo de la accion pedir_dato.
 ; Escribir.
 ; cadena 'Escribe un numero: '.
@@ -71,20 +179,33 @@ L3:
 	STC  0
 ; Asignacion.
 	ASG
-L4:
+L5:
 ; MQ.
 ; Acceso a la variable correcto.
 	SRF  0  4
 	DRF
+;Comprobamos si correcto esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	NGB
 ; Salir del bucle si la guarda se evalua a falso.
-	JMF  L5
+	JMF  L6
 ; Invocacion a pedir_dato.
-	OSF  4  0 L3
+	OSF  4  0 L4
 ; Direccion de la variable correcto.
 	SRF  0  4
 ; Acceso a la variable dato.
 	SRF  0  3
+	DRF
+;Comprobamos si dato esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	DRF
 	STC  0
 	GT
@@ -94,8 +215,14 @@ L4:
 ; Acceso a la variable correcto.
 	SRF  0  4
 	DRF
+;Comprobamos si correcto esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	NGB
-	JMF  L6
+	JMF  L7
 ; ENT.
 ; Escribir.
 ; cadena 'El numero debe ser postivo.'.
@@ -154,86 +281,137 @@ L4:
 	STC  46
 	WRT  0
 ; Invocacion a cambiar_de_linea.
-	OSF  4  -1 L1
-L6:
+	OSF  4  1 L2
+L7:
 ; Fin SI:
 ; Fin de la iteracion. Saltar a la cabecera del bucle.
-	JMP  L4
-L5:
+	JMP  L5
+L6:
 ; Fin MQ.
 ; Fin de la accion / funcion dato.
 	CSF
 ; Accion fib.
-L7:
+L8:
+	SRF  0  4
+	ASGI
+	SRF  0  3
+	ASGI
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  5
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  6
+	STC  32768
+	ASG 
 ; Comienzo de la accion fib.
 ; SI.
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  1
 	GT
-	JMF  L8
+	JMF  L9
 ; ENT.
 ; Invocacion a fib.
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  1
 	SBT
 ; Acceso a la variable r1.
 	SRF  0  5
-	DRF
-	OSF  6  -1 L7
+	OSF  6  1 L8
 ; Invocacion a fib.
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  2
 	SBT
 ; Acceso a la variable r2.
 	SRF  0  6
-	DRF
-	OSF  6  -1 L7
+	OSF  6  1 L8
 ; Direccion de la variable r.
 	SRF  0  4
 ; Acceso a la variable r1.
 	SRF  0  5
 	DRF
+;Comprobamos si r1 esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable r2.
 	SRF  0  6
 	DRF
+;Comprobamos si r2 esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	PLUS
 ; Asignacion.
 	ASG
-	JMP  L9
-L8:
+	JMP  L10
+L9:
 ; SI_NO.
 ; Direccion de la variable r.
 	SRF  0  4
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Asignacion.
 	ASG
-L9:
+L10:
 ; Fin SI:
 ; Fin de la accion / funcion fib.
 	CSF
-; Comienzo del programa fibbonaci.
 L0:
+; Comienzo del programa fibbonaci.
 ; Invocacion a dato.
 ; Acceso a la variable n.
-	SRF  0  3
-	DRF
-	OSF  4  0 L2
+	OSF  4  0 L3
 ; Invocacion a fib.
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable r.
 	SRF  0  4
-	DRF
-	OSF  4  0 L7
+	OSF  4  0 L8
 ; Escribir.
 ; cadena 'Fibbonaci('.
 	STC  70
@@ -259,6 +437,12 @@ L0:
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	WRT  1
 ; cadena ') es: '.
 	STC  41
@@ -276,8 +460,15 @@ L0:
 ; Acceso a la variable r.
 	SRF  0  4
 	DRF
+;Comprobamos si r esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	WRT  1
 ; Invocacion a cambiar_de_linea.
-	OSF  4  0 L1
+	OSF  4  0 L2
+FIN_PROGRAMA:
 ; Fin de programa fibbonaci.
 	LVP
