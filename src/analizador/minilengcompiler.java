@@ -2205,18 +2205,16 @@ public class minilengcompiler implements minilengcompilerConstants {
                       }else {
                         buff.add("; Acceso a la variable "+t.image+".\u005cn");
                         buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\u005cn");
-                        if(!s.ES_VECTOR()) {
-                                buff.add("\u005ct"+"DRF"+"\u005cn");
-                                buff.add(";Comprobamos si "+s.getNombre()+" esta inicializada.\u005cn");
-                                buff.add("\u005ct"+"DUP"+"\u005cn");
-                                buff.add("\u005ct"+"STC  32768"+"\u005cn");
-                                buff.add("\u005ct"+"EQ"+"\u005cn");
-                                buff.add("\u005ct"+"JMT  error_inicializada\u005cn");
-                                buff.add(";sino, seguimos ejecucion.\u005cn");
-                                if(s.ES_REFERENCIA()) {
-                                                buff.add("\u005ct"+"DRF"+"\u005cn");
-                                }
-                        }
+                        buff.add("\u005ct"+"DRF"+"\u005cn");
+                        buff.add(";Comprobamos si "+s.getNombre()+" esta inicializada.\u005cn");
+                        buff.add("\u005ct"+"DUP"+"\u005cn");
+                        buff.add("\u005ct"+"STC  32768"+"\u005cn");
+                        buff.add("\u005ct"+"EQ"+"\u005cn");
+                        buff.add("\u005ct"+"JMT  error_inicializada\u005cn");
+                        buff.add(";sino, seguimos ejecucion.\u005cn");
+                        if(s.ES_REFERENCIA()) {
+                                        buff.add("\u005ct"+"DRF"+"\u005cn");
+                            }
                           }
                     }
                 e.setSimbolo(s.getTipo());
@@ -2234,8 +2232,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 e.setPara(s.getParametro());
                 }
                 e.setTipo(s.getVariable());
-                //Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
-                //con un valor por defecto, mas adelante se le dara el valor correspondiente
              }catch(SimboloNoEncontradoException es) {
                         error_semantico(t.image, t.beginLine, t.beginColumn, es);
                         try {

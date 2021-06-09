@@ -2074,18 +2074,16 @@ Elemento factor2():
   		      }else {   
 		     	buff.add("; Acceso a la variable "+t.image+".\n");
 		     	buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
-		     	if(!s.ES_VECTOR()) {
-		     		buff.add("\t"+"DRF"+"\n");
-		     		buff.add(";Comprobamos si "+s.getNombre()+" esta inicializada.\n");
-		     		buff.add("\t"+"DUP"+"\n");
-		     		buff.add("\t"+"STC  32768"+"\n");
-		     		buff.add("\t"+"EQ"+"\n");
-		     		buff.add("\t"+"JMT  error_inicializada\n");
-		     		buff.add(";sino, seguimos ejecucion.\n");
-		     		if(s.ES_REFERENCIA()) {
-						buff.add("\t"+"DRF"+"\n");
-			    	}
-		    	}
+		     	buff.add("\t"+"DRF"+"\n");
+		     	buff.add(";Comprobamos si "+s.getNombre()+" esta inicializada.\n");
+		     	buff.add("\t"+"DUP"+"\n");
+		     	buff.add("\t"+"STC  32768"+"\n");
+		     	buff.add("\t"+"EQ"+"\n");
+		     	buff.add("\t"+"JMT  error_inicializada\n");
+		     	buff.add(";sino, seguimos ejecucion.\n");
+		     	if(s.ES_REFERENCIA()) {
+					buff.add("\t"+"DRF"+"\n");
+			    }
 		   	  }	
 		    }
 	     	e.setSimbolo(s.getTipo());
@@ -2103,8 +2101,6 @@ Elemento factor2():
 				e.setPara(s.getParametro());
 	     	}
 	     	e.setTipo(s.getVariable());
-	     	//Para poder realizar pruebas con el analizador semantico se han inicializado todas las variables
-	     	//con un valor por defecto, mas adelante se le dara el valor correspondiente
 	     }catch(SimboloNoEncontradoException es) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, es);
 			try {
