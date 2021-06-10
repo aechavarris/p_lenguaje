@@ -127,7 +127,6 @@ public class minilengcompiler implements minilengcompilerConstants {
       p = jj_consume_token(tIDENTIFICADOR);
                   if(p!=null){
                     etiqueta=codigo.getEtiqueta("PROGRAMA");
-                    etiqueta1=codigo.getEtiqueta("error");
                         tabla_simbolos.introducir_programa(p.image,0);
                         tabla_simbolos.imprimirTabla();
                   }
@@ -148,7 +147,6 @@ public class minilengcompiler implements minilengcompilerConstants {
       }
            codigo.escribir("; Programa "+p.image+".\u005cn");
            codigo.escribir("\u005ct"+"ENP  "+etiqueta+"\u005cn");
-           codigo.escribir("\u005ct"+"JMP  "+etiqueta1+"\u005cn");
            codigo.escribir("error_inicializada:\u005cn");
            codigo.escribir(";Escribir error en runtime.\u005cn");
            String tmp="Error en runtime: variable no inicializada.\u005cn";
@@ -157,15 +155,14 @@ public class minilengcompiler implements minilengcompilerConstants {
                         codigo.escribir("\u005ct"+"WRT  0"+"\u005cn");
                 }
            codigo.escribir("\u005ct"+"JMP  FIN_PROGRAMA"+"\u005cn");
-           codigo.escribir(etiqueta1+":\u005cn");
-           for(int n=0; n<variables.size();n++) {
-                        codigo.escribir(variables.get(n));
-           }
            for(int n=0; n<declaraciones.size();n++) {
                         codigo.escribir(declaraciones.get(n));
            }
            codigo.escribir(etiqueta+":\u005cn");
            codigo.escribir("; Comienzo del programa "+p.image+".\u005cn");
+           for(int n=0; n<variables.size();n++) {
+                        codigo.escribir(variables.get(n));
+           }
 
            for(int n=0; n<bloque.size();n++) {
                         codigo.escribir(bloque.get(n));

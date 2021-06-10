@@ -267,7 +267,6 @@ void programa():
   		{
   		  if(p!=null){
   		    etiqueta=codigo.getEtiqueta("PROGRAMA");
-  		    etiqueta1=codigo.getEtiqueta("error");
 			tabla_simbolos.introducir_programa(p.image,0);
 			tabla_simbolos.imprimirTabla(); 
   	 	  } 
@@ -278,7 +277,6 @@ void programa():
  	 {
  	   codigo.escribir("; Programa "+p.image+".\n");
 	   codigo.escribir("\t"+"ENP  "+etiqueta+"\n");
-	   codigo.escribir("\t"+"JMP  "+etiqueta1+"\n");
 	   codigo.escribir("error_inicializada:\n");
 	   codigo.escribir(";Escribir error en runtime.\n");
 	   String tmp="Error en runtime: variable no inicializada.\n";
@@ -287,15 +285,14 @@ void programa():
 			codigo.escribir("\t"+"WRT  0"+"\n");
 		}
 	   codigo.escribir("\t"+"JMP  FIN_PROGRAMA"+"\n");
-	   codigo.escribir(etiqueta1+":\n");
-	   for(int n=0; n<variables.size();n++) {
-			codigo.escribir(variables.get(n));
-	   }
 	   for(int n=0; n<declaraciones.size();n++) {
 			codigo.escribir(declaraciones.get(n));
 	   }
 	   codigo.escribir(etiqueta+":\n");	
   	   codigo.escribir("; Comienzo del programa "+p.image+".\n");
+  	   for(int n=0; n<variables.size();n++) {
+			codigo.escribir(variables.get(n));
+	   }
 	  
 	   for(int n=0; n<bloque.size();n++) {
 			codigo.escribir(bloque.get(n));
