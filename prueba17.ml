@@ -1,6 +1,10 @@
 %------------------------------------------------------
 programa nprimos;
 %------------------------------------------------------
+% En este fichero de pruebas se fuerza la variable m no inicializada
+% se declara 1 variable no inicializada y se utiliza a continuacion 
+% [Lineas 20 y 36]
+%------------------------------------------------------
 
     entero n, i,m;
 

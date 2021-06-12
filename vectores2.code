@@ -1,0 +1,446 @@
+; Programa media_vectores.
+	ENP  L0
+error_inicializada:
+;Escribir error en runtime.
+	STC  69
+	WRT  0
+	STC  114
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  114
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  105
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  98
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  105
+	WRT  0
+	STC  99
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  105
+	WRT  0
+	STC  122
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  97
+	WRT  0
+	STC  46
+	WRT  0
+	STC  10
+	WRT  0
+	JMP  FIN_PROGRAMA
+L0:
+; Comienzo del programa media_vectores.
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  5
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  6
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  7
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  8
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  9
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  10
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  11
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  12
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  13
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  14
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  15
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  16
+	STC  32768
+	ASG 
+; Escribir.
+; cadena 'Introduce el número de elementos: '.
+	STC  73
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  100
+	WRT  0
+	STC  117
+	WRT  0
+	STC  99
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  108
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  195
+	WRT  0
+	STC  186
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  100
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  111
+	WRT  0
+	STC  115
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Leer.
+	SRF  0  15
+	RD  1
+; Direccion de la variable i.
+	SRF  0  14
+	STC  0
+; Asignacion.
+	ASG
+; Direccion de la variable suma.
+	SRF  0  16
+	STC  0
+; Asignacion.
+	ASG
+L1:
+; MQ.
+; Acceso a la variable i.
+	SRF  0  14
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+; Acceso a la variable n.
+	SRF  0  15
+	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	LT
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L2
+; Escribir.
+; cadena 'Introduce el número '.
+	STC  73
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  100
+	WRT  0
+	STC  117
+	WRT  0
+	STC  99
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  108
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  195
+	WRT  0
+	STC  186
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+; Escribir.
+; Acceso a la variable i.
+	SRF  0  14
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+	WRT  1
+; Escribir.
+; cadena ': '.
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Leer.
+	SRF  0  3
+; Acceso a la variable i.
+	SRF  0  14
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+	PLUS
+	RD  1
+; Direccion de la variable suma.
+	SRF  0  16
+; Acceso a la variable suma.
+	SRF  0  16
+	DRF
+;Comprobamos si suma esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+; Acceso a la variable valores.
+	SRF  0  3
+; Acceso a la variable i.
+	SRF  0  14
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+	PLUS
+	DRF
+	PLUS
+; Asignacion.
+	ASG
+; Direccion de la variable i.
+	SRF  0  14
+; Acceso a la variable i.
+	SRF  0  14
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+; Asignacion.
+	ASG
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L1
+L2:
+; Fin MQ.
+; Escribir.
+; cadena 'La media es: '.
+	STC  76
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  100
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Escribir.
+; Acceso a la variable suma.
+	SRF  0  16
+	DRF
+;Comprobamos si suma esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+; Acceso a la variable n.
+	SRF  0  15
+	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	DIV
+	WRT  1
+FIN_PROGRAMA:
+; Fin de programa media_vectores.
+	LVP

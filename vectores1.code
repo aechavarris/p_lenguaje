@@ -1,0 +1,381 @@
+; Programa muestra_valores.
+	ENP  L0
+error_inicializada:
+;Escribir error en runtime.
+	STC  69
+	WRT  0
+	STC  114
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  114
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  105
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  98
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  105
+	WRT  0
+	STC  99
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  105
+	WRT  0
+	STC  122
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  97
+	WRT  0
+	STC  46
+	WRT  0
+	STC  10
+	WRT  0
+	JMP  FIN_PROGRAMA
+L0:
+; Comienzo del programa muestra_valores.
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  5
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  6
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  7
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  8
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  9
+	STC  32768
+	ASG 
+; Escribir.
+; cadena 'Introduce 5 valores: '.
+	STC  73
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  100
+	WRT  0
+	STC  117
+	WRT  0
+	STC  99
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  53
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Direccion de la variable i.
+	SRF  0  9
+	STC  0
+; Asignacion.
+	ASG
+L1:
+; MQ.
+; Acceso a la variable i.
+	SRF  0  9
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  5
+	LT
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L2
+; Leer.
+	SRF  0  3
+; Acceso a la variable i.
+	SRF  0  9
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+	PLUS
+	RD  1
+; Direccion de la variable i.
+	SRF  0  9
+; Acceso a la variable i.
+	SRF  0  9
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+; Asignacion.
+	ASG
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L1
+L2:
+; Fin MQ.
+; Escribir.
+; cadena 'Mostrando los valores: '.
+	STC  77
+	WRT  0
+	STC  111
+	WRT  0
+	STC  115
+	WRT  0
+	STC  116
+	WRT  0
+	STC  114
+	WRT  0
+	STC  97
+	WRT  0
+	STC  110
+	WRT  0
+	STC  100
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  108
+	WRT  0
+	STC  111
+	WRT  0
+	STC  115
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  101
+	WRT  0
+	STC  115
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+; Escribir.
+; Acceso a la variable valores.
+	SRF  0  4
+	DRF  
+;Comprobamos si valores esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	WRT  1
+; Acceso a la variable valores.
+	SRF  0  5
+	DRF  
+;Comprobamos si valores esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	WRT  1
+; Acceso a la variable valores.
+	SRF  0  6
+	DRF  
+;Comprobamos si valores esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	WRT  1
+; Acceso a la variable valores.
+	SRF  0  7
+	DRF  
+;Comprobamos si valores esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	WRT  1
+; Acceso a la variable valores.
+	SRF  0  8
+	DRF  
+;Comprobamos si valores esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	WRT  1
+; Direccion de la variable i.
+	SRF  0  9
+	STC  0
+; Asignacion.
+	ASG
+L3:
+; MQ.
+; Acceso a la variable i.
+	SRF  0  9
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  5
+	LT
+; Salir del bucle si la guarda se evalua a falso.
+	JMF  L4
+; Escribir.
+; Acceso a la variable valores.
+	SRF  0  3
+; Acceso a la variable i.
+	SRF  0  9
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+	PLUS
+	DRF
+	WRT  1
+; Direccion de la variable i.
+	SRF  0  9
+; Acceso a la variable i.
+	SRF  0  9
+	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
+	STC  1
+	PLUS
+; Asignacion.
+	ASG
+; Fin de la iteracion. Saltar a la cabecera del bucle.
+	JMP  L3
+L4:
+; Fin MQ.
+FIN_PROGRAMA:
+; Fin de programa muestra_valores.
+	LVP

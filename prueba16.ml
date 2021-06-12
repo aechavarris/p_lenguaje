@@ -1,6 +1,10 @@
 %------------------------------------------------------
 programa nprimos;
 %------------------------------------------------------
+% En este fichero de pruebas se comprueba que todos los posibles 
+% accesos a vectores y sus componentes se realicen correctamente
+% [Lineas 23, 24, 25, 26 y 27]
+%------------------------------------------------------
 
     entero n, i;
 	caracter car[5],car2[5];

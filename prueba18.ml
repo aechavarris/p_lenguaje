@@ -1,6 +1,10 @@
 %------------------------------------------------------
 programa nprimos;
 %------------------------------------------------------
+% En este fichero de pruebas se comprueba que el acceso a parametros
+% de referencia en accion sea correcto 
+% [Lineas 18 y 38]
+%------------------------------------------------------
 
     entero n, i;
 

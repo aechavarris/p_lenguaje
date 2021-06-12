@@ -442,6 +442,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                 int corcheteA=0;
                 int corcheteB=0;
                 for(int i=0;i<listaID.size();i++) {
+                  vector=false;
                   try {
                     for(int j=0;j<listaID.get(i).image.length();j++) {
                         if(listaID.get(i).image.charAt(j)=='[') {
@@ -453,20 +454,19 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
               }
               if(vector) {
-
                         es=listaID.get(i).image.substring(corcheteA+1,corcheteB);
                         listaID.get(i).image=listaID.get(i).image.substring(0,corcheteA);
                         v=Integer.parseInt(es);
 
                         s=tabla_simbolos.introducir_variable_vector(listaID.get(i).image,tipo,v,nivel,direccion);
-                        for(int n=0;n<s.getLongitud();n++) {
+                        for(int n=1;n<=s.getLongitud();n++) {
                                 declaracion.add("; Reservamos direccion.\u005cn");
                                 declaracion.add("; Inicializamos con valor centinela.\u005cn");
                                 declaracion.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+n)+"\u005cn");
                                 declaracion.add("\u005ct"+"STC  "+"32768"+"\u005cn");
                                 declaracion.add("\u005ct"+"ASG \u005cn");
                         }
-                        direccion = direccion+v;
+                        direccion = direccion+s.getLongitud()+1;
                         tabla_simbolos.imprimirTabla();
               }else {
                         s=tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
@@ -1091,14 +1091,12 @@ public class minilengcompiler implements minilengcompilerConstants {
       el1 = expresion();
                 lista.add("; Escribir.\u005cn");
 
-                if(el1.getTipo()==Tipo_variable.CHAR) {
-                  if(el1.getCaracter()!=null) {
-                          if((int)el1.getCaracter()>=32 && (int)el1.getCaracter() <=254 && el1.getPara()==Clase_parametro.VAL) {
-                                lista.add("; caracter '"+el1.getCaracter()+"'.\u005cn");
-                          }
-                  }
-
                         if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
+                          if(el1.getPara()==Clase_parametro.VAL && el1.getEntero()!=null) {
+                                lista.add("; entero '"+Integer.toString(el1.getEntero())+"'.\u005cn");
+                          }if(el1.getPara()==Clase_parametro.VAL && el1.getBool()!=null) {
+                                lista.add("; booleano '"+el1.getBool()+"'.\u005cn");
+                          }
                           if(el1.isVector()) {
                             for(int n=0;n<el1.getLongitud();n++) {
                                 lista.add(el1.getBuff().get(n*9));
@@ -1117,7 +1115,13 @@ public class minilengcompiler implements minilengcompilerConstants {
                             lista.add("\u005ct"+"WRT  1"+"\u005cn");
                           }
 
-                        }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
+                        }else if(el1.getTipo()==Tipo_variable.CHAR) {
+
+                          if(el1.getCaracter()!=null) {
+                                if((int)el1.getCaracter()>=32 && (int)el1.getCaracter() <=254 && el1.getPara()==Clase_parametro.VAL) {
+                                   lista.add("; caracter '"+el1.getCaracter()+"'.\u005cn");
+                                }
+                           }
                                 if(el1.isVector()) {
                                   for(int n=0;n<el1.getLongitud();n++) {
                                     lista.add(el1.getBuff().get(n*9));
@@ -1135,29 +1139,19 @@ public class minilengcompiler implements minilengcompilerConstants {
                             lista.addAll(el1.getBuff());
                             lista.add("\u005ct"+"WRT  0"+"\u005cn");
                           }
-                        }
+                        }else if(el1.getTipo()==Tipo_variable.CADENA){
 
-                }else if(el1.getTipo()==Tipo_variable.CADENA){
                         String tmp=el1.getCadena().substring(1,el1.getCadena().length()-1);
                         lista.add("; cadena '"+tmp+"'.\u005cn");
                         for(int i=0;i<tmp.length();i++) {
                           lista.add("\u005ct"+"STC  "+(int)tmp.charAt(i)+"\u005cn");
-                        if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
-                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
-                        }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
-                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
-                        }
+                          lista.add("\u005ct"+"WRT  0"+"\u005cn");
                         }
                 }else {
-                  if(el1.getPara()==Clase_parametro.VAL && el1.getEntero()!=null) {
-                        lista.add("; entero '"+Integer.toString(el1.getEntero())+"'.\u005cn");
-                  }
+                    System.out.println(lista);
                         lista.addAll(el1.getBuff());
-                        if(el1.getTipo()==Tipo_variable.ENTERO || el1.getTipo()==Tipo_variable.BOOLEANO) {
-                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
-                        }if(el1.getTipo()==Tipo_variable.CADENA || el1.getTipo()==Tipo_variable.CHAR) {
-                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
-                        }
+                        lista.add("\u005ct"+"WRT  0"+"\u005cn");
+
                 }
       label_7:
       while (true) {
@@ -1171,17 +1165,15 @@ public class minilengcompiler implements minilengcompilerConstants {
         }
         t = jj_consume_token(tCOMA);
         el2 = expresion();
-        if((el1.getTipo()==Tipo_variable.CHAR || el1.getTipo()==Tipo_variable.CADENA ||el1.getTipo()==Tipo_variable.ENTERO) &&
-                (el2.getTipo()==Tipo_variable.CHAR || el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.ENTERO)) {
-                if(el2.getTipo()==Tipo_variable.CHAR) {
-                  if(el2.getCaracter()!=null) {
-                  if((int)el2.getCaracter()>=32 && (int)el2.getCaracter() <=254 && el2.getPara()==Clase_parametro.VAL) {
-                        lista.add("; caracter '"+el2.getCaracter()+"'.\u005cn");
-                  }
-                }
-                        //lista.add("\t"+"STC  "+(int)el2.getCaracter()+"\n");
+                        lista.add("; Escribir.\u005cn");
+
                         if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
-                                if(el2.isVector()) {
+                          if(el2.getPara()==Clase_parametro.VAL && el2.getEntero()!=null) {
+                                lista.add("; entero '"+Integer.toString(el2.getEntero())+"'.\u005cn");
+                          }if(el2.getPara()==Clase_parametro.VAL && el2.getBool()!=null) {
+                                lista.add("; booleano '"+el2.getBool()+"'.\u005cn");
+                          }
+                          if(el2.isVector()) {
                             for(int n=0;n<el2.getLongitud();n++) {
                                 lista.add(el2.getBuff().get(n*9));
                                     lista.add(el2.getBuff().get(n*9+1));
@@ -1198,12 +1190,17 @@ public class minilengcompiler implements minilengcompilerConstants {
                             lista.addAll(el2.getBuff());
                             lista.add("\u005ct"+"WRT  1"+"\u005cn");
                           }
-                        }if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
+
+                        }else if(el2.getTipo()==Tipo_variable.CHAR) {
+
+                          if(el2.getCaracter()!=null) {
+                                if((int)el2.getCaracter()>=32 && (int)el2.getCaracter() <=254 && el2.getPara()==Clase_parametro.VAL) {
+                                   lista.add("; caracter '"+el2.getCaracter()+"'.\u005cn");
+                                }
+                           }
                                 if(el2.isVector()) {
-
-                            for(int n=0;n<el2.getLongitud();n++) {
-
-                                lista.add(el2.getBuff().get(n*9));
+                                  for(int n=0;n<el2.getLongitud();n++) {
+                                    lista.add(el2.getBuff().get(n*9));
                                     lista.add(el2.getBuff().get(n*9+1));
                                     lista.add(el2.getBuff().get(n*9+2));
                                     lista.add(el2.getBuff().get(n*9+3));
@@ -1212,35 +1209,26 @@ public class minilengcompiler implements minilengcompilerConstants {
                                     lista.add(el2.getBuff().get(n*9+6));
                                     lista.add(el2.getBuff().get(n*9+7));
                                     lista.add(el2.getBuff().get(n*9+8));
-                                        lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                                        lista.add("\u005ct"+"WRT  0"+"\u005cn");
                                   }
                           }else {
                             lista.addAll(el2.getBuff());
                             lista.add("\u005ct"+"WRT  0"+"\u005cn");
                           }
-                        }
-                }else if(el2.getTipo()==Tipo_variable.CADENA){
+                        }else if(el2.getTipo()==Tipo_variable.CADENA){
+
                         String tmp=el2.getCadena().substring(1,el2.getCadena().length()-1);
                         lista.add("; cadena '"+tmp+"'.\u005cn");
                         for(int i=0;i<tmp.length();i++) {
                           lista.add("\u005ct"+"STC  "+(int)tmp.charAt(i)+"\u005cn");
-                        if(el2.getTipo()==Tipo_variable.ENTERO || el2.getTipo()==Tipo_variable.BOOLEANO) {
-                                lista.add("\u005ct"+"WRT  1"+"\u005cn");
-                        }if(el2.getTipo()==Tipo_variable.CADENA || el2.getTipo()==Tipo_variable.CHAR) {
-                                lista.add("\u005ct"+"WRT  0"+"\u005cn");
-                        }
+                          lista.add("\u005ct"+"WRT  0"+"\u005cn");
                         }
                 }else {
-
-                  if(el2.getPara()==Clase_parametro.VAL &&el2.getEntero()!=null) {
-                        lista.add("; entero '"+Integer.toString(el2.getEntero())+"'.\u005cn");
-                 }
+                    System.out.println(lista);
                         lista.addAll(el2.getBuff());
-                        lista.add("\u005ct"+"WRT  1"+"\u005cn");
+                        lista.add("\u005ct"+"WRT  0"+"\u005cn");
+
                 }
-        }else {
-                error_semantico(t.image, t.beginLine, t.beginColumn, new WrongTypeException());
-        }
       }
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de escribir incorrecta ");
@@ -2188,7 +2176,7 @@ public class minilengcompiler implements minilengcompilerConstants {
                         }
                     }else {
                       if(s.ES_VECTOR()) {
-                        for(int n=0;n<s.getLongitud();n++) {
+                        for(int n=1;n<=s.getLongitud();n++) {
                                         buff.add("; Acceso a la variable "+t.image+".\u005cn");
                                 buff.add("\u005ct"+"SRF  "+(nivel-s.getNivel())+"  "+(s.getDir()+n)+"\u005cn");
                                 buff.add("\u005ct"+"DRF  "+"\u005cn");
