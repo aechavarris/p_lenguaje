@@ -128,7 +128,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                   if(p!=null){
                     etiqueta=codigo.getEtiqueta("PROGRAMA");
                         tabla_simbolos.introducir_programa(p.image,0);
-                        tabla_simbolos.imprimirTabla();
                   }
       jj_consume_token(tFIN_SENTENCIA);
       variables = declaracion_variables();
@@ -171,7 +170,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                         tabla_simbolos.eliminar_variables(nivel);
                         tabla_simbolos.eliminar_acciones(nivel);
                         tabla_simbolos.eliminar_programa();
-                        tabla_simbolos.imprimirTabla();
                         try {
                             codigo.escribir("FIN_PROGRAMA:\u005cn");
                                 codigo.escribir("; Fin de programa "+p.image+".\u005cn");
@@ -472,7 +470,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 declaracion.add("\u005ct"+"ASG \u005cn");
                         }
                         direccion = direccion+s.getLongitud()+1;
-                        tabla_simbolos.imprimirTabla();
               }else {
                         s=tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
                         declaracion.add("; Reservamos direccion.\u005cn");
@@ -481,7 +478,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                         declaracion.add("\u005ct"+"STC  "+"32768"+"\u005cn");
                         declaracion.add("\u005ct"+"ASG \u005cn");
                         direccion=direccion+1;
-                        tabla_simbolos.imprimirTabla();
                   }
                   } catch(SimboloYaDeclaradoException e) {
                       t = listaID.get(i);
@@ -678,7 +674,6 @@ public class minilengcompiler implements minilengcompilerConstants {
           tabla_simbolos.eliminar_variables(nivel);
           tabla_simbolos.eliminar_parametros(nivel);
           direccion=direccion_anterior;
-          tabla_simbolos.imprimirTabla();
           nivel=nivel-1;
     } catch (ParseException e) {
         error_sintactico(e,"Estructura de accion incorrecta");
@@ -702,7 +697,6 @@ public class minilengcompiler implements minilengcompilerConstants {
                                 encontrado=true;
                         }
                         direccion = direccion+1;
-                        tabla_simbolos.imprimirTabla();
                   } catch(SimboloYaDeclaradoException e) {
                           error_semantico(t.image, t.beginLine, t.beginColumn, e);
                     }
@@ -807,12 +801,10 @@ public class minilengcompiler implements minilengcompilerConstants {
                         s=tabla_simbolos.introducir_parametro_vector(tokens.get(i).image,tipo,clase,v,nivel,direccion);
                         parametros.add(s);
                         direccion = direccion+v;
-                        tabla_simbolos.imprimirTabla();
               }else {
                         s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
                         parametros.add(s);
                         direccion = direccion+1;
-                        tabla_simbolos.imprimirTabla();
                   }
                 } catch(SimboloYaDeclaradoException e) {
                         boolean end=false;
@@ -825,13 +817,11 @@ public class minilengcompiler implements minilengcompilerConstants {
                                                 end=true;
                                                 parametros.add(s);
                                                 direccion = direccion+v;
-                                                tabla_simbolos.imprimirTabla();
                                         }else {
                                                 s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
                                                 end=true;
                                                 parametros.add(s);
                                                 direccion = direccion+1;
-                                                tabla_simbolos.imprimirTabla();
                                         }
                                 } catch(SimboloYaDeclaradoException es) {n=n+1;}
                         }

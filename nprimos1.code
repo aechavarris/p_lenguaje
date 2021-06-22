@@ -91,6 +91,16 @@ error_inicializada:
 	STC  10
 	WRT  0
 	JMP  FIN_PROGRAMA
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  3
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
 ; Accion es_primo.
 L1:
 ; Reservamos direccion.
@@ -103,7 +113,9 @@ L1:
 	SRF  0  4
 	STC  32768
 	ASG 
+	JMP  L2
 ; Comienzo de la accion es_primo.
+L2:
 ; Direccion de la variable j.
 	SRF  0  3
 	STC  2
@@ -114,7 +126,7 @@ L1:
 	STC  0
 ; Asignacion.
 	ASG
-L2:
+L3:
 ; MQ.
 ; Acceso a la variable j.
 	SRF  0  3
@@ -149,7 +161,7 @@ L2:
 	NGB
 	AND
 ; Salir del bucle si la guarda se evalua a falso.
-	JMF  L3
+	JMF  L4
 ; Direccion de la variable divisible.
 	SRF  0  4
 ; Acceso a la variable i.
@@ -191,8 +203,8 @@ L2:
 ; Asignacion.
 	ASG
 ; Fin de la iteracion. Saltar a la cabecera del bucle.
-	JMP  L2
-L3:
+	JMP  L3
+L4:
 ; Fin MQ.
 ; SI.
 ; Acceso a la variable divisible.
@@ -205,7 +217,7 @@ L3:
 	JMT  error_inicializada
 ;sino, seguimos ejecucion.
 	NGB
-	JMF  L4
+	JMF  L5
 ; ENT.
 ; Escribir.
 ; Acceso a la variable i.
@@ -244,22 +256,12 @@ L3:
 ; Escribir.
 	STC  10
 	WRT  0
-L4:
+L5:
 ; Fin SI:
 ; Fin de la accion / funcion es_primo.
 	CSF
 L0:
 ; Comienzo del programa nprimos.
-; Reservamos direccion.
-; Inicializamos con valor centinela.
-	SRF  0  3
-	STC  32768
-	ASG 
-; Reservamos direccion.
-; Inicializamos con valor centinela.
-	SRF  0  4
-	STC  32768
-	ASG 
 ; Direccion de la variable n.
 	SRF  0  3
 	STC  100
@@ -270,7 +272,7 @@ L0:
 	STC  2
 ; Asignacion.
 	ASG
-L5:
+L6:
 ; MQ.
 ; Acceso a la variable i.
 	SRF  0  4
@@ -292,7 +294,7 @@ L5:
 ;sino, seguimos ejecucion.
 	LTE
 ; Salir del bucle si la guarda se evalua a falso.
-	JMF  L6
+	JMF  L7
 ; Invocacion a es_primo.
 	OSF  4  0 L1
 ; Direccion de la variable i.
@@ -311,8 +313,8 @@ L5:
 ; Asignacion.
 	ASG
 ; Fin de la iteracion. Saltar a la cabecera del bucle.
-	JMP  L5
-L6:
+	JMP  L6
+L7:
 ; Fin MQ.
 FIN_PROGRAMA:
 ; Fin de programa nprimos.

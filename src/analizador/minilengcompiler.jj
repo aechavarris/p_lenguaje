@@ -268,7 +268,6 @@ void programa():
   		  if(p!=null){
   		    etiqueta=codigo.getEtiqueta("PROGRAMA");
 			tabla_simbolos.introducir_programa(p.image,0);
-			tabla_simbolos.imprimirTabla(); 
   	 	  } 
   	  	}
   	   < tFIN_SENTENCIA > (variables=declaracion_variables()) (declaraciones=declaracion_acciones())
@@ -301,7 +300,6 @@ void programa():
 			tabla_simbolos.eliminar_variables(nivel);
 			tabla_simbolos.eliminar_acciones(nivel);
 			tabla_simbolos.eliminar_programa();
-			tabla_simbolos.imprimirTabla();
 			try {
 			    codigo.escribir("FIN_PROGRAMA:\n");
 				codigo.escribir("; Fin de programa "+p.image+".\n");
@@ -570,7 +568,6 @@ ArrayList < String> declaracion():
 	 			declaracion.add("\t"+"ASG \n");
 			}
 		  	direccion = direccion+s.getLongitud()+1;
-		  	tabla_simbolos.imprimirTabla();
   	      }else { 
 			s=tabla_simbolos.introducir_variable(listaID.get(i).image,tipo,nivel,direccion);
 			declaracion.add("; Reservamos direccion.\n");
@@ -579,7 +576,6 @@ ArrayList < String> declaracion():
 	 		declaracion.add("\t"+"STC  "+"32768"+"\n");
 	 		declaracion.add("\t"+"ASG \n");
 			direccion=direccion+1;
-			tabla_simbolos.imprimirTabla();
 		  }
 		  } catch(SimboloYaDeclaradoException e) {
 		      t = listaID.get(i);
@@ -739,7 +735,6 @@ ArrayList<String> declaracion_accion():
   	  tabla_simbolos.eliminar_variables(nivel);
   	  tabla_simbolos.eliminar_parametros(nivel);
   	  direccion=direccion_anterior;
-  	  tabla_simbolos.imprimirTabla();
   	  nivel=nivel-1;}
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de accion incorrecta");
@@ -764,7 +759,6 @@ Token cabecera_accion():
 				encontrado=true;
 			}
 			direccion = direccion+1;
-			tabla_simbolos.imprimirTabla();
   		  } catch(SimboloYaDeclaradoException e) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, e);
   		    }
@@ -846,12 +840,10 @@ ArrayList<Simbolo > parametros():
 			s=tabla_simbolos.introducir_parametro_vector(tokens.get(i).image,tipo,clase,v,nivel,direccion);
 			parametros.add(s);
 		  	direccion = direccion+v;
-		  	tabla_simbolos.imprimirTabla();
   	      }else { 
 		  	s=tabla_simbolos.introducir_parametro(tokens.get(i).image,tipo,clase,nivel,direccion);
 		  	parametros.add(s);
 		  	direccion = direccion+1;
-		  	tabla_simbolos.imprimirTabla();
 		  }
 		} catch(SimboloYaDeclaradoException e) {
 		  	boolean end=false;
@@ -864,13 +856,11 @@ ArrayList<Simbolo > parametros():
 						end=true;
 		  				parametros.add(s);
 		  				direccion = direccion+v;
-		  				tabla_simbolos.imprimirTabla();
 		   	   		}else { 
 						s=tabla_simbolos.introducir_parametro(t.image+"_"+Integer.toString(n),tipo,clase,nivel,direccion);
 						end=true;
 		  				parametros.add(s);
 		  				direccion = direccion+1;
-		  				tabla_simbolos.imprimirTabla();
 		  			}
 				} catch(SimboloYaDeclaradoException es) {n=n+1;}
 		  	}
