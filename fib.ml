@@ -20,7 +20,7 @@ booleano correcto;
   Principio
      escribir ("Escribe un numero: ");
      leer (dato);
-  Fin
+  Fin 
     
 Principio
   dato := 0;
@@ -29,9 +29,10 @@ Principio
      pedir_dato ;
      correcto := dato > 0;
      Si not correcto ent
-        escribir ("El numero debe ser postivo.");
+        escribir ("El numero debe ser positivo.");
 	cambiar_de_linea;
      FSi
+	 
   FMq
 Fin
 

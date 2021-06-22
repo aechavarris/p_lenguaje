@@ -1,6 +1,5 @@
 ; Programa noventa_y_nueve.
 	ENP  L0
-	JMP  L0
 error_inicializada:
 ;Escribir error en runtime.
 	STC  69
@@ -92,6 +91,8 @@ error_inicializada:
 	STC  10
 	WRT  0
 	JMP  FIN_PROGRAMA
+L0:
+; Comienzo del programa noventa_y_nueve.
 ; Reservamos direccion.
 ; Inicializamos con valor centinela.
 	SRF  0  3
@@ -117,27 +118,17 @@ error_inicializada:
 	SRF  0  7
 	STC  32768
 	ASG 
-; Comienzo del programa noventa_y_nueve.
-L0:
 ; Direccion de la variable n.
 	SRF  0  5
-; Acceso a la variable w.
-	SRF  0  7
-	DRF
-;Comprobamos si i esta inicializada.
-	DUP
-	STC  32768
-	EQ
-	JMT  error_inicializada
-;sino, seguimos ejecucion.
+	STC  0
 ; Asignacion.
 	ASG
 L1:
 ; MQ.
-; Acceso a la variable w.
-	SRF  0  7
+; Acceso a la variable n.
+	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -148,7 +139,7 @@ L1:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -160,7 +151,7 @@ L1:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -171,7 +162,7 @@ L1:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -202,13 +193,14 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
 	JMT  error_inicializada
 ;sino, seguimos ejecucion.
 	WRT  1
+; Escribir.
 ; cadena ' se convierte en '.
 	STC  32
 	WRT  0
@@ -249,7 +241,7 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -264,7 +256,7 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -280,7 +272,7 @@ L2:
 ; Acceso a la variable y.
 	SRF  0  4
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si y esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -290,7 +282,7 @@ L2:
 ; Acceso a la variable x.
 	SRF  0  3
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si x esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -303,7 +295,7 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -312,7 +304,7 @@ L2:
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si m esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -326,7 +318,7 @@ L2:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -335,7 +327,7 @@ L2:
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si m esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -352,7 +344,7 @@ L3:
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si m esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -361,7 +353,7 @@ L3:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -377,7 +369,7 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -392,7 +384,7 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -408,7 +400,7 @@ L4:
 ; Acceso a la variable y.
 	SRF  0  4
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si y esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -418,7 +410,7 @@ L4:
 ; Acceso a la variable x.
 	SRF  0  3
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si x esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -432,7 +424,7 @@ L4:
 ; Acceso a la variable m.
 	SRF  0  6
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si m esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -441,7 +433,7 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
@@ -454,15 +446,17 @@ L4:
 ; Acceso a la variable n.
 	SRF  0  5
 	DRF
-;Comprobamos si i esta inicializada.
+;Comprobamos si n esta inicializada.
 	DUP
 	STC  32768
 	EQ
 	JMT  error_inicializada
 ;sino, seguimos ejecucion.
 	WRT  1
+; Escribir.
 	STC  13
 	WRT  0
+; Escribir.
 	STC  10
 	WRT  0
 FIN_PROGRAMA:

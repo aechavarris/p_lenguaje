@@ -111,7 +111,17 @@ public class TablaSimbolos {
 		// Si no se ha encontrado
 		throw new SimboloNoEncontradoException();
 	}
+	public Simbolo buscar_simbolo_nivel(String nombre,int nivel) throws SimboloNoEncontradoException {
+		int clave = h(nombre);
+		for (Simbolo s : tabla_hash[clave]) {
+			if (s.nombre.equals(nombre)&&s.nivel==nivel) {
+				return s;
+			}
+		}
 
+		// Si no se ha encontrado
+		throw new SimboloNoEncontradoException();
+	}
 	/*
 	 * Introduce en la tabla un simbolo PROGRAMA, con el nombre del parametro, de
 	 * nivel 0, con la direccion del parametro. Dado que debe ser el primer simbolo

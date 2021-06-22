@@ -285,14 +285,14 @@ void programa():
 			codigo.escribir("\t"+"WRT  0"+"\n");
 		}
 	   codigo.escribir("\t"+"JMP  FIN_PROGRAMA"+"\n");
+	   for(int n=0; n<variables.size();n++) {
+			codigo.escribir(variables.get(n));
+	   }
 	   for(int n=0; n<declaraciones.size();n++) {
 			codigo.escribir(declaraciones.get(n));
 	   }
 	   codigo.escribir(etiqueta+":\n");	
   	   codigo.escribir("; Comienzo del programa "+p.image+".\n");
-  	   for(int n=0; n<variables.size();n++) {
-			codigo.escribir(variables.get(n));
-	   }
 	  
 	   for(int n=0; n<bloque.size();n++) {
 			codigo.escribir(bloque.get(n));
@@ -395,6 +395,9 @@ ArrayList< String> asignacion(Token t):
    {
      asig.add("; Direccion de la variable "+t.image+".\n");
      asig.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
+     if(s.ES_REFERENCIA()) {
+		asig.add("\t"+"DRF"+"\n");
+     }
      if(hayExpresion) {
         asig.addAll(E.getBuff());
 		asig.add("\t"+"PLUS"+"\n");
@@ -464,7 +467,7 @@ ArrayList< String> invocacion_accion(Token t):
 {
   {
     invocacion.add("; Invocacion a "+t.image+".\n");
-    try { 
+    try {
     	accion=tabla_simbolos.buscar_simbolo(t.image);
     	if(accion.getVariable()!=Tipo_variable.DESCONOCIDO && !accion.ES_ACCION()) {
 			error_semantico(t.image, t.beginLine, t.beginColumn, new WrongActionException());
@@ -475,15 +478,20 @@ ArrayList< String> invocacion_accion(Token t):
   }
   try {
     (parametros=argumentos(accion) {hayLista=true; })?
-    {{invocacion.addAll(parametros);
+    {
+      {
+      invocacion.addAll(parametros);
   	  if(accion!=null && accion.ES_ACCION() && accion.getVariable()!=Tipo_variable.DESCONOCIDO){
       		paraList=accion.getListaParametros();
       
   		}
-  		if(paraList.size() >0 && !hayLista) {
-			error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
+  		if(paraList!=null) { 
+	  		if(paraList.size() >0 && !hayLista) {
+				error_semantico(accion.getNombre(), t.beginLine, t.beginColumn, new WrongActionException());
+	  		}
   		}
-  	} }
+  	}
+  	}
 }catch(ParseException e) {
 	error_sintactico(e,"Sintaxis de invocacion a accion incorrecta");
 }
@@ -495,7 +503,6 @@ ArrayList< String> invocacion_accion(Token t):
 		invocacion.add("\t"+"OSF  "+Integer.toString(direccion-1)+"  "+(nivel-accion.getNivel())+" "+"L"+n+"\n");
 	}
   } 
-  
   return invocacion;}
 }
 
@@ -690,6 +697,7 @@ ArrayList<String> declaracion_accion():
   ArrayList<String> variables=new ArrayList<String>();
   ArrayList< String> bloque=new ArrayList< String>();
   ArrayList< Simbolo> parametros=new ArrayList< Simbolo>();
+  String etiqueta="";
 }
 {
   try {
@@ -697,14 +705,16 @@ ArrayList<String> declaracion_accion():
   	t=cabecera_accion()
   	{
   	  try { 
-	  	s=tabla_simbolos.buscar_simbolo(t.image);
+	  	s=tabla_simbolos.buscar_simbolo_nivel(t.image,nivel-1);
 	  }catch(SimboloNoEncontradoException e) { }
+	  	
 	  	parametros=s.getListaParametros();
 	}
 	variables=declaracion_variables()
   	{
   	  declaracion.add("; Accion "+t.image+".\n");
 	  declaracion.add(codigo.getEtiqueta(t.image)+":\n");
+	  etiqueta=codigo.getEtiqueta(t.image+"_JMP");
 	  if(parametros!=null) { 
 	  	for(int n=parametros.size()-1;n>=0;n--) {
 			declaracion.add("\t"+"SRF  "+(nivel-parametros.get(n).getNivel())
@@ -716,11 +726,13 @@ ArrayList<String> declaracion_accion():
 	}
 	declaracion2=declaracion_acciones()
   	{
+  	    declaracion.add("\t"+"JMP  "+etiqueta+"\n");
   	  	declaracion.addAll(declaracion2);
 		declaracion.add("; Comienzo de la accion "+t.image+".\n");
   	}
   	bloque=bloque_sentencias()
   	{
+  	  declaracion.add(etiqueta+":\n");
   	  declaracion.addAll(bloque);
   	  declaracion.add("; Fin de la accion / funcion "+t.image+".\n");
 	  declaracion.add("\t"+"CSF"+"\n");
@@ -965,6 +977,8 @@ ArrayList< String> leer():
 		  	 		}if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
 						l.add("\t"+"RD  0"+"\n");
 		  	 		}
+				}else {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 				}
   	        }else { 
 				String e=iden.get(n).image.substring(corcheteA+1,corcheteB);
@@ -986,6 +1000,8 @@ ArrayList< String> leer():
 		  	 		}if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
 						l.add("\t"+"RD  0"+"\n");
 		  	 		}
+				}else {
+					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 				}
 			}
   	      }else {
@@ -993,15 +1009,20 @@ ArrayList< String> leer():
 			
 			l.add("; Leer.\n");
 			l.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
+			if(s.ES_REFERENCIA()) {
+					l.add("\t"+"DRF"+"\n");
+			    }
 			if(s.ES_VARIABLE() || (s.ES_PARAMETRO() && s.ES_REFERENCIA())) {
 				if(s.getVariable()==Tipo_variable.BOOLEANO || s.getParametro()==Clase_parametro.VAL) {
-				  	error_semantico(t1.image, t1.beginLine, t1.beginColumn,new WrongTypeException());
+				  	error_semantico(t1.image	, t1.beginLine, t1.beginColumn,new WrongTypeException());
 				}
 				if(s.getVariable()==Tipo_variable.ENTERO || s.getVariable()==Tipo_variable.BOOLEANO) {
 					l.add("\t"+"RD  1"+"\n");
 	  	 		}if(s.getVariable()==Tipo_variable.CADENA || s.getVariable()==Tipo_variable.CHAR) {
 					l.add("\t"+"RD  0"+"\n");
 	  	 		}
+			}else {
+				error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 			}
 		  }
 		  }catch(SimboloNoEncontradoException e) {
@@ -1355,7 +1376,8 @@ ArrayList< String> argumentos(Simbolo accion):
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de lista de argumentos incorrecta");
 }
-{return lista;}
+{ 
+  return lista;}
 }
 
 ArrayList< String> lista_expresiones(Simbolo accion):
@@ -1397,6 +1419,7 @@ ArrayList< String> lista_expresiones(Simbolo accion):
 			    error=true;
 			  }else if(parametro.ES_REFERENCIA()) {
 				lista.add(el1.getBuff().get(0));
+				lista.add(el1.getBuff().get(1));
 			  }else {
 			    lista.addAll(el1.getBuff());
 			  }
@@ -1446,7 +1469,8 @@ ArrayList< String> lista_expresiones(Simbolo accion):
  }catch(ParseException e) {
 	error_sintactico(e,"Estructura de lista de expresiones incorrecta");
 }
-{return lista;}
+{ 
+  return lista;}
 {
   	
 	if(!error && paraList!=null) {
@@ -1512,7 +1536,7 @@ Elemento expresion():
      	if(o1!=null) {
      	  	el.setComplex(true);
        		if(el1.getTipo()==el2.getTipo() && !(el1.isVector() && el.isComplex()) && !el2.isVector()) {
-       		  
+       		    
        		  	el.setTipo(Tipo_variable.BOOLEANO);
          		if(el1.getTipo()==Tipo_variable.ENTERO) {
          		  	
@@ -1554,6 +1578,7 @@ Elemento expresion():
 							}
 					}
          		}else if(el1.getTipo()==Tipo_variable.BOOLEANO) {
+         		  
 					switch (o1) {
 						case IGUAL:
 							buff.add("\t"+"EQ"+"\n");
@@ -1574,7 +1599,8 @@ Elemento expresion():
 					
 					error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
 					 
-         		}else if(el.getTipo()==Tipo_variable.CHAR) {
+         		}else if(el1.getTipo()==Tipo_variable.CHAR) {
+         		   
 					switch (o1) {
 						case MAYOR:
 							buff.add("\t"+"GT"+"\n");
@@ -1974,12 +2000,11 @@ Elemento factor2():
 			if(e.getEntero() <0 || e.getEntero() >255 ) {
 			  error_semantico(t.image, t.beginLine, t.beginColumn, new OutOfBoundsIntExcepction());
 			}else {
-			  
 			  c=(char)e.getEntero().intValue();
-			  
 			  buff.add("\t"+"STC  "+e.getEntero()+"\n");
-			  
 			}
+			}else {
+				buff.addAll(e.getBuff());
 			}
 		}else {
 		  
@@ -1998,6 +2023,8 @@ Elemento factor2():
 		  if(e.getCaracter()!=null) { 
 			en=(int)e.getCaracter().charValue();
 			buff.add("\t"+"STC  "+en+"\n"); 
+			}else {
+				buff.addAll(e.getBuff());
 			}
 		}else {
 		  error_semantico(t.image, t.beginLine, t.beginColumn, new WrongExpresionException());
@@ -2055,7 +2082,7 @@ Elemento factor2():
 		     		buff.add("\t"+"JMT  error_inicializada\n");
 		     		buff.add(";sino, seguimos ejecucion.\n");
   		        }
-  		      }else {   
+  		      }else {
 		     	buff.add("; Acceso a la variable "+t.image+".\n");
 		     	buff.add("\t"+"SRF  "+(nivel-s.getNivel())+"  "+s.getDir()+"\n");
 		     	buff.add("\t"+"DRF"+"\n");

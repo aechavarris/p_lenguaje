@@ -1,7 +1,108 @@
 ; Programa nprimos.
 	ENP  L0
+error_inicializada:
+;Escribir error en runtime.
+	STC  69
+	WRT  0
+	STC  114
+	WRT  0
+	STC  114
+	WRT  0
+	STC  111
+	WRT  0
+	STC  114
+	WRT  0
+	STC  32
+	WRT  0
+	STC  101
+	WRT  0
+	STC  110
+	WRT  0
+	STC  32
+	WRT  0
+	STC  114
+	WRT  0
+	STC  117
+	WRT  0
+	STC  110
+	WRT  0
+	STC  116
+	WRT  0
+	STC  105
+	WRT  0
+	STC  109
+	WRT  0
+	STC  101
+	WRT  0
+	STC  58
+	WRT  0
+	STC  32
+	WRT  0
+	STC  118
+	WRT  0
+	STC  97
+	WRT  0
+	STC  114
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  98
+	WRT  0
+	STC  108
+	WRT  0
+	STC  101
+	WRT  0
+	STC  32
+	WRT  0
+	STC  110
+	WRT  0
+	STC  111
+	WRT  0
+	STC  32
+	WRT  0
+	STC  105
+	WRT  0
+	STC  110
+	WRT  0
+	STC  105
+	WRT  0
+	STC  99
+	WRT  0
+	STC  105
+	WRT  0
+	STC  97
+	WRT  0
+	STC  108
+	WRT  0
+	STC  105
+	WRT  0
+	STC  122
+	WRT  0
+	STC  97
+	WRT  0
+	STC  100
+	WRT  0
+	STC  97
+	WRT  0
+	STC  46
+	WRT  0
+	STC  10
+	WRT  0
+	JMP  FIN_PROGRAMA
 ; Accion es_primo.
 L1:
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  3
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
 ; Comienzo de la accion es_primo.
 ; Direccion de la variable j.
 	SRF  0  3
@@ -18,15 +119,33 @@ L2:
 ; Acceso a la variable j.
 	SRF  0  3
 	DRF
+;Comprobamos si j esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable i.
 	SRF  1  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  2
 	DIV
 	LT
 ; Acceso a la variable divisible.
 	SRF  0  4
 	DRF
+;Comprobamos si divisible esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	NGB
 	AND
 ; Salir del bucle si la guarda se evalua a falso.
@@ -36,9 +155,21 @@ L2:
 ; Acceso a la variable i.
 	SRF  1  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable j.
 	SRF  0  3
 	DRF
+;Comprobamos si j esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	MOD
 	STC  0
 	EQ
@@ -49,6 +180,12 @@ L2:
 ; Acceso a la variable j.
 	SRF  0  3
 	DRF
+;Comprobamos si j esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  1
 	PLUS
 ; Asignacion.
@@ -61,6 +198,12 @@ L3:
 ; Acceso a la variable divisible.
 	SRF  0  4
 	DRF
+;Comprobamos si divisible esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	NGB
 	JMF  L4
 ; ENT.
@@ -68,7 +211,14 @@ L3:
 ; Acceso a la variable i.
 	SRF  1  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	WRT  1
+; Escribir.
 ; cadena 'es primo.'.
 	STC  101
 	WRT  0
@@ -88,16 +238,28 @@ L3:
 	WRT  0
 	STC  46
 	WRT  0
+; Escribir.
 	STC  13
 	WRT  0
+; Escribir.
 	STC  10
 	WRT  0
 L4:
 ; Fin SI:
 ; Fin de la accion / funcion es_primo.
 	CSF
-; Comienzo del programa nprimos.
 L0:
+; Comienzo del programa nprimos.
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  3
+	STC  32768
+	ASG 
+; Reservamos direccion.
+; Inicializamos con valor centinela.
+	SRF  0  4
+	STC  32768
+	ASG 
 ; Direccion de la variable n.
 	SRF  0  3
 	STC  100
@@ -113,9 +275,21 @@ L5:
 ; Acceso a la variable i.
 	SRF  0  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 ; Acceso a la variable n.
 	SRF  0  3
 	DRF
+;Comprobamos si n esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	LTE
 ; Salir del bucle si la guarda se evalua a falso.
 	JMF  L6
@@ -126,6 +300,12 @@ L5:
 ; Acceso a la variable i.
 	SRF  0  4
 	DRF
+;Comprobamos si i esta inicializada.
+	DUP
+	STC  32768
+	EQ
+	JMT  error_inicializada
+;sino, seguimos ejecucion.
 	STC  1
 	PLUS
 ; Asignacion.
@@ -134,5 +314,6 @@ L5:
 	JMP  L5
 L6:
 ; Fin MQ.
+FIN_PROGRAMA:
 ; Fin de programa nprimos.
 	LVP
